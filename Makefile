@@ -1,9 +1,11 @@
 
-build:
-	mkdir -p bin
-	gcc -o bin/dubflight src/main.c -lm
+dubflight: bin
+	gcc -o bin/dubflight src/*.c -lm -Wall -Wextra -g
 
-run:
+bin:
+	mkdir -p bin
+
+run: dubflight
 	./bin/dubflight
 
 clean:
