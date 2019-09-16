@@ -1,6 +1,18 @@
 #ifndef _DTYPES_H
 #define _DTYPES_H
 
+struct DConfig {
+  int berry_gps;
+  int lz_count;
+  struct LandingZone *lzs;
+};
+
+struct LatLngAlt {
+  double lat;
+  double lng;
+  double alt;
+};
+
 struct GeoPointV {
   long long int millis;
   double lat;
@@ -10,6 +22,29 @@ struct GeoPointV {
   double vN;
   double vE;
 };
+
+struct PointV {
+  double x;
+  double y;
+  double vx;
+  double vy;
+};
+
+struct LandingZone {
+  struct LatLngAlt destination;
+  double landingDirection; // radians
+
+  /** Ground length of final approach, in meters */
+  double finalDistance;
+
+  /** Destination, as origin of coordinate system */
+  struct PointV dest;
+};
+
+// Config
+struct DConfig load_config();
+void save_berry(int berry_gps);
+void free_config(struct DConfig conf);
 
 void test();
 

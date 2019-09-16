@@ -8,5 +8,10 @@ bin:
 run: dubflight
 	./bin/dubflight
 
+lint:
+	infer run -- make
+	cppcheck --enable=all src/*
+	valgrind bin/dubflight
+
 clean:
-	rm -rf bin
+	rm -rf bin infer-out
