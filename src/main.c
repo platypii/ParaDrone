@@ -37,6 +37,6 @@ static void run() {
  * Called when GPS location is updated
  */
 void update_location(struct GeoPointV point) {
-  // log_point(point);
+  log_point(point);
   // TODO: Plan and update controls
 }
