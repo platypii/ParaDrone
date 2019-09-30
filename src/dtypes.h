@@ -56,6 +56,8 @@ double to_radians(double degrees);
 // GPS
 void parse_nmea(char *line);
 void update_location(struct GeoPointV point);
+int berry_check();
+void berry_start();
 
 // Logger
 void log_point(struct GeoPointV point);

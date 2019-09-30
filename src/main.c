@@ -18,17 +18,17 @@ static void run() {
   struct DConfig conf = load_config();
   if (conf.berry_gps) {
     printf("BerryGPS enabled\n");
-    // berry_start();
+    berry_start();
   } else {
-    // // Check if BerryGPS is present
-    // if (berry_check()) {
-    //   printf("BerryGPS found\n");
-    //   // Save for faster start up
-    //   save_berry(1);
-    //   berry_start();
-    // } else {
-    //   printf("BerryGPS not found\n");
-    // }
+    // Check if BerryGPS is present
+    if (berry_check()) {
+      printf("BerryGPS found\n");
+      // Save for faster start up
+      save_berry(1);
+      berry_start();
+    } else {
+      printf("BerryGPS not found\n");
+    }
   }
   free_config(conf);
 }
