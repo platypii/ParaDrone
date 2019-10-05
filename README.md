@@ -37,3 +37,21 @@ Many of the components can be substituted with no problem.
 Any Raspberry Pi series will work.
 The software also supports bluetooth GPS such as the XGPS 160, however using BerryGPS means one less possible failure mode.
 The battery and servos can be changed freely, the UBEC and Micro Maestro can handle 6-16V @ 3A.
+
+## Raspberry Pi Setup
+
+Install Raspbian Lite
+
+`unzip -p 2019-07-10-raspbian-buster-lite.img.zip | sudo dd of=/dev/sdX bs=4M conv=fsync status=progress`
+
+### Systemd init
+
+`cp dubflight.service /etc/systemd/system/`
+
+`systemctl enable dubflight.service`
+
+`systemctl start dubflight.service`
+
+### BerryGPS
+
+`raspi-config` > Interfacing options > disable serial shell.
