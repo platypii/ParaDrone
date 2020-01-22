@@ -13,5 +13,8 @@ lint:
 	cppcheck --enable=all src/*
 	valgrind bin/dubflight
 
+docs:
+	@doxygen
+
 clean:
-	rm -rf bin infer-out
+	rm -rf bin html infer-out

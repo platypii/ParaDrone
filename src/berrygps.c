@@ -43,7 +43,7 @@ void berry_start() {
     // Read loop
     char buffer[255];
     while (fgets(buffer, 255, fp)) {
-      parseNMEA(buffer);
+      parse_nmea(buffer);
     }
     fclose(fp);
   } else {
