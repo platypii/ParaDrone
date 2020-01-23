@@ -42,7 +42,9 @@ The battery and servos can be changed freely, the UBEC and Micro Maestro can han
 
 Install Raspbian Lite
 
-`unzip -p 2019-07-10-raspbian-buster-lite.img.zip | sudo dd of=/dev/sdX bs=4M conv=fsync status=progress`
+`unzip -p 2019-09-26-raspbian-buster-lite.zip | sudo dd of=/dev/sdX bs=4M conv=fsync status=progress`
+
+`raspi-config` > Enable wifi, ssh, etc.
 
 ### Systemd init
 

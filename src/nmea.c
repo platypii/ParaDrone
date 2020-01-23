@@ -9,7 +9,7 @@
 
 static void parse_gga(const char *line);
 static void parse_rmc(char *line);
-static double parse_degrees_minutes(const char *dm, char *nsew);
+static double parse_degrees_minutes(const char *dm, const char *nsew);
 static long long int parse_date(const char *str);
 static long long int parse_time(const char *str);
 
@@ -87,7 +87,7 @@ static void parse_rmc(char *line) {
  * @param nsew The modifier "N", "S", "E", or "W"
  * @return The latitude or longitude in decimal degrees
  */
-static double parse_degrees_minutes(const char *dm, char *nsew) {
+static double parse_degrees_minutes(const char *dm, const char *nsew) {
   if (!*dm || !*nsew) {
     return NAN;
   }

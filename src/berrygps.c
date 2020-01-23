@@ -1,7 +1,6 @@
 #include <fcntl.h>
 #include <stdio.h>
 #include <sys/select.h>
-#include <sys/stat.h>
 #include <unistd.h>
 #include "dtypes.h"
 

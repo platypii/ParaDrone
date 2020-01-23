@@ -1,15 +1,12 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
-#include <sys/types.h>
 #include <sys/stat.h>
 #include <time.h>
-#include <unistd.h>
 #include "dtypes.h"
 
 static FILE *fp = NULL;
 
-static FILE *getFile();
+static FILE *get_file();
 
 void log_point(struct GeoPointV loc) {
   // Log to screen
@@ -21,14 +18,14 @@ void log_point(struct GeoPointV loc) {
 
   // Log to file
   if (!fp) {
-    fp = getFile();
+    fp = get_file();
     fputs("millis,lat,lng,alt,vN,vE\n", fp);
   }
   fprintf(fp, "%lld,%.6f,%.6f,%.2f,%.2f,%.2f\n", loc.millis, loc.lat, loc.lng, loc.alt, loc.vN, loc.vE);
   fflush(fp);
 }
 
-static FILE *getFile() {
+static FILE *get_file() {
   // Construct filename
   char filename[20];
   strcpy(filename, "log/");
@@ -46,7 +43,7 @@ static FILE *getFile() {
   return fopen(filename, "a");
 }
 
-void stopLogging() {
+void stop_logging() {
   if (fp) {
     fclose(fp);
   }

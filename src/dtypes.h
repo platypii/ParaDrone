@@ -7,6 +7,16 @@ struct DConfig {
   struct LandingZone *lzs;
 };
 
+/**
+ * Paramotor input controls (left and right toggle)
+ * 0.0 = no deflection
+ * 1.0 = full deflection
+ */
+struct ParaControls {
+  double left;
+  double right;
+};
+
 struct LatLngAlt {
   double lat;
   double lng;

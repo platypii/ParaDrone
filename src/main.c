@@ -1,13 +1,17 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include "dtypes.h"
 
 static void run();
+void maestro_main(int target);
 
 int main(int argc, char *argv[]) {
   if (argc == 2 && strcmp(argv[1], "test") == 0) {
     printf("DubFlight self test\n");
     // test();
+  } else if (argc == 3 && strcmp(argv[1], "servo") == 0) {
+    maestro_main(atoi(argv[2]));
   } else {
     run();
   }
