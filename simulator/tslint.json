@@ -1,0 +1,29 @@
+{
+  /*
+   * Possible values:
+   * - the name of a built-in config
+   * - the name of an NPM module which has a "main" file that exports a config object
+   * - a relative path to a JSON file
+   */
+  "extends": "tslint:latest",
+  "rules": {
+    /*
+     * Any rules specified here will override those from the base config we are extending.
+     */
+
+    "array-type": [true, "array-simple"],
+    "curly": [true, "ignore-same-line"],
+    "interface-name": [true, "never-prefix"],
+    "member-ordering": [true, {"order": "instance-sandwich"}],
+    "no-console": [true, "log", "warn"], // Allow error
+    "no-duplicate-imports": false, // Can't be avoided for wildcard + Type
+    "no-empty": false,
+    "no-this-assignment": [true, {"allowed-names": ["^self$"]}],
+    "no-unused-expression": false,
+    "object-literal-sort-keys": false, // [true, "match-declaration-order"],
+    "ordered-imports": true,
+    "semicolon": false,
+    "trailing-comma": [true, {"multiline": "never", "singleline": "never"}],
+    "variable-name": [true, "allow-snake-case"]
+  }
+}

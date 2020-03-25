@@ -61,3 +61,19 @@ hardware:
     - npm run battery
     - npm run remotecontrol
     - npm run spool
+
+simulator:
+  stage: build
+  image: node:14-slim
+  script:
+    - cd simulator
+    - npm i
+    - npx tsc
+
+simulator-lint:
+  stage: test
+  image: node:14-slim
+  script:
+    - cd simulator
+    - npm i
+    - npx tslint --project .
