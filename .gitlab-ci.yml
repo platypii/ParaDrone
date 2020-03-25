@@ -33,3 +33,19 @@ rc:
     key: pio-deps
     paths:
       - .pio/libdeps
+
+simulator:
+  stage: build
+  image: node:14-slim
+  script:
+    - cd simulator
+    - npm i
+    - node_modules/typescript/bin/tsc
+
+simulator-lint:
+  stage: test
+  image: node:14-slim
+  script:
+    - cd simulator
+    - npm i
+    - node_modules/tslint/bin/tslint --project .

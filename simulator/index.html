@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>BASEline ParaDrone</title>
+    <link rel="shortcut icon" type="image/png" href="/img/favicon.png">
+    <link rel="stylesheet" href="css/main.css">
+  </head>
+
+  <body>
+    <div class="map-fullscreen">
+      <div id="map"></div>
+
+      <div class="map-overlay map-layers">
+        <div class="paramotor-status">
+          <div id="pstatus-start"></div>
+          <div id="pstatus-curr"></div>
+          <div id="pstatus-alt"></div>
+          <div id="pstatus-error"></div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=visualization&key=AIzaSyDYk5vsLVQO1Fe2SKHzwMEAQHnsA3SzO1I"></script>
+    <script>
+      // Load modules
+      require(["js/main"], function(exits) {
+        exits.init()
+      })
+    </script>
+  </body>
+</html>
