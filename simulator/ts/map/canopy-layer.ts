@@ -1,49 +1,16 @@
 import { GeoPointV } from "../dtypes"
 import { toDegrees } from "../geo/trig"
-import { Paramotor } from "../paramotor"
-import { MapLayer } from "./basemap"
+import * as icons from "./icons"
+import { MarkerLayer } from "./marker-layer"
 
-export class CanopyLayer implements MapLayer {
-  private marker?: google.maps.Marker
-  private loc?: GeoPointV
+export class CanopyLayer extends MarkerLayer {
+  constructor() {
+    super("Pilot", icons.canopy(90))
+  }
 
   public setLocation(loc: GeoPointV) {
-    this.loc = loc
-    this.update()
-  }
-
-  public onAdd(googleMap: google.maps.Map) {
-    this.marker = new google.maps.Marker({
-      map: googleMap,
-      title: "Paramotor",
-      icon: getCanopyIcon(90)
-    })
-    this.update()
-  }
-
-  public onRemove() {
-    if (this.marker) {
-      this.marker.setMap(null)
-      this.marker = undefined
-    }
-  }
-
-  private update() {
-    if (this.marker && this.loc) {
-      this.marker.setPosition(this.loc)
-      const bearing = toDegrees(Math.atan2(this.loc.vE, this.loc.vN))
-      this.marker.setIcon(getCanopyIcon(bearing))
-    }
-  }
-}
-
-function getCanopyIcon(rotation: number): google.maps.Symbol {
-  return {
-    path: "m1.538 0.1023c-0.775 0-1.41 0.637-1.41 1.412v3.766h-0.001034v15.44c0 0.7751 0.6369 1.41 1.412 1.41h3.263c0.4049 0 0.7558-0.1826 1.014-0.459 0.2583 0.2767 0.6105 0.459 1.016 0.459h3.263c0.4042 0 0.7559-0.1813 1.014-0.4569 0.2582 0.2756 0.6093 0.4569 1.014 0.4569h3.263c0.4051 0 0.7573-0.1823 1.016-0.459 0.2583 0.2764 0.6092 0.459 1.014 0.459h3.263c0.4049 0 0.7558-0.1826 1.014-0.459 0.2583 0.2767 0.6105 0.459 1.016 0.459h3.263c0.4049 0 0.7558-0.1826 1.014-0.459 0.2583 0.2767 0.6105 0.459 1.016 0.459h3.263c0.4042 0 0.7553-0.1813 1.014-0.4569 0.2582 0.2756 0.6114 0.4569 1.016 0.4569h3.262c0.7751 0 1.412-0.6349 1.412-1.41v-0.04031c1.03e-4 -0.0069 0.0011-0.01371 0.0011-0.02068v-19.14c-6.5e-5 -0.775-0.637-1.412-1.412-1.412h-3.263c-0.3976 0-0.7575 0.1693-1.015 0.4373-0.2576-0.2678-0.6171-0.4373-1.015-0.4373h-3.263c-0.3978 0-0.7569 0.1697-1.014 0.4378-0.2576-0.2683-0.6177-0.4378-1.016-0.4378h-3.263c-0.3975 0-0.7565 0.1694-1.014 0.4373-0.2571-0.2679-0.6164-0.4373-1.014-0.4373h-3.263c-0.3978 0-0.7575 0.1697-1.015 0.4378-0.2571-0.2683-0.6167-0.4378-1.015-0.4378h-3.263c-0.3975 0-0.757 0.1694-1.015 0.4373-0.2576-0.2679-0.6175-0.4373-1.015-0.4373h-3.263c-0.3978 0-0.7569 0.1697-1.014 0.4378-0.2576-0.2682-0.6177-0.4378-1.016-0.4378zm0 0.7928h3.263c0.349 0 0.6192 0.2702 0.6192 0.6192v3.766h-4.5v-3.766c0-0.349 0.2681-0.6192 0.6171-0.6192zm5.293 0h3.263c0.349 0 0.6176 0.2702 0.6176 0.6192v3.766h-4.498v-3.766c0-0.349 0.2681-0.6192 0.6171-0.6192zm5.293 0h3.263c0.349 0 0.6171 0.2702 0.6171 0.6192v3.766h-4.498v-3.766c0-0.349 0.2681-0.6192 0.6171-0.6192zm5.293 0h3.263c0.349 0 0.6171 0.2702 0.6171 0.6192v19.14c0 0.349-0.2681 0.6171-0.6171 0.6171h-3.263c-0.349 0-0.6192-0.2681-0.6192-0.6171v-19.14c0-0.349 0.2702-0.6192 0.6192-0.6192zm5.291 0h3.263c0.349 0 0.6192 0.2702 0.6192 0.6192v3.766h-4.5v-3.766c0-0.349 0.2681-0.6192 0.6171-0.6192zm5.293 0h3.263c0.349 0 0.6171 0.2702 0.6171 0.6192v3.766h-4.498v-3.766c0-0.349 0.2681-0.6192 0.6171-0.6192zm5.293 0h3.263c0.349 0 0.6171 0.2702 0.6171 0.6192v3.766h-4.498v-3.766c0-0.349 0.2687-0.6192 0.6176-0.6192z",
-    anchor: new google.maps.Point(16, 0),
-    fillColor: "#6f00ff",
-    fillOpacity: 1,
-    strokeWeight: 1,
-    rotation
+    super.setLocation(loc)
+    const bearing = toDegrees(Math.atan2(loc.vE, loc.vN))
+    this.setIcon(icons.canopy(bearing))
   }
 }

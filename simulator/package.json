@@ -10,7 +10,7 @@
   "devDependencies": {
     "@types/googlemaps": "^3.39.3",
     "@types/requirejs": "2.1.31",
-    "tslint": "^6.1.0",
+    "tslint": "^6.1.1",
     "typescript": "^3.8.3"
   },
   "dependencies": {

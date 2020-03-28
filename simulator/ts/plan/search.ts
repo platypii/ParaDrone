@@ -3,6 +3,7 @@ import { LandingZone } from "../geo/landingzone"
 import { Path } from "../geo/paths"
 import { Paramotor } from "../paramotor"
 import { distance } from "../util"
+import { dubins } from "./planner-dubins"
 import { naive } from "./planner-naive"
 import { straight } from "./planner-straight"
 
@@ -21,10 +22,10 @@ export function search(loc: Point3V, lz: LandingZone): Path {
   // Construct flight paths
   const straightPath = straight(loc).fly(distance)
   const paths = [
-    // dubins(loc, dest, r, Turn.Right, Turn.Right), // rsr
-    // dubins(loc, dest, r, Turn.Right, Turn.Left), // rsl
-    // dubins(loc, dest, r, Turn.Left, Turn.Right), // lsr
-    // dubins(loc, dest, r, Turn.Left, Turn.Left), // lsl
+    dubins(loc, dest, r, Turn.Right, Turn.Right), // rsr
+    dubins(loc, dest, r, Turn.Right, Turn.Left), // rsl
+    dubins(loc, dest, r, Turn.Left, Turn.Right), // lsr
+    dubins(loc, dest, r, Turn.Left, Turn.Left), // lsl
     naive(loc, dest, r),
     straightPath
   ]

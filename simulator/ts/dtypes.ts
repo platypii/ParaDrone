@@ -1,4 +1,5 @@
 import { LandingZone } from "./geo/landingzone"
+import { Path } from "./geo/paths"
 import { ParaControls } from "./paracontrols"
 
 export interface LatLng {
