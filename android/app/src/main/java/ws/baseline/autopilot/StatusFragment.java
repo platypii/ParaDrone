@@ -57,10 +57,12 @@ public class StatusFragment extends Fragment {
         final DroneState drone = DroneState.get();
         if (drone != null) {
             binding.statusLocation.setText(drone.currentLocation.toString());
+            binding.statusLandingZone.setText(drone.lz.toString());
             binding.statusAltitude.setText(Convert.distance3(drone.currentLocation.alt - drone.lz.destination.alt) + " AGL");
             binding.statusDistance.setText("Distance...");
         } else {
             binding.statusLocation.setText("");
+            binding.statusLandingZone.setText("");
             binding.statusAltitude.setText("");
             binding.statusDistance.setText("");
         }

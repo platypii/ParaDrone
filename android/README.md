@@ -1,3 +1,7 @@
-# BASEline Autopilot
+# BASEline ParaDrone Companion App
 
-This android app acts as a remote control for the autopilot device.
+Android app to interface with the BASEline ParaDrone hardware.
+
+This app pairs with the ParaDrone using bluetooth LE.
+
+Shows current location, target landing zone, and current flight path on a map.
