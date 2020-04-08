@@ -1,12 +1,15 @@
 package ws.baseline.autopilot;
 
+import ws.baseline.autopilot.geo.LandingZone;
+import ws.baseline.autopilot.geo.LatLngAlt;
+
 import androidx.annotation.Nullable;
 import org.greenrobot.eventbus.EventBus;
 
 public class DroneState {
-    public long lastUpdate;
-    public LandingZone lz;
-    public GeoPoint currentLocation;
+    public final long lastUpdate;
+    public final LandingZone lz;
+    public final GeoPoint currentLocation;
 
     @Nullable
     private static DroneState state;
@@ -35,8 +38,9 @@ public class DroneState {
         final double lzLng = Double.parseDouble(split[2]);
         final double lzAlt = Double.parseDouble(split[3]);
         final double lzDir = Double.parseDouble(split[4]);
+        final LatLngAlt lzDestination = new LatLngAlt(lzLat, lzLng, lzAlt);
 
-        return new DroneState(lastUpdate, new LandingZone(), new GeoPoint());
+        return new DroneState(lastUpdate, new LandingZone(lzDestination, lzDir), new GeoPoint());
     }
 
 }
