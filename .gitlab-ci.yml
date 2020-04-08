@@ -33,3 +33,17 @@ rc:
     key: pio-deps
     paths:
       - .pio/libdeps
+
+android:
+  stage: build
+  image: circleci/android:api-29
+  script:
+    - cd android
+    - ./gradlew compileDebugSources
+
+android-test:
+  stage: test
+  image: circleci/android:api-29
+  script:
+    - cd android
+    - ./gradlew testDebugUnitTest

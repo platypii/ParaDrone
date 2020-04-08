@@ -1,6 +1,6 @@
 package ws.baseline.autopilot.bluetooth;
 
-import ws.baseline.autopilot.LandingZone;
+import ws.baseline.autopilot.geo.LandingZone;
 
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
