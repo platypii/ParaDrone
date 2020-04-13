@@ -1,0 +1,7 @@
+default:
+  image: baselinews/paradrone
+
+build:
+  stage: build
+  script:
+    - make

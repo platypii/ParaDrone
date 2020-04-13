@@ -1,0 +1,12 @@
+#!/bin/bash
+
+set -e
+
+echo "Building builder image"
+docker build -t baselinews/paradrone .
+
+if [[ "$1" == "push" ]]
+then
+  echo "Pushing images"
+  docker push baselinews/paradrone
+fi
