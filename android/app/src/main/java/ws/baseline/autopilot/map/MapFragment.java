@@ -2,13 +2,18 @@ package ws.baseline.autopilot.map;
 
 import ws.baseline.autopilot.DroneState;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
 import java.util.ArrayList;
 import java.util.List;
 import org.greenrobot.eventbus.EventBus;
@@ -41,10 +46,16 @@ public class MapFragment extends SupportMapFragment implements OnMapReadyCallbac
     public void onMapReady(@NonNull GoogleMap map) {
         this.map = map;
         map.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(47.6, -122.3), 12));
 
         // Add map layers
         addLayer(new MyPositionLayer());
         addLayer(new LandingLayer());
+
+        // Zoom to current phone location
+        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            map.setMyLocationEnabled(true);
+        }
     }
 
     @Subscribe

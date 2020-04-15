@@ -5,7 +5,6 @@ import ws.baseline.autopilot.Paramotor;
 import ws.baseline.autopilot.geo.LandingZone;
 import ws.baseline.autopilot.geo.Path;
 import ws.baseline.autopilot.geo.PointV;
-import ws.baseline.autopilot.geo.Turn;
 
 import androidx.annotation.Nullable;
 
@@ -33,7 +32,7 @@ public class Search {
             // naive(params),
             straightPath
         };
-        Path best = best_plan(lz, paths);
+        Path best = bestPlan(lz, paths);
         if (best == null) {
             best = straightPath;
         }
@@ -44,7 +43,7 @@ public class Search {
      * Find the path that minimizes landing error
      */
     @Nullable
-    static Path best_plan(LandingZone lz, Path[] paths) {
+    private static Path bestPlan(LandingZone lz, Path[] paths) {
         Path best = null;
         double bestScore = Double.POSITIVE_INFINITY;
         for (Path path : paths) {
