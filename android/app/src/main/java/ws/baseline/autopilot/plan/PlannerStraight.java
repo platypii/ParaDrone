@@ -5,11 +5,11 @@ import ws.baseline.autopilot.geo.Point;
 import ws.baseline.autopilot.geo.PointV;
 import ws.baseline.autopilot.geo.SegmentLine;
 
-import androidx.annotation.Nullable;
+import androidx.annotation.NonNull;
 
 class PlannerStraight {
 
-    @Nullable
+    @NonNull
     public static Path straight(PointV loc) {
         final Point target = new Point(loc.x + loc.vx, loc.y + loc.vy);
         return new Path(

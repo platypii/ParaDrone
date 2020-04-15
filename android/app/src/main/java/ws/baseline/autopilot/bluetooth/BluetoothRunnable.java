@@ -55,17 +55,24 @@ class BluetoothRunnable implements Runnable {
     }
 
     /**
-     * Scan for bluetooth LE devices that look like a rangefinder
+     * Scan for bluetooth LE devices that look like an autopilot device
      */
     @Override
     public void run() {
-        Log.i(TAG, "Rangefinder bluetooth thread starting");
+        Log.i(TAG, "Autopilot bluetooth thread starting");
         if (!bluetoothAdapter.isEnabled()) {
             Log.e(TAG, "Bluetooth is not enabled");
             return;
         }
-        // Scan for rangefinders
-        Log.i(TAG, "Scanning for rangefinder");
+        // Scan for autopilot devices
+        scan();
+    }
+
+    /**
+     * Scan BLE for autopilot devices
+     */
+    private void scan() {
+        Log.i(TAG, "Scanning for autopilot");
         service.setState(BT_STARTING);
         bluetoothScanner = bluetoothAdapter.getBluetoothLeScanner();
         if (bluetoothScanner == null) {
@@ -82,18 +89,15 @@ class BluetoothRunnable implements Runnable {
                 if (service.getState() == BT_STARTING) {
                     final BluetoothDevice device = result.getDevice();
                     final ScanRecord record = result.getScanRecord();
-                    if (isAutopilot(device, record)) {
-                        Log.i(TAG, "ATN rangefinder found, connecting to: " + device.getName());
+                    if (AutopilotProtocol.isAutopilot(device, record)) {
+                        Log.i(TAG, "Autopilot device found, connecting to: " + device.getName() + " " + device.getAddress());
                         connect(device);
+                        protocol = new AutopilotProtocol(bluetoothGatt);
                     }
                 }
             }
         };
         bluetoothScanner.startScan(scanFilters, scanSettings, scanCallback);
-    }
-
-    private boolean isAutopilot(BluetoothDevice device, ScanRecord record) {
-        return false; // TODO
     }
 
     private void connect(@NonNull BluetoothDevice device) {
@@ -121,15 +125,15 @@ class BluetoothRunnable implements Runnable {
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
             super.onConnectionStateChange(gatt, status, newState);
             if (newState == BluetoothProfile.STATE_CONNECTED) {
-                Log.i(TAG, "Rangefinder connected");
+                Log.d(TAG, "Bluetooth profile connected");
                 // TODO: Do we need to discover services? Or can we just connect?
                 bluetoothGatt.discoverServices();
                 service.setState(BT_CONNECTED);
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
-                Log.i(TAG, "Rangefinder disconnected");
+                Log.i(TAG, "Autopilot disconnected");
                 service.setState(BT_DISCONNECTED);
             } else {
-                Log.i(TAG, "Rangefinder state " + newState);
+                Log.i(TAG, "Autopilot state " + newState);
             }
         }
 
@@ -137,10 +141,10 @@ class BluetoothRunnable implements Runnable {
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
             super.onServicesDiscovered(gatt, status);
             if (status == BluetoothGatt.GATT_SUCCESS) {
-                Log.i(TAG, "Rangefinder bluetooth services discovered");
+                Log.i(TAG, "Bluetooth services discovered");
                 protocol.onServicesDiscovered();
             } else {
-                Log.i(TAG, "Rangefinder service discovery failed");
+                Log.i(TAG, "Bluetooth service discovery failed");
             }
         }
 
@@ -149,7 +153,7 @@ class BluetoothRunnable implements Runnable {
             if (ch.getUuid().equals(protocol.getCharacteristic())) {
                 protocol.processBytes(ch.getValue());
             } else {
-                Log.i(TAG, "Rangefinder onCharacteristicChanged " + ch);
+                Log.i(TAG, "Autopilot onCharacteristicChanged " + ch);
             }
         }
     };

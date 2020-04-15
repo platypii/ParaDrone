@@ -44,8 +44,18 @@ public class LandingZone {
      */
     Point startOfBase(int turn) {
         return new Point(
-                -finalDistance * (this.dest.vx + this.dest.vy),
+                -finalDistance * (this.dest.vx - turn * this.dest.vy),
                 -finalDistance * (turn * this.dest.vx + this.dest.vy)
+        );
+    }
+
+    /**
+     * Landing pattern: start of downwind leg
+     */
+    Point startOfDownwind(int turn) {
+        return new Point(
+                finalDistance * turn * this.dest.vy,
+                -finalDistance * turn * this.dest.vx
         );
     }
 
