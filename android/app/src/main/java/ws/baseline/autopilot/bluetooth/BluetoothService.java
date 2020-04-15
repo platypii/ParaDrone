@@ -2,16 +2,11 @@ package ws.baseline.autopilot.bluetooth;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 
 import static ws.baseline.autopilot.bluetooth.BluetoothState.BT_CONNECTING;
 import static ws.baseline.autopilot.bluetooth.BluetoothState.BT_STARTING;
@@ -72,21 +67,6 @@ public class BluetoothService {
         return bluetoothAdapter;
     }
 
-    /**
-     * Return list of bonded devices, with GPS devices first
-     */
-    @NonNull
-    public List<BluetoothDevice> getDevices() {
-        final BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (bluetoothAdapter != null) {
-            final Set<BluetoothDevice> deviceSet = bluetoothAdapter.getBondedDevices();
-            return new ArrayList<>(deviceSet);
-        } else {
-            Log.w(TAG, "Tried to get devices, but bluetooth is not enabled");
-            return new ArrayList<>();
-        }
-    }
-
     public int getState() {
         return bluetoothState;
     }
@@ -117,14 +97,14 @@ public class BluetoothService {
                     bluetoothRunnable = null;
                     bluetoothThread = null;
                     if (bluetoothState != BT_STOPPED) {
-                        Log.e(TAG, "Unexpected bluetooth state: state should be STOPPED when thread has stopped");
+                        Log.e(TAG, "Unexpected bluetooth state, should be STOPPED when thread has stopped: " + BT_STATES[bluetoothState]);
                     }
                 } catch (InterruptedException e) {
                     Log.e(TAG, "Bluetooth thread interrupted while waiting for it to die", e);
                 }
                 Log.i(TAG, "Bluetooth service stopped");
             } else {
-                Log.e(TAG, "Cannot stop bluetooth: runnable is null: " + BT_STATES[bluetoothState]);
+                Log.e(TAG, "Cannot stop bluetooth, runnable is null: " + BT_STATES[bluetoothState]);
                 // Set state to stopped since it prevents getting stuck in state STOPPING
             }
             setState(BT_STOPPED);

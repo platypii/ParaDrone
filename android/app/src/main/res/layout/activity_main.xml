@@ -7,11 +7,34 @@
     tools:context=".MainActivity"
     android:orientation="vertical">
 
-    <fragment
-        android:id="@+id/map"
-        android:name="ws.baseline.autopilot.map.MapFragment"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="320dp" />
+        android:layout_height="340dp">
+
+        <fragment
+            android:id="@+id/map"
+            android:name="ws.baseline.autopilot.map.MapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="340dp" />
+
+        <Button
+            android:id="@+id/set_landing_zone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableEnd="@drawable/ic_crosshair"
+            android:text="LZ"
+            android:layout_gravity="bottom"/>
+
+        <ImageView
+            android:id="@+id/crosshair_overlay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_crosshair"
+            android:layout_gravity="center"
+            android:visibility="gone"
+            tools:ignore="ContentDescription" />
+
+    </FrameLayout>
 
     <fragment
         android:id="@+id/status"
