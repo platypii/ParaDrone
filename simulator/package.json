@@ -8,16 +8,16 @@
     "url": "git+https://github.com/platypii/ParaDrone.git"
   },
   "devDependencies": {
-    "@types/googlemaps": "^3.39.3",
-    "@types/requirejs": "2.1.31",
-    "tslint": "^6.1.1",
-    "typescript": "^3.8.3"
+    "@types/googlemaps": "^3.39.6",
+    "@types/requirejs": "2.1.32",
+    "tslint": "^6.1.2",
+    "typescript": "^3.9.3"
   },
   "dependencies": {
-    "http-server": "^0.12.1"
+    "http-server": "^0.12.3"
   },
   "scripts": {
-    "start": "./node_modules/http-server/bin/http-server",
+    "start": "./node_modules/http-server/bin/http-server -p 8080",
     "lint": "./node_modules/tslint/bin/tslint --project ."
   }
 }

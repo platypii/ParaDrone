@@ -17,7 +17,7 @@ export class MarkerLayer implements MapLayer {
     this.update()
   }
 
-  public setLocation(loc: LatLng) {
+  public setLocation(loc?: LatLng) {
     this.loc = loc
     this.update()
   }
@@ -39,9 +39,14 @@ export class MarkerLayer implements MapLayer {
   }
 
   private update() {
-    if (this.marker && this.loc) {
-      this.marker.setPosition(this.loc)
-      this.marker.setIcon(this.icon)
+    if (this.marker) {
+      if (this.loc) {
+        this.marker.setPosition(this.loc)
+        this.marker.setIcon(this.icon)
+        this.marker.setVisible(true)
+      } else {
+        this.marker.setVisible(false)
+      }
     }
   }
 }

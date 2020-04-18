@@ -1,7 +1,7 @@
-import { LatLng, LatLngAlt, Point, Point3V, PointV, Turn } from "../dtypes"
+import { GeoPointV, LatLng, LatLngAlt, Point, Point3V, PointV, Turn } from "../dtypes"
+import { Paramotor } from "../paramotor"
 import * as geo from "./geo"
 import { toDegrees, toRadians } from "./trig"
-import { Paramotor } from "../paramotor"
 
 /**
  * Defines landing zone parameters.
@@ -9,10 +9,11 @@ import { Paramotor } from "../paramotor"
  */
 export class LandingZone {
   public readonly destination: LatLngAlt
-  public readonly landingDirection: number // radians
+  /** Landing direction in radians */
+  public readonly landingDirection: number
 
   // Ground length of final approach
-  public readonly finalDistance: number = 100 // meters
+  public readonly finalDistance: number = 150 // meters
 
   // Destination, as origin of coordinate system
   public readonly dest: Point3V
@@ -24,8 +25,8 @@ export class LandingZone {
       x: 0,
       y: 0,
       alt: destination.alt,
-      vx: Math.cos(this.landingDirection),
-      vy: Math.sin(this.landingDirection),
+      vx: Math.sin(landingDirection),
+      vy: Math.cos(landingDirection),
       climb: 0
     }
   }
@@ -49,17 +50,31 @@ export class LandingZone {
    */
   public startOfBase(turn: Turn): Point3V {
     return {
-      x: -this.finalDistance * (this.dest.vx + this.dest.vy),
-      y: -this.finalDistance * (turn * this.dest.vx + this.dest.vy),
+      x: this.finalDistance * (-this.dest.vx + turn * this.dest.vy),
+      y: this.finalDistance * (-turn * this.dest.vx - this.dest.vy),
       alt: this.dest.alt + 2 * this.finalDistance / Paramotor.glide, // TODO: Doesn't account for turns
-      vx: -turn * this.dest.vy,
-      vy: turn * this.dest.vx,
+      vx: -this.dest.vx,
+      vy: -this.dest.vy,
       climb: Paramotor.descentRate
     }
   }
 
   /**
-   * Convert lat, lng to x, y meters centered at current location
+   * Landing pattern: start of downwind leg
+   */
+  public startOfDownwind(turn: Turn): Point3V {
+    return {
+      x: this.finalDistance * turn * this.dest.vy,
+      y: -this.finalDistance * turn * this.dest.vx,
+      alt: this.dest.alt + 3 * this.finalDistance / Paramotor.glide, // TODO: Doesn't account for turns
+      vx: -this.dest.vx,
+      vy: -this.dest.vy,
+      climb: Paramotor.descentRate
+    }
+  }
+
+  /**
+   * Convert lat, lng to x, y meters centered at destination
    */
   public toPoint(ll: LatLng): Point {
     const bearing = toRadians(geo.bearing(this.destination.lat, this.destination.lng, ll.lat, ll.lng))
@@ -67,6 +82,22 @@ export class LandingZone {
     return {
       x: distance * Math.sin(bearing),
       y: distance * Math.cos(bearing)
+    }
+  }
+
+  /**
+   * Convert lat, lng to x, y meters centered at current location
+   */
+  public toPoint3V(ll: GeoPointV): Point3V {
+    const bearing = toRadians(geo.bearing(this.destination.lat, this.destination.lng, ll.lat, ll.lng))
+    const distance = geo.distance(this.destination.lat, this.destination.lng, ll.lat, ll.lng)
+    return {
+      x: distance * Math.sin(bearing),
+      y: distance * Math.cos(bearing),
+      alt: ll.alt,
+      vx: ll.vE,
+      vy: ll.vN,
+      climb: ll.climb
     }
   }
 
@@ -81,4 +112,4 @@ export class LandingZone {
 
 }
 
-export const kpow = new LandingZone({lat: 47.239, lng: -123.143, alt: 84}, 1.0472)
+export const kpow = new LandingZone({lat: 47.239, lng: -123.143, alt: 84}, toRadians(32))

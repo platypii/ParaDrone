@@ -8,8 +8,8 @@ export class Paramotor {
   // Constants
   public static readonly turnRadius = 50 // Turn radius in meters with 1 toggle buried
   // public static readonly yawRate = toDegrees(velocity / turnRadius) // Yaw degrees per second with 1 toggle buried
-  public static readonly descentRate = 5 // Meters of altitude lost per second
-  public static readonly groundSpeed = 10 // Meters per second
+  public static readonly descentRate = 3 // Meters of altitude lost per second
+  public static readonly groundSpeed = 12 // Meters per second
   public static readonly glide = Paramotor.groundSpeed / Paramotor.descentRate
 
   // State

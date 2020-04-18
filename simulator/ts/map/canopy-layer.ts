@@ -8,9 +8,11 @@ export class CanopyLayer extends MarkerLayer {
     super("Pilot", icons.canopy(90))
   }
 
-  public setLocation(loc: GeoPointV) {
+  public setLocation(loc?: GeoPointV) {
     super.setLocation(loc)
-    const bearing = toDegrees(Math.atan2(loc.vE, loc.vN))
-    this.setIcon(icons.canopy(bearing))
+    if (loc) {
+      const bearing = toDegrees(Math.atan2(loc.vE, loc.vN))
+      this.setIcon(icons.canopy(bearing))
+    }
   }
 }
