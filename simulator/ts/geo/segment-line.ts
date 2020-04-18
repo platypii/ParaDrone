@@ -1,15 +1,32 @@
-import { Point } from "../dtypes"
+import { Point, PointV } from "../dtypes"
 import { ParaControls } from "../paracontrols"
 import { interpolate } from "../util"
 import { Path } from "./paths"
 
-export class LineSegment {
-  start: Point
-  end: Point
+/**
+ * 2D line segment.
+ */
+export class SegmentLine {
+  start: PointV
+  end: PointV
 
   constructor(start: Point, end: Point) {
-    this.start = start
-    this.end = end
+    const dx = end.x - start.x
+    const dy = end.y - start.y
+    const len = Math.hypot(dx, dy)
+    this.start = {
+      ...start,
+      vx: dx / len,
+      vy: dy / len
+    }
+    this.end = {
+      ...end,
+      vx: dx / len,
+      vy: dy / len
+    }
+    if (len === 0) {
+      console.error("Invalid line: same start and end", start)
+    }
   }
 
   public controls(): ParaControls {
@@ -35,7 +52,7 @@ export class LineSegment {
     }
     // Linear interpolate
     const alpha = distance / this.length()
-    return new Path(new LineSegment(this.start, {
+    return new Path("line-fly", new SegmentLine(this.start, {
       x: interpolate(this.start.x, this.end.x, alpha),
       y: interpolate(this.start.y, this.end.y, alpha)
     }))

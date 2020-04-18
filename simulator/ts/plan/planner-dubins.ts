@@ -1,7 +1,7 @@
 import { PointV, Turn } from "../dtypes"
 import { Path } from "../geo/paths"
-import { LineSegment } from "../geo/segment-line"
-import { TurnSegment } from "../geo/segment-turn"
+import { SegmentLine } from "../geo/segment-line"
+import { SegmentTurn } from "../geo/segment-turn"
 
 /**
  * Find dubins path
@@ -59,8 +59,9 @@ export function dubins(loc: PointV, dest: PointV, r: number, turn1: Turn, turn2:
     y: c2.y + turn2 * r * Math.sin(commute_angle)
   }
   return new Path(
-    new TurnSegment(c1, loc, comm1, turn1),
-    new LineSegment(comm1, comm2),
-    new TurnSegment(c2, comm2, dest, turn2)
+    "dubins",
+    new SegmentTurn(c1, loc, comm1, turn1),
+    new SegmentLine(comm1, comm2),
+    new SegmentTurn(c2, comm2, dest, turn2)
   )
 }

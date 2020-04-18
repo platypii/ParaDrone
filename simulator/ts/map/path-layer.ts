@@ -10,8 +10,8 @@ export class PathLayer implements MapLayer {
     this.color = color
   }
 
-  public setPath(points: LatLng[]) {
-    this.points = points
+  public setPath(points?: LatLng[]) {
+    this.points = points || []
     this.update()
   }
 

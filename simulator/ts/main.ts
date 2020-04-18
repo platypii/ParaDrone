@@ -16,6 +16,7 @@ let map: DroneMap
 
 export function init() {
   map = new DroneMap()
+  map.setState({lz})
   map.googleMap.addListener("click", (e) => {
     player.stop()
     setStart({
@@ -43,45 +44,50 @@ function setStart(latlng: LatLngAlt) {
   update()
 
   // Start player
-  // player.start(start, lz, (next) => {
-  //   loc = next
-  //   update()
-  // })
+  player.start(start, lz, (next) => {
+    loc = next
+    update()
+  })
 }
 
 /**
  * Update views
  */
 function update() {
-  if (start) {
-    const xy = lz.toPoint(start)
-    const dist = Math.hypot(xy.x, xy.y)
-    document.getElementById("pstatus-start")!.innerText = `Start: ${xy.x.toFixed(1)}, ${xy.y.toFixed(1)} (${dist.toFixed(0)} m)` // Coordinate space
-  }
-
   if (loc) {
     // Compute full plan
     const plan = getPlan(loc, lz)
     const rendered = plan.render()
       .map((p) => lz.toLatLng(p))
-    // const actual = sim(start, lz)
-    const actual: any[] = []
+    const actual = sim(start, lz)
+    // const actual: any[] = []
 
     // Update map
     map.setState({
       start,
       current: loc,
-      dest: lz.destination,
       plan: rendered,
+      lz,
       actual
     })
 
-    const curr = lz.toPoint(loc)
-    const dist = geo.distance(loc.lat, loc.lng, lz.destination.lat, lz.destination.lng)
-    document.getElementById("pstatus-curr")!.innerText = `Curr: ${curr.x.toFixed(1)}, ${curr.y.toFixed(1)} (${dist.toFixed(0)} m)` // Coordinate space
-    document.getElementById("pstatus-alt")!.innerText = `Alt: ${loc.alt.toFixed(0)} m`
-
     const error = distance(plan.end, lz.dest)
+    document.getElementById("pstatus-name")!.innerText = "Plan: " + plan.name
     document.getElementById("pstatus-error")!.innerText = `Error: ${error.toFixed(1)} m`
+  }
+  updateApScreen()
+}
+
+function updateApScreen() {
+  if (loc) {
+    const dist = geo.distance(loc.lat, loc.lng, lz.destination.lat, lz.destination.lng)
+    const alt = loc.alt - lz.destination.alt
+    document.getElementById("ap-latlng")!.innerText = `${loc.lat.toFixed(6)}, ${loc.lng.toFixed(6)}`
+    document.getElementById("ap-landingzone")!.innerText = `LZ: ${dist.toFixed(0)} m`
+    document.getElementById("ap-alt")!.innerText = `Alt: ${alt.toFixed(0)} m AGL`
+  } else {
+    document.getElementById("ap-latlng")!.innerText = ""
+    document.getElementById("ap-landingzone")!.innerText = "LZ:"
+    document.getElementById("ap-alt")!.innerText = "Alt:"
   }
 }

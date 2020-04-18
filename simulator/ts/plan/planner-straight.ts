@@ -1,6 +1,6 @@
 import { PointV } from "../dtypes"
 import { Path } from "../geo/paths"
-import { LineSegment } from "../geo/segment-line"
+import { SegmentLine } from "../geo/segment-line"
 
 /**
  * Fly straight forever.
@@ -11,5 +11,5 @@ export function straight(loc: PointV): Path {
     x: loc.x + loc.vx,
     y: loc.y + loc.vy
   }
-  return new Path(new LineSegment(loc, dest))
+  return new Path("straight", new SegmentLine(loc, dest))
 }

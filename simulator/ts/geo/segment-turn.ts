@@ -1,23 +1,38 @@
-import { Circle, Point, Turn } from "../dtypes"
+import { Circle, Point, PointV, Turn } from "../dtypes"
 import { ParaControls } from "../paracontrols"
 import { Path } from "./paths"
-import { LineSegment } from "./segment-line"
+import { SegmentLine } from "./segment-line"
 import { toRadians } from "./trig"
 
 // If turn is less than minimum_turn, then don't bury a toggle
 const minimum_turn = toRadians(6)
 
-export class TurnSegment {
+/**
+ * 2D curved segment with fixed turn radius.
+ */
+export class SegmentTurn {
   circle: Circle
-  start: Point
-  end: Point
+  start: PointV
+  end: PointV
   turn: Turn
 
   constructor(circle: Circle, start: Point, end: Point, turn: Turn) {
     this.circle = circle
-    this.start = start
-    this.end = end
     this.turn = turn
+    const start_dx = start.x - circle.x
+    const start_dy = start.y - circle.y
+    this.start = {
+      ...start,
+      vx: start_dx / circle.radius,
+      vy: start_dy / circle.radius
+    }
+    const end_dx = end.x - circle.x
+    const end_dy = end.y - circle.y
+    this.end = {
+      ...end,
+      vx: end_dx / circle.radius,
+      vy: end_dy / circle.radius
+    }
   }
 
   public controls(): ParaControls {
@@ -48,7 +63,7 @@ export class TurnSegment {
         x: this.circle.x + this.circle.radius * Math.sin(theta),
         y: this.circle.y + this.circle.radius * Math.cos(theta)
       }
-      return new Path(new TurnSegment(this.circle, this.start, end, this.turn))
+      return new Path("turn-fly", new SegmentTurn(this.circle, this.start, end, this.turn))
     } else {
       // Line extending from end of this turn
       const remaining = distance - len
@@ -58,12 +73,12 @@ export class TurnSegment {
         x: this.end.x + this.turn * remaining * dy / this.circle.radius,
         y: this.end.y - this.turn * remaining * dx / this.circle.radius
       }
-      return new Path(this, new LineSegment(this.end, extension))
+      return new Path("turn-fly", this, new SegmentLine(this.end, extension))
     }
   }
 
   public render(): Point[] {
-    const points = [this.start]
+    const points: Point[] = [this.start]
     const angle1 = this.angle1()
     const step = 0.05 // ~3 degrees
     const arcs = this.arcs()
