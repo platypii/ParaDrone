@@ -1,7 +1,10 @@
 
+# ParaDrone specific
 /config.txt
 /log/
-/bin
+/simulator/js
+
+# linter output
 /infer-out
 
 # doxygen

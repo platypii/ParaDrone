@@ -1,6 +1,6 @@
-FROM alpine:3.11
+FROM python:3.8
 
-RUN apk add make gcc libc-dev
+RUN pip3 install platformio
 
 WORKDIR /opt/paradrone
 

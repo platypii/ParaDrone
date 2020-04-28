@@ -51,25 +51,4 @@ struct LandingZone {
   struct PointV dest;
 };
 
-// Config
-struct DConfig load_config();
-void save_berry(int berry_gps);
-void free_config(struct DConfig conf);
-
-void test();
-
-// Math
-double mod360(double degrees);
-double to_degrees(double radians);
-double to_radians(double degrees);
-
-// GPS
-void parse_nmea(char *line);
-void update_location(struct GeoPointV point);
-int berry_check();
-void berry_start();
-
-// Logger
-void log_point(struct GeoPointV point);
-
 #endif

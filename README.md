@@ -1,59 +1,93 @@
-# DubFlight
+# BASEline ParaDrone
 
-DubFlight is a C implementation of auto-pilot for gliders.
+BASEline ParaDrone aims to automate the flight of any parachute or paraglider.
 
-It is intended to run on a Raspberry Pi, linked with a GPS and a hardware interface to the aircraft controls.
-
-The flight path planner uses Dubins Paths to efficiently compute paths for unpowered gliders.
-
-[1] Dubins, L.E. (1957). "On Curves of Minimal Length with a Constraint on Average Curvature, and with Prescribed Initial and Terminal Positions and Tangents." American Journal of Mathematics.
-
-## Build
-
-Setup build environment:
-
-`apt install libbluetooth-dev`
-
-Build dubflight:
-
-`make`
-
-Run:
-
-`./bin/dubflight`
+The system consists of:
+ - Hardware to pull left and right toggles.
+ - Electronics for remote control and autopilot control.
+ - Autopilot software
 
 ## Hardware
 
 Recommended configuration:
-
- - Raspberry Pi Zero W
- - BerryGPS module
- - Micro Maestro Servo controller
- - 2x Parallax Feedback 360 Servos
- - 50C 7.4V 5200mAh Lithium Polymer battery
- - UBEC power converter
+ - Build tools:
+   - Phillips screwdriver
+   - Super glue
+   - Soldering kit
 
 Many of the components can be substituted with no problem.
-Any Raspberry Pi series will work.
-The software also supports bluetooth GPS such as the XGPS 160, however using BerryGPS means one less possible failure mode.
-The battery and servos can be changed freely, the UBEC and Micro Maestro can handle 6-16V @ 3A.
+The battery and motors can be changed as long as there is enough power.
+Most arduino variants should work.
 
-## Raspberry Pi Setup
+## Toggle actuator (2x)
 
-Install Raspbian Lite
+### Materials
 
-`unzip -p 2019-09-26-raspbian-buster-lite.zip | sudo dd of=/dev/sdX bs=4M conv=fsync status=progress`
+ - 3D printed actuator top
+ - 3D printed actuator bottom
+ - 3D printed motor bracket
+ - 12V DC 200RPM Gear Box Motor
+ - 31cm pulley spool
+ - Limit switch 20x6x10mm
+ - 2x 20cm 20 gauge wire
+ - 3A diode
+ - 2x banana plugs
+ - 6x wood screws #4 x 1/2"
+ - 2x M3 8mm machine screws
+ - QuicRun 1060 ESC
+ - 140cm 100lbs braided fishing line
 
-`raspi-config` > Enable wifi, ssh, etc.
+### Assembly
 
-### Systemd init
+1. Pre-solder limit switch with 20cm wires on outer (NC) pins.
 
-`cp dubflight.service /etc/systemd/system/`
+2. Glue limit switch to actuator top.
 
-`systemctl enable dubflight.service`
+3. Drill mounting holes in board.
 
-`systemctl start dubflight.service`
+4. Screw actuator bottom and motor bracket to board.
 
-### BerryGPS
+5. Screw motor to actuator bottom.
 
-`raspi-config` > Interfacing options > disable serial shell.
+6. Tie fishing line to spool.
+
+7. Attach spool to motor shaft, tighen coupling screws. You may need to power the motor to rotate the screws into position.
+
+8. Thread the limit switch wires through actuator bottom and motor bracket.
+
+9. Thread fishing line through actuator top.
+
+10. Snap actuator top into actuator bottom.
+
+11. Girth hitch the fishing line to the snap shackle.
+
+12. Solder wires, diode, and banana plugs.
+
+## Remote control (R/C)
+
+Materials:
+
+ - 11.1V lithium polymer (LiPo) battery
+ - 2x QuicRun 1060 ESC
+ - RadioLink T8S + R8EF
+
+## AutoPilot
+
+Materials:
+
+ - 11.1V lithium polymer (LiPo) battery
+ - RadioLink T8S + R8EF
+ - ESP32
+ - BN-220 GPS
+ - L298N motor driver
+
+## Software
+
+Autopilot software runs on an arduino board such as the ESP32. These are super cheap but powerful microcontrollers. We use PlatformIO to manage the software.
+
+To program the ESP32:
+
+Install Visual Studio Code and PlatformIO.
+Open the project in the `arduino` directory of this project.
+Connect the ESP32 to the computer by USB.
+Use the PlatformIO "Upload" function to program the device.

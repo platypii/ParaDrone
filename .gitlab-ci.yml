@@ -1,7 +1,8 @@
 default:
-  image: baselinews/paradrone
+  image: baselinews/paradrone:platformio
 
 build:
   stage: build
   script:
-    - make
+    - cd arduino
+    - platformio run

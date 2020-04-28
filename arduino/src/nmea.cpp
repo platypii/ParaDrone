@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include "dtypes.h"
+#include "paradrone.h"
 
 #define parseInt2(a, b) ((a - '0') * 10 + (b - '0'))
 
@@ -12,6 +12,7 @@ static void parse_rmc(char *line);
 static double parse_degrees_minutes(const char *dm, const char *nsew);
 static long long int parse_date(const char *str);
 static long long int parse_time(const char *str);
+static double parse_double(const char *str);
 
 // Global altitude
 static double altitude = NAN;
@@ -36,7 +37,7 @@ static void parse_gga(const char *line) {
   for (int i = 0; line[i]; i++) {
     if (line[i] == ',') {
       if (++commaCount == 9) {
-        altitude = atof(line + i + 1);
+        altitude = parse_double(line + i + 1);
       }
     }
   }
@@ -47,7 +48,7 @@ static void parse_gga(const char *line) {
  */
 static void parse_rmc(char *line) {
   // char timeStr[10], status, latDM[11], latNS, lngDM[11], lngEW, dateStr[7];
-  char *TOK = ",";
+  const char *TOK = ",";
   strsep(&line, TOK); // command
   char *timeStr = strsep(&line, TOK);
   strsep(&line, TOK); // status
@@ -68,8 +69,8 @@ static void parse_rmc(char *line) {
   const double lat = parse_degrees_minutes(latDM, latNS);
   const double lng = parse_degrees_minutes(lngDM, lngEW);
   const double climb = NAN; // TODO: Kalman
-  const double hspeed = atof(hspeedStr);
-  const double bearing = atof(bearingStr);
+  const double hspeed = parse_double(hspeedStr);
+  const double bearing = parse_double(bearingStr);
   const double vN = hspeed * cos(to_radians(bearing));
   const double vE = hspeed * sin(to_radians(bearing));
 
@@ -92,14 +93,16 @@ static double parse_degrees_minutes(const char *dm, const char *nsew) {
     return NAN;
   }
   int index = strchr(dm, '.') - dm - 2;
-  char degrees[4] = "";
-  strncpy(degrees, dm, index);
-  double d = atof(degrees);
+  char degrees_str[4] = "";
+  strncpy(degrees_str, dm, index);
+  double d = atof(degrees_str);
   double m = atof(dm + index);
+  double degrees = d + m / 60.0;
   if (*nsew == 'S' || *nsew == 'W') {
-    d = -d;
+    return -degrees;
+  } else {
+    return degrees;
   }
-  return d + m / 60.0;
 }
 
 /**
@@ -126,4 +129,17 @@ static long long int parse_time(const char *str) {
   const int s = parseInt2(str[4], str[5]);
   const int hundredths = parseInt2(str[7], str[8]);
   return h * 3600000 + m * 60000 + s * 1000 + hundredths * 10;
+}
+
+/**
+ * Parse double from string, nan on parse error.
+ */
+static double parse_double(const char *str) {
+  char *end;
+  double parsed = strtod(str, &end);
+  if (str != end) {
+    return parsed;
+  } else {
+    return NAN;
+  }
 }
