@@ -1,9 +1,12 @@
 package ws.baseline.autopilot;
 
+import ws.baseline.autopilot.bluetooth.APEvent;
+import ws.baseline.autopilot.bluetooth.APLocationEvent;
 import ws.baseline.autopilot.bluetooth.BluetoothState;
 import ws.baseline.autopilot.databinding.FragmentStatusBinding;
 import ws.baseline.autopilot.util.Convert;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -13,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 /**
  * Display drone status
@@ -39,32 +43,37 @@ public class StatusFragment extends Fragment {
         EventBus.getDefault().unregister(this);
     }
 
-    @Subscribe
+    @Subscribe(threadMode = ThreadMode.MAIN)
     public void onBluetoothState(@NonNull BluetoothState event) {
         update();
     }
 
-    @Subscribe
-    public void onDroneState(@NonNull DroneState event) {
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onApEvent(@NonNull APEvent event) {
         update();
     }
 
     /**
      * Update views
      */
+    @SuppressLint("SetTextI18n")
     private void update() {
-        binding.statusConnect.setText("Connect status...");
+        // Bluetooth state
+        binding.statusConnect.setText("BT: " + BluetoothState.toString(Services.bluetooth.getState()));
+        if (APLocationEvent.lastLocation != null) {
+            binding.statusLocation.setText("LL: " + APLocationEvent.lastLocation);
+        } else {
+            binding.statusLocation.setText("LL:");
+        }
         final DroneState drone = DroneState.get();
         if (drone != null) {
-            binding.statusLocation.setText(drone.currentLocation.toString());
-            binding.statusLandingZone.setText(drone.lz.toString());
+            binding.statusLandingZone.setText("LZ: " + drone.lz);
             binding.statusAltitude.setText(Convert.distance3(drone.currentLocation.alt - drone.lz.destination.alt) + " AGL");
-            binding.statusDistance.setText("Distance...");
+            binding.statusDistance.setText("Dist:");
         } else {
-            binding.statusLocation.setText("");
-            binding.statusLandingZone.setText("");
-            binding.statusAltitude.setText("");
-            binding.statusDistance.setText("");
+            binding.statusLandingZone.setText("LZ: not set");
+            binding.statusAltitude.setText("Alt:");
+            binding.statusDistance.setText("Dist:");
         }
     }
 

@@ -1,5 +1,7 @@
 package ws.baseline.autopilot.bluetooth;
 
+import ws.baseline.autopilot.geo.LandingZone;
+
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
@@ -45,6 +47,11 @@ public class BluetoothService {
             }
         } else {
             Log.e(TAG, "Bluetooth already started: " + BT_STATES[bluetoothState]);
+        }
+    }
+    public void setLandingZone(LandingZone lz) {
+        if (bluetoothRunnable != null && bluetoothRunnable.protocol != null) {
+            bluetoothRunnable.protocol.setLandingZone(lz);
         }
     }
 

@@ -12,9 +12,13 @@ public class BluetoothState {
     static final int BT_DISCONNECTED = 4;
     static final int BT_STOPPING = 5;
 
-    static final String[] BT_STATES = {"BT_STOPPED", "BT_STARTING", "BT_CONNECTING", "BT_CONNECTED", "BT_DISCONNECTED", "BT_STOPPING"};
+    static final String[] BT_STATES = {"stopped", "starting", "connecting", "connected", "disconnected", "stopping"};
 
     BluetoothState(int state) {
         this.state = state;
+    }
+
+    public static String toString(int state) {
+        return BT_STATES[state];
     }
 }
