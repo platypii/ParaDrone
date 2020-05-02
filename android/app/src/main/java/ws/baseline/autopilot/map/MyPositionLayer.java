@@ -1,6 +1,7 @@
 package ws.baseline.autopilot.map;
 
-import ws.baseline.autopilot.DroneState;
+import ws.baseline.autopilot.bluetooth.APLocationEvent;
+import ws.baseline.autopilot.bluetooth.APSpeedEvent;
 import ws.baseline.autopilot.util.Numbers;
 import ws.baseline.autopilot.R;
 
@@ -35,16 +36,21 @@ public class MyPositionLayer extends MapLayer {
 
     @Override
     public void update() {
-        final DroneState state = DroneState.get();
-        if (myPositionMarker != null && state.currentLocation != null) {
+        final APLocationEvent ll = APLocationEvent.lastLocation;
+        final APSpeedEvent ss = APSpeedEvent.lastSpeed;
+        if (myPositionMarker != null && ll != null) {
             myPositionMarker.setVisible(true);
-            myPositionMarker.setPosition(state.currentLocation.toLatLng());
-            final double groundSpeed = state.currentLocation.groundSpeed();
-            final double bearing = state.currentLocation.bearing();
-            if (Numbers.isReal(bearing) && groundSpeed > 0.1) {
-                // Speed > 0.2mph
-                myPositionMarker.setIcon(myposition1);
-                myPositionMarker.setRotation((float) bearing);
+            myPositionMarker.setPosition(ll.toLatLng());
+            if (ss != null) {
+                final double groundSpeed = ss.groundSpeed();
+                final double bearing = ss.bearing();
+                if (Numbers.isReal(bearing) && groundSpeed > 0.1) {
+                    // Speed > 0.2mph
+                    myPositionMarker.setIcon(myposition1);
+                    myPositionMarker.setRotation((float) bearing);
+                } else {
+                    myPositionMarker.setIcon(myposition2);
+                }
             } else {
                 myPositionMarker.setIcon(myposition2);
             }
