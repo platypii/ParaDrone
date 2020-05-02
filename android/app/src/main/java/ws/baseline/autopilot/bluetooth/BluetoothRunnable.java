@@ -46,7 +46,7 @@ class BluetoothRunnable implements Runnable {
     @Nullable
     private ScanCallback scanCallback;
     @Nullable
-    private BluetoothProtocol protocol;
+    AutopilotProtocol protocol;
 
     BluetoothRunnable(@NonNull BluetoothService service, @NonNull Context context, @NonNull BluetoothAdapter bluetoothAdapter) {
         this.service = service;

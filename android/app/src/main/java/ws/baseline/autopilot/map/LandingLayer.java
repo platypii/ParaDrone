@@ -48,7 +48,7 @@ public class LandingLayer extends MapLayer {
     public void update() {
         if (landingMarker != null && landingPath != null) {
             final DroneState state = DroneState.get();
-            if (state.lz != null) {
+            if (state != null && state.lz != null) {
                 landingMarker.setPosition(state.lz.destination.toLatLng());
                 landingMarker.setVisible(true);
                 landingPoints.clear();

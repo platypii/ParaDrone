@@ -1,6 +1,6 @@
 package ws.baseline.autopilot.map;
 
-import ws.baseline.autopilot.DroneState;
+import ws.baseline.autopilot.bluetooth.APEvent;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 /**
  * Implements a map
@@ -29,6 +30,22 @@ public class MapFragment extends SupportMapFragment implements OnMapReadyCallbac
     private GoogleMap map;
 
     private final List<MapLayer> layers = new ArrayList<>();
+
+    public LatLng center() {
+        if (map != null) {
+            return map.getCameraPosition().target;
+        } else {
+            return null;
+        }
+    }
+
+    public double direction() {
+        if (map != null) {
+            return Math.toRadians(map.getCameraPosition().bearing);
+        } else {
+            return 0;
+        }
+    }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -58,8 +75,8 @@ public class MapFragment extends SupportMapFragment implements OnMapReadyCallbac
         }
     }
 
-    @Subscribe
-    public void onUpdate(@NonNull DroneState state) {
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onUpdate(@NonNull APEvent event) {
         updateLayers();
     }
 
@@ -69,14 +86,14 @@ public class MapFragment extends SupportMapFragment implements OnMapReadyCallbac
         EventBus.getDefault().unregister(this);
     }
 
-    void addLayer(@NonNull MapLayer layer) {
+    private void addLayer(@NonNull MapLayer layer) {
         layers.add(layer);
         if (map != null) {
             layer.onAdd(map);
         }
     }
 
-    void updateLayers() {
+    private void updateLayers() {
         for (MapLayer layer : layers) {
             layer.update();
         }

@@ -12,6 +12,8 @@ import android.os.Build;
 import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.UUID;
 
 /**
@@ -24,15 +26,11 @@ class AutopilotProtocol implements BluetoothProtocol {
     // Autopilot service UUID
     private static final UUID apService = UUID.fromString("00ba5e00-c55f-496f-a444-9855f5f14992");
     // Autopilot characteristic UUID
-    private static final UUID apCharacteristic = UUID.fromString("00b45300-9235-47c8-b2f3-916cee33d85c");
+    private static final UUID characteristicLocation = UUID.fromString("00b45300-9235-47c8-b2f3-916cee33d85c");
+    private static final UUID characteristicLz = UUID.fromString("00845300-ed55-43fa-bb54-8e721e0926ee");
 
     // Client Characteristic Configuration (what we subscribe to)
     private static final UUID clientCharacteristicDescriptor = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");
-
-    // Messages from autopilot device
-    private static final byte statusLocation = 0x20;
-    // Messages to autopilot device
-    private static final byte setLandingZone = 0x40;
 
     // Protocol state
     private final BluetoothGatt bluetoothGatt;
@@ -45,7 +43,6 @@ class AutopilotProtocol implements BluetoothProtocol {
         final String deviceName = device.getName();
         return "ParaDrone".equals(deviceName);
     }
-
 
     @Override
     public void onServicesDiscovered() {
@@ -60,12 +57,28 @@ class AutopilotProtocol implements BluetoothProtocol {
 
     @Override
     public UUID getCharacteristic() {
-        return apCharacteristic;
+        return characteristicLocation;
     }
 
     private void processSentence(@NonNull byte[] value) {
-        if (value[0] == statusLocation) {
-            Log.i(TAG, "ap -> phone: location");
+        if (value[0] == 'L' && value.length == 19) {
+            // 'L', millis, lat, lng, alt
+            final ByteBuffer buf = ByteBuffer.wrap(value).order(ByteOrder.LITTLE_ENDIAN);
+            final long millis = buf.getLong(1);
+            final double lat = buf.getInt(9) * 1e-6; // microdegrees
+            final double lng = buf.getInt(13) * 1e-6; // microdegrees
+            final double alt = buf.getShort(17) * 0.1; // decimeters
+            Log.i(TAG, "ap -> phone: location " + lat + " " + lng + " " + alt);
+            APLocationEvent.update(millis, lat, lng, alt);
+        } else if (value[0] == 'S' && value.length == 15) {
+            // 'S', millis, vN, vE, climb
+            final ByteBuffer buf = ByteBuffer.wrap(value).order(ByteOrder.LITTLE_ENDIAN);
+            final long millis = buf.getLong(1);
+            final double vD = buf.getShort(9) * 0.01; // cm/s
+            final double vE = buf.getShort(11) * 0.01; // cm/s
+            final double climb = buf.getShort(13) * 0.01; // cm/s
+            Log.i(TAG, "ap -> phone: speed " + vD + " " + vE + " " + climb);
+            APSpeedEvent.update(millis, vD, vE, climb);
         } else {
             Log.w(TAG, "ap -> phone: unknown " + Util.byteArrayToHex(value));
         }
@@ -73,7 +86,7 @@ class AutopilotProtocol implements BluetoothProtocol {
 
     private void requestAutopilotService() {
         final BluetoothGattService service = bluetoothGatt.getService(apService);
-        final BluetoothGattCharacteristic ch = service.getCharacteristic(apCharacteristic);
+        final BluetoothGattCharacteristic ch = service.getCharacteristic(characteristicLocation);
         if (ch != null) {
             // Enables notification locally:
             bluetoothGatt.setCharacteristicNotification(ch, true);
@@ -88,12 +101,19 @@ class AutopilotProtocol implements BluetoothProtocol {
         }
     }
 
-    private void sendLandingZone(LandingZone lz) {
-        Log.d(TAG, "app -> device: lz " + lz);
+    void setLandingZone(LandingZone lz) {
+        Log.i(TAG, "phone -> ap: lz " + lz);
         final BluetoothGattService service = bluetoothGatt.getService(apService);
-        final BluetoothGattCharacteristic ch = service.getCharacteristic(apCharacteristic);
+        final BluetoothGattCharacteristic ch = service.getCharacteristic(characteristicLz);
         if (ch != null) {
-            final byte[] value = {setLandingZone, 0x00};
+            // Pack LZ into bytes
+            final byte[] value = new byte[13];
+            value[0] = 'Z';
+            final ByteBuffer buf = ByteBuffer.wrap(value).order(ByteOrder.LITTLE_ENDIAN);
+            buf.putInt(1, (int)(lz.destination.lat * 1e6)); // microdegrees
+            buf.putInt(5, (int)(lz.destination.lng * 1e6)); // microdegrees
+            buf.putShort(9, (short)(lz.destination.alt * 10)); // decimeters
+            buf.putShort(11, (short)(lz.landingDirection * 1000)); // milliradians
             ch.setValue(value);
             bluetoothGatt.writeCharacteristic(ch);
         }

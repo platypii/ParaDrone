@@ -9,7 +9,7 @@ import androidx.annotation.NonNull;
 public class Services {
     private static final String TAG = "Services";
 
-    private static final BluetoothService bluetooth = new BluetoothService();
+    public static final BluetoothService bluetooth = new BluetoothService();
 
     public static void start(@NonNull Activity activity) {
         Log.i(TAG, "Starting services...");
