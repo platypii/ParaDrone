@@ -16,3 +16,6 @@ void log_point(GeoPointV point);
 double mod360(double degrees);
 double to_degrees(double radians);
 double to_radians(double degrees);
+
+// Landing zone
+void set_landing_zone(const char *packed);

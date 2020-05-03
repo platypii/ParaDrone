@@ -2,7 +2,8 @@
 #include <BLEDevice.h>
 #include <BLEUtils.h>
 #include <BLEServer.h>
-#include "dtypes.h"
+#include "geo.h"
+#include "paradrone.h"
 
 #define SERVICE_PARADRONE       "00ba5e00-c55f-496f-a444-9855f5f14992"
 #define CHARACTERISTIC_LOCATION "00b45300-9235-47c8-b2f3-916cee33d85c"
@@ -36,10 +37,18 @@ class AutoPilotServer : public BLEServerCallbacks {
       _BLEClientConnected = true;
       Serial.println("BT client connected");
     };
-
     void onDisconnect(BLEServer* pServer) {
       _BLEClientConnected = false;
       Serial.println("BT client disconnected");
+    }
+};
+
+class LandingZoneCharacteristic : public BLECharacteristicCallbacks {
+    void onRead(BLECharacteristic *pCharacteristic) {
+    };
+    void onWrite(BLECharacteristic *pCharacteristic) {
+      const char *value = pCharacteristic->getValue().c_str();
+      set_landing_zone(value);
     }
 };
 
@@ -65,7 +74,7 @@ void bt_init() {
     BLECharacteristic::PROPERTY_READ |
     BLECharacteristic::PROPERTY_WRITE
   );
-  // ch_lz->setValue("ParaDrone v1.0");
+  ch_lz->setCallbacks(new LandingZoneCharacteristic());
 
   pService->start();
   // BLEAdvertising *pAdvertising = pServer->getAdvertising();  // this still is working for backward compatibility
