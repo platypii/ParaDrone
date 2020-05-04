@@ -11,32 +11,46 @@ import androidx.annotation.Nullable;
 import static ws.baseline.autopilot.geo.Turn.TURN_LEFT;
 import static ws.baseline.autopilot.geo.Turn.TURN_RIGHT;
 import static ws.baseline.autopilot.plan.PlannerDubins.dubins;
+import static ws.baseline.autopilot.plan.PlannerNaive.naive;
 import static ws.baseline.autopilot.plan.PlannerStraight.straight;
 
 public class Search {
 
     public static Path search(GeoPoint point, LandingZone lz) {
-        // How much farther can we fly with available altitude?
-        final double alt = point.alt - lz.destination.alt;
-        final double distance = Paramotor.flightDistanceRemaining(alt);
-        final double r = Paramotor.turnRadius;
         final PointV loc = lz.toPointV(point);
 
+        // How much farther can we fly with available altitude?
+        final double alt = point.alt - lz.destination.alt;
+        final double fdr = Paramotor.flightDistanceRemaining(alt);
+
+        final PointV sof = lz.startOfFinal();
+        final double r = Paramotor.turnRadius;
+        final double distance = Math.hypot(loc.x, loc.y);
+
         // Construct flight paths
-        final Path straightPath = straight(loc).fly(distance);
-        final Path[] paths = {
-            dubins(loc, lz.dest, r, TURN_RIGHT, TURN_RIGHT), // rsr
-            dubins(loc, lz.dest, r, TURN_RIGHT, TURN_LEFT), // rsl
-            dubins(loc, lz.dest, r, TURN_LEFT, TURN_RIGHT), // lsr
-            dubins(loc, lz.dest, r, TURN_LEFT, TURN_LEFT), // lsl
-            // naive(params),
-            straightPath
-        };
-        Path best = bestPlan(lz, paths);
-        if (best == null) {
-            best = straightPath;
+        final Path straightPath = straight(loc).fly(fdr);
+        final Path naivePath = naive(loc, sof, r);
+
+        if (distance > 1000 && naivePath != null) {
+            return naivePath;
+        } else if (alt < 30) {
+            // No turns under 100ft
+            return straightPath;
+        } else {
+            final Path[] paths = {
+                    dubins(loc, sof, r, TURN_RIGHT, TURN_RIGHT), // rsr
+                    dubins(loc, sof, r, TURN_RIGHT, TURN_LEFT), // rsl
+                    dubins(loc, sof, r, TURN_LEFT, TURN_RIGHT), // lsr
+                    dubins(loc, sof, r, TURN_LEFT, TURN_LEFT), // lsl
+                    // naivePath,
+                    straightPath
+            };
+            Path best = bestPlan(lz, paths);
+            if (best == null) {
+                best = straightPath;
+            }
+            return best;
         }
-        return best;
     }
 
     /**

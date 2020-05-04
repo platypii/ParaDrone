@@ -1,7 +1,5 @@
 package ws.baseline.autopilot.map;
 
-import ws.baseline.autopilot.bluetooth.APEvent;
-
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -9,16 +7,12 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import java.util.ArrayList;
 import java.util.List;
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 
 /**
  * Implements a map
@@ -54,46 +48,26 @@ public class MapFragment extends SupportMapFragment implements OnMapReadyCallbac
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-        EventBus.getDefault().register(this);
-    }
-
-    @Override
     public void onMapReady(@NonNull GoogleMap map) {
         this.map = map;
+
+        // Map defaults
         map.setMapType(GoogleMap.MAP_TYPE_HYBRID);
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(47.6, -122.3), 12));
 
-        // Add map layers
-        addLayer(new MyPositionLayer());
-        addLayer(new LandingLayer());
-
-        // Zoom to current phone location
+        // Show current phone location
         if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             map.setMyLocationEnabled(true);
         }
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onUpdate(@NonNull APEvent event) {
-        updateLayers();
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        EventBus.getDefault().unregister(this);
-    }
-
-    private void addLayer(@NonNull MapLayer layer) {
+    void addLayer(@NonNull MapLayer layer) {
         layers.add(layer);
         if (map != null) {
             layer.onAdd(map);
         }
     }
 
-    private void updateLayers() {
+    void updateLayers() {
         for (MapLayer layer : layers) {
             layer.update();
         }

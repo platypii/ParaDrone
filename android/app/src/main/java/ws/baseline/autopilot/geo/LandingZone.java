@@ -62,15 +62,6 @@ public class LandingZone {
     /**
      * Convert lat, lng to x, y meters centered at current location
      */
-    public Point toPoint(LatLng ll) {
-        final double bearing = Math.toRadians(Geo.bearing(this.destination.lat, this.destination.lng, ll.lat, ll.lng));
-        final double distance = Geo.distance(this.destination.lat, this.destination.lng, ll.lat, ll.lng);
-        return new Point(distance * Math.sin(bearing),distance * Math.cos(bearing));
-    }
-
-    /**
-     * Convert lat, lng to x, y meters centered at current location
-     */
     public PointV toPointV(GeoPoint point) {
         final double bearing = Math.toRadians(Geo.bearing(this.destination.lat, this.destination.lng, point.lat, point.lng));
         final double distance = Geo.distance(this.destination.lat, this.destination.lng, point.lat, point.lng);
@@ -89,6 +80,6 @@ public class LandingZone {
     @NonNull
     @Override
     public String toString() {
-        return String.format(Locale.getDefault(), "%.6f, %.6f, %s, %.1f°", destination.lat, destination.lng, Convert.distance(destination.alt), Math.toDegrees(landingDirection));
+        return String.format(Locale.getDefault(), "%.6f, %.6f, %s, %.0f°", destination.lat, destination.lng, Convert.distance(destination.alt), Math.toDegrees(landingDirection));
     }
 }
