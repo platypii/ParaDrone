@@ -20,6 +20,7 @@ import androidx.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 
+import static android.bluetooth.BluetoothGatt.GATT_SUCCESS;
 import static ws.baseline.autopilot.bluetooth.BluetoothState.BT_CONNECTED;
 import static ws.baseline.autopilot.bluetooth.BluetoothState.BT_CONNECTING;
 import static ws.baseline.autopilot.bluetooth.BluetoothState.BT_DISCONNECTED;
@@ -104,7 +105,7 @@ class BluetoothRunnable implements Runnable {
         stopScan();
         service.setState(BT_CONNECTING);
         // Connect to device
-        bluetoothGatt = device.connectGatt(context, true, gattCallback);
+        bluetoothGatt = device.connectGatt(context, true, gattCallback, BluetoothDevice.TRANSPORT_LE);
         // Log event
         final Bundle bundle = new Bundle();
         bundle.putString("device_name", device.getName());
@@ -123,24 +124,35 @@ class BluetoothRunnable implements Runnable {
     private final BluetoothGattCallback gattCallback = new BluetoothGattCallback() {
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
-            super.onConnectionStateChange(gatt, status, newState);
-            if (newState == BluetoothProfile.STATE_CONNECTED) {
-                Log.d(TAG, "Bluetooth profile connected");
-                // TODO: Do we need to discover services? Or can we just connect?
-                bluetoothGatt.discoverServices();
-                service.setState(BT_CONNECTED);
-            } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
-                Log.i(TAG, "Autopilot disconnected");
-                service.setState(BT_DISCONNECTED);
+            if (status == GATT_SUCCESS) {
+                if (newState == BluetoothProfile.STATE_CONNECTED) {
+                    Log.d(TAG, "Bluetooth profile connected");
+                    // TODO: If we have connected to a device before, skip discover services and connect directly.
+                    bluetoothGatt.discoverServices();
+                    service.setState(BT_CONNECTED);
+                } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
+                    // Disconnected our own request
+                    Log.i(TAG, "Autopilot disconnected");
+                    gatt.close();
+                    onDisconnect();
+                } else {
+                    // Connecting or disconnecting state
+                    Log.i(TAG, "Autopilot state " + newState);
+                }
             } else {
-                Log.i(TAG, "Autopilot state " + newState);
+                gatt.close();
+                if (newState == BluetoothProfile.STATE_DISCONNECTED) {
+                    Log.i(TAG, "Autopilot remote disconnect");
+                    onDisconnect();
+                } else {
+                    Log.e(TAG, "Bluetooth connection state error " + status + " " + newState);
+                }
             }
         }
 
         @Override
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
-            super.onServicesDiscovered(gatt, status);
-            if (status == BluetoothGatt.GATT_SUCCESS) {
+            if (status == GATT_SUCCESS) {
                 Log.i(TAG, "Bluetooth services discovered");
                 protocol.onServicesDiscovered();
             } else {
@@ -150,13 +162,33 @@ class BluetoothRunnable implements Runnable {
 
         @Override
         public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic ch) {
-            if (ch.getUuid().equals(protocol.getCharacteristic())) {
+            if (ch.getUuid().equals(protocol.characteristicLocation)) {
+//                Log.d(TAG, "Autopilot onCharacteristicChanged location");
                 protocol.processBytes(ch.getValue());
             } else {
-                Log.i(TAG, "Autopilot onCharacteristicChanged " + ch);
+                Log.i(TAG, "Autopilot onCharacteristicChanged unknown " + ch);
+            }
+        }
+
+        @Override
+        public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic ch, int status) {
+            if (ch.getUuid().equals(protocol.characteristicLz)) {
+                if (status == GATT_SUCCESS) {
+                    Log.d(TAG, "Autopilot onCharacteristicRead lz");
+                    protocol.processBytes(ch.getValue());
+                } else {
+                    Log.w(TAG, "Autopilot onCharacteristicRead lz failed " + status);
+                }
+            } else {
+                Log.i(TAG, "Autopilot onCharacteristicRead unknown " + ch);
             }
         }
     };
+
+    private void onDisconnect() {
+        service.setState(BT_DISCONNECTED);
+        scan();
+    }
 
     void stop() {
         // Close bluetooth socket

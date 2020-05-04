@@ -1,7 +1,7 @@
 package ws.baseline.autopilot.map;
 
-import ws.baseline.autopilot.bluetooth.APLocationEvent;
-import ws.baseline.autopilot.bluetooth.APSpeedEvent;
+import ws.baseline.autopilot.bluetooth.APLocationMsg;
+import ws.baseline.autopilot.bluetooth.APSpeedMsg;
 import ws.baseline.autopilot.util.Numbers;
 import ws.baseline.autopilot.R;
 
@@ -36,8 +36,8 @@ public class MyPositionLayer extends MapLayer {
 
     @Override
     public void update() {
-        final APLocationEvent ll = APLocationEvent.lastLocation;
-        final APSpeedEvent ss = APSpeedEvent.lastSpeed;
+        final APLocationMsg ll = APLocationMsg.lastLocation;
+        final APSpeedMsg ss = APSpeedMsg.lastSpeed;
         if (myPositionMarker != null && ll != null) {
             myPositionMarker.setVisible(true);
             myPositionMarker.setPosition(ll.toLatLng());

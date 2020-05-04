@@ -1,15 +1,22 @@
 package ws.baseline.autopilot.bluetooth;
 
-public class APLandingZone {
-    public final double lat;
-    public final double lng;
-    public final double alt;
-    public final double landingDirection;
+import ws.baseline.autopilot.geo.LandingZone;
 
-    public APLandingZone(double lat, double lng, double alt, double landingDirection) {
-        this.lat = lat;
-        this.lng = lng;
-        this.alt = alt;
-        this.landingDirection = landingDirection;
+import androidx.annotation.Nullable;
+import org.greenrobot.eventbus.EventBus;
+
+public class APLandingZone implements APEvent {
+    public final LandingZone lz;
+
+    @Nullable
+    public static APLandingZone lastLz;
+
+    public APLandingZone(LandingZone lz) {
+        this.lz = lz;
+    }
+
+    public static void update(LandingZone lz) {
+        lastLz = new APLandingZone(lz);
+        EventBus.getDefault().post(lastLz);
     }
 }

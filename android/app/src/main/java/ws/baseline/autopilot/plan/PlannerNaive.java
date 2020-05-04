@@ -14,8 +14,13 @@ import static ws.baseline.autopilot.geo.Turn.TURN_RIGHT;
 
 class PlannerNaive {
 
+    /**
+     * Fly naively to a waypoint.
+     * This path will consist of a turn, plus a straight line to the target.
+     * You will probably not arrive at your destination in the DIRECTION you want though.
+     */
     @Nullable
-    public static Path naive(PointV loc, PointV dest, double turnRadius) {
+    static Path naive(PointV loc, PointV dest, double turnRadius) {
         if (Math.hypot(loc.x - dest.x, loc.y - dest.y) < 2 * turnRadius) {
             // Log.w(TAG, "Naive planner on top of lz");
             return null;

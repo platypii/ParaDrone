@@ -5,21 +5,21 @@ import androidx.annotation.Nullable;
 import java.util.Locale;
 import org.greenrobot.eventbus.EventBus;
 
-public class APSpeedEvent implements APEvent {
-    final long millis;
-    final double vN;
-    final double vE;
-    final double climb;
+public class APSpeedMsg {
+    public final long millis;
+    public final double vN;
+    public final double vE;
+    public final double climb;
 
     @Nullable
-    public static APSpeedEvent lastSpeed;
+    public static APSpeedMsg lastSpeed;
 
     static void update(long millis, double vN, double vE, double climb) {
-        lastSpeed = new APSpeedEvent(millis, vN, vE, climb);
+        lastSpeed = new APSpeedMsg(millis, vN, vE, climb);
         EventBus.getDefault().post(lastSpeed);
     }
 
-    private APSpeedEvent(long millis, double vN, double vE, double climb) {
+    private APSpeedMsg(long millis, double vN, double vE, double climb) {
         this.millis = millis;
         this.vN = vN;
         this.vE = vE;

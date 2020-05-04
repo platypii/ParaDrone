@@ -20,14 +20,14 @@ import java.util.UUID;
  * Implements bluetooth two-way communication protocol with autopilot device.
  */
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-class AutopilotProtocol implements BluetoothProtocol {
+class AutopilotProtocol {
     private static final String TAG = "AutopilotProtocol";
 
     // Autopilot service UUID
     private static final UUID apService = UUID.fromString("00ba5e00-c55f-496f-a444-9855f5f14992");
     // Autopilot characteristic UUID
-    private static final UUID characteristicLocation = UUID.fromString("00b45300-9235-47c8-b2f3-916cee33d85c");
-    private static final UUID characteristicLz = UUID.fromString("00845300-ed55-43fa-bb54-8e721e0926ee");
+    public final UUID characteristicLocation = UUID.fromString("00b45300-9235-47c8-b2f3-916cee33d85c");
+    public final UUID characteristicLz = UUID.fromString("00845300-ed55-43fa-bb54-8e721e0926ee");
 
     // Client Characteristic Configuration (what we subscribe to)
     private static final UUID clientCharacteristicDescriptor = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");
@@ -44,23 +44,12 @@ class AutopilotProtocol implements BluetoothProtocol {
         return "ParaDrone".equals(deviceName);
     }
 
-    @Override
-    public void onServicesDiscovered() {
+    void onServicesDiscovered() {
         requestAutopilotService();
+        fetchLandingZone();
     }
 
-    @Override
-    public void processBytes(@NonNull byte[] value) {
-        // TODO: Buffer into lines?
-        processSentence(value);
-    }
-
-    @Override
-    public UUID getCharacteristic() {
-        return characteristicLocation;
-    }
-
-    private void processSentence(@NonNull byte[] value) {
+    void processBytes(@NonNull byte[] value) {
         if (value[0] == 'L' && value.length == 19) {
             // 'L', millis, lat, lng, alt
             final ByteBuffer buf = ByteBuffer.wrap(value).order(ByteOrder.LITTLE_ENDIAN);
@@ -68,8 +57,8 @@ class AutopilotProtocol implements BluetoothProtocol {
             final double lat = buf.getInt(9) * 1e-6; // microdegrees
             final double lng = buf.getInt(13) * 1e-6; // microdegrees
             final double alt = buf.getShort(17) * 0.1; // decimeters
-            Log.i(TAG, "ap -> phone: location " + lat + " " + lng + " " + alt);
-            APLocationEvent.update(millis, lat, lng, alt);
+            Log.d(TAG, "ap -> phone: location " + lat + " " + lng + " " + alt);
+            APLocationMsg.update(millis, lat, lng, alt);
         } else if (value[0] == 'S' && value.length == 15) {
             // 'S', millis, vN, vE, climb
             final ByteBuffer buf = ByteBuffer.wrap(value).order(ByteOrder.LITTLE_ENDIAN);
@@ -77,10 +66,20 @@ class AutopilotProtocol implements BluetoothProtocol {
             final double vD = buf.getShort(9) * 0.01; // cm/s
             final double vE = buf.getShort(11) * 0.01; // cm/s
             final double climb = buf.getShort(13) * 0.01; // cm/s
-            Log.i(TAG, "ap -> phone: speed " + vD + " " + vE + " " + climb);
-            APSpeedEvent.update(millis, vD, vE, climb);
+            Log.d(TAG, "ap -> phone: speed " + vD + " " + vE + " " + climb);
+            APSpeedMsg.update(millis, vD, vE, climb);
+        } else if (value[0] == 'Z' && value.length == 13) {
+            // 'Z', lat, lng, alt, dir
+            final ByteBuffer buf = ByteBuffer.wrap(value).order(ByteOrder.LITTLE_ENDIAN);
+            final double lat = buf.getInt(1) * 1e-6; // microdegrees
+            final double lng = buf.getInt(5) * 1e-6; // microdegrees
+            final double alt = buf.getShort(9) * 0.1; // decimeters
+            final double dir = buf.getShort(11) * 0.001; // milliradians
+            final LandingZone lz = new LandingZone(lat, lng, alt, dir);
+            Log.i(TAG, "ap -> phone: lz " + lz);
+            APLandingZone.update(lz);
         } else {
-            Log.w(TAG, "ap -> phone: unknown " + Util.byteArrayToHex(value));
+            Log.e(TAG, "ap -> phone: unknown " + Util.byteArrayToHex(value));
         }
     }
 
@@ -102,7 +101,7 @@ class AutopilotProtocol implements BluetoothProtocol {
     }
 
     void setLandingZone(LandingZone lz) {
-        Log.i(TAG, "phone -> ap: lz " + lz);
+        Log.i(TAG, "phone -> ap: set lz " + lz);
         final BluetoothGattService service = bluetoothGatt.getService(apService);
         final BluetoothGattCharacteristic ch = service.getCharacteristic(characteristicLz);
         if (ch != null) {
@@ -115,8 +114,29 @@ class AutopilotProtocol implements BluetoothProtocol {
             buf.putShort(9, (short)(lz.destination.alt * 10)); // decimeters
             buf.putShort(11, (short)(lz.landingDirection * 1000)); // milliradians
             ch.setValue(value);
-            bluetoothGatt.writeCharacteristic(ch);
+            if (!bluetoothGatt.writeCharacteristic(ch)) {
+                Log.e(TAG, "Failed to set lz");
+            }
+            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N) {
+                // TODO: Wait a sec...
+            }
+            fetchLandingZone();
         }
     }
 
+    private void fetchLandingZone() {
+        // TODO: Replace with cmd queue
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException ignored) {
+        }
+        Log.i(TAG, "phone -> ap: fetch lz");
+        final BluetoothGattService service = bluetoothGatt.getService(apService);
+        final BluetoothGattCharacteristic ch = service.getCharacteristic(characteristicLz);
+        if (ch != null) {
+            if (!bluetoothGatt.readCharacteristic(ch)) {
+                Log.e(TAG, "Failed to fetch lz");
+            }
+        }
+    }
 }

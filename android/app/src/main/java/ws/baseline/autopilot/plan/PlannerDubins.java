@@ -13,8 +13,11 @@ import androidx.annotation.Nullable;
 class PlannerDubins {
     private static final String TAG = "PlannerDubins";
 
+    /**
+     * Find dubins path.
+     */
     @Nullable
-    public static Path dubins(PointV loc, PointV dest, double turnRadius, int turn1, int turn2) {
+    static Path dubins(PointV loc, PointV dest, double turnRadius, int turn1, int turn2) {
         // First dubins circle, perpendicular to velocity
         final double velocity = Math.hypot(loc.vx, loc.vy);
         if (velocity == 0) {

@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
 
         binding.setLandingZone.setOnClickListener((e) -> {
             if (!settingLz) {
-                binding.crosshairOverlay.setVisibility(View.VISIBLE);
+                binding.landingArrow.setVisibility(View.VISIBLE);
                 binding.setLandingZone.setText("✢ Set");
             } else {
                 final MapFragment frag = (MapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
@@ -47,12 +47,14 @@ public class MainActivity extends AppCompatActivity {
                     Elevation.get(this, ll, (elevation) -> {
                         final LandingZone lz = new LandingZone(ll.latitude, ll.longitude, elevation, landingDirection);
                         Log.i(TAG, "Setting landing zone " + lz);
+                        Services.flightComputer.lz = lz; // Set pending lz
+                        Services.flightComputer.lzPending = true;
                         Services.bluetooth.setLandingZone(lz);
                     });
                 } else {
                     Log.e(TAG, "Failed to find map fragment");
                 }
-                binding.crosshairOverlay.setVisibility(View.GONE);
+                binding.landingArrow.setVisibility(View.GONE);
                 binding.setLandingZone.setText("✢ LZ");
             }
             settingLz = !settingLz;

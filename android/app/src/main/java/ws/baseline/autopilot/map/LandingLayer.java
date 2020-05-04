@@ -1,7 +1,8 @@
 package ws.baseline.autopilot.map;
 
-import ws.baseline.autopilot.DroneState;
 import ws.baseline.autopilot.R;
+import ws.baseline.autopilot.Services;
+import ws.baseline.autopilot.geo.LandingZone;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -10,19 +11,11 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.Polyline;
-import com.google.android.gms.maps.model.PolylineOptions;
-import com.google.android.gms.maps.model.RoundCap;
-import java.util.ArrayList;
-import java.util.List;
 
 public class LandingLayer extends MapLayer {
 
     @Nullable
     private Marker landingMarker;
-    @Nullable
-    private Polyline landingPath;
-    private final List<LatLng> landingPoints = new ArrayList<>();
 
     @Override
     public void onAdd(@NonNull GoogleMap map) {
@@ -34,31 +27,22 @@ public class LandingLayer extends MapLayer {
                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_target))
                 .anchor(0.5f, 0.5f)
         );
-        // Add line to projected landing zone
-        landingPath = map.addPolyline(new PolylineOptions()
-                .visible(false)
-                .width(10)
-                .color(0x66ff0000)
-                .startCap(new RoundCap())
-                .endCap(new RoundCap())
-        );
     }
 
     @Override
     public void update() {
-        if (landingMarker != null && landingPath != null) {
-            final DroneState state = DroneState.get();
-            if (state != null && state.lz != null) {
-                landingMarker.setPosition(state.lz.destination.toLatLng());
+        if (landingMarker != null) {
+            final LandingZone lz = Services.flightComputer.lz;
+            if (lz != null) {
+                landingMarker.setPosition(lz.destination.toLatLng());
                 landingMarker.setVisible(true);
-                landingPoints.clear();
-                landingPoints.add(state.currentLocation.toLatLng());
-                landingPoints.add(state.lz.destination.toLatLng());
-                landingPath.setPoints(landingPoints);
-                landingPath.setVisible(true);
+                if (Services.flightComputer.lzPending) {
+                    landingMarker.setAlpha(0.5f);
+                } else {
+                    landingMarker.setAlpha(1);
+                }
             } else {
                 landingMarker.setVisible(false);
-                landingPath.setVisible(false);
             }
         }
     }
