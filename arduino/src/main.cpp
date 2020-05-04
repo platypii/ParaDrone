@@ -21,6 +21,7 @@ void setup() {
 
   load_landing_zone();
   screen_init();
+  motor_init();
   init_gps();
   bt_init();
 
@@ -31,6 +32,7 @@ void setup() {
 void loop() {
   read_gps();
   screen_loop();
+  delay(20);
 }
 
 /**

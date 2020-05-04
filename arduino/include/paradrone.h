@@ -8,6 +8,9 @@ extern LandingZone *current_landing_zone;
 extern GeoPointV *last_location;
 extern bool bt_connected;
 
+extern signed char control_left;
+extern signed char control_right;
+
 // Screen
 void screen_init();
 void screen_loop();
@@ -34,5 +37,9 @@ double to_radians(double degrees);
 // Landing zone
 void load_landing_zone();
 void set_landing_zone(const char *packed);
+
+// Motors
+void motor_init();
+void set_controls(signed char left, signed char right);
 
 #endif

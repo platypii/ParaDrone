@@ -8,6 +8,7 @@
 #define SERVICE_PARADRONE       "ba5e0001-c55f-496f-a444-9855f5f14901"
 #define CHARACTERISTIC_LOCATION "ba5e0002-9235-47c8-b2f3-916cee33d802"
 #define CHARACTERISTIC_LZ       "ba5e0003-ed55-43fa-bb54-8e721e092603"
+#define CHARACTERISTIC_CTRL     "ba5e0004-be98-4de9-9e9a-080b5bb41404"
 
 // Global bluetooth state
 bool bt_connected = false;
@@ -52,8 +53,23 @@ class LandingZoneCharacteristic : public BLECharacteristicCallbacks {
       const char *value = pCharacteristic->getValue().c_str();
       if (value[0] == 'Z') {
         set_landing_zone(value);
+        screen_update();
       } else {
         Serial.printf("Unexpected LZ write %02x", value[0]);
+      }
+    }
+};
+
+class CtrlCharacteristic : public BLECharacteristicCallbacks {
+    void onRead(BLECharacteristic *pCharacteristic) {
+    };
+    void onWrite(BLECharacteristic *pCharacteristic) {
+      const char *value = pCharacteristic->getValue().c_str();
+      if (value[0] == 'C') {
+        set_controls(value[1], value[2]);
+        screen_update();
+      } else {
+        Serial.printf("Unexpected ctrl write %02x", value[0]);
       }
     }
 };
@@ -81,6 +97,14 @@ void bt_init() {
     BLECharacteristic::PROPERTY_WRITE
   );
   ch_lz->setCallbacks(new LandingZoneCharacteristic());
+
+  // Characteristic controls
+  ch_lz = pService->createCharacteristic(
+    CHARACTERISTIC_CTRL,
+    BLECharacteristic::PROPERTY_READ |
+    BLECharacteristic::PROPERTY_WRITE
+  );
+  ch_lz->setCallbacks(new CtrlCharacteristic());
 
   pService->start();
   // BLEAdvertising *pAdvertising = pServer->getAdvertising();  // this still is working for backward compatibility

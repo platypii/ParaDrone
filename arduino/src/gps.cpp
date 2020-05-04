@@ -2,7 +2,7 @@
 #include "paradrone.h"
 
 #define GPS_TX 12 // white GPS output
-#define GPS_RX 33 // green GPS input
+#define GPS_RX 36 // green GPS input
 
 GeoPointV *last_location;
 

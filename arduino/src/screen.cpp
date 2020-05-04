@@ -72,6 +72,11 @@ static void screen_draw() {
   }
   Heltec.display->drawString(0, 20, buf);
 
+  // Controls
+  sprintf(buf, "%d | %d", control_left, control_right);
+  Heltec.display->setTextAlignment(TEXT_ALIGN_CENTER);
+  Heltec.display->drawString(DISPLAY_WIDTH / 2, 54, buf);
+
   // Phone connected?
   if (bt_connected) {
     Heltec.display->setTextAlignment(TEXT_ALIGN_RIGHT);

@@ -63,23 +63,41 @@ Most arduino variants should work.
 
 12. Solder wires, diode, and banana plugs.
 
-## Remote control (R/C)
-
-Materials:
-
- - 11.1V lithium polymer (LiPo) battery
- - 2x QuicRun 1060 ESC
- - RadioLink T8S + R8EF
-
 ## AutoPilot
 
 Materials:
 
  - 11.1V lithium polymer (LiPo) battery
- - RadioLink T8S + R8EF
- - ESP32
+ - Heltec ESP32 LoRa
  - BN-220 GPS
- - L298N motor driver
+ - Pololu dual MC33926 motor driver
+
+## Pins
+
+ESP32
+ - Pin 17 -> Driver M1_IN2
+ - Pin 2 -> Driver M1_IN1
+ - Pin 23 -> Driver M2_IN2
+ - Pin 22 -> Driver M2_IN1
+ - Pin 12 -> GPS out
+ - Pin 36 -> GPS in
+
+Motor Driver
+ - M2_FB -> ESP32 pin 33
+ - M2_IN1 -> ESP32 pin 22
+ - M2_IN2 -> ESP32 pin 23
+ - M1_FB -> ESP32 pin 32
+ - M1_IN1 -> ESP32 pin 2
+ - M1_IN2 -> ESP32 pin 17
+ - VDD -> ESP32 +3V
+ - GND -> BEC GND
+ - VIN -> BEC in
+
+GPS
+ - red -> ESP32 +3V
+ - black -> ESP32 GND
+ - green -> ESP32 pin 36
+ - white -> ESP32 pin 12
 
 ## Software
 
