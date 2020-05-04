@@ -6,9 +6,9 @@ import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.util.Log;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import org.greenrobot.eventbus.EventBus;
 
 import static ws.baseline.autopilot.bluetooth.BluetoothState.BT_CONNECTING;
 import static ws.baseline.autopilot.bluetooth.BluetoothState.BT_STARTING;
@@ -87,8 +87,7 @@ public class BluetoothService {
         }
         Log.d(TAG, "Bluetooth state: " + BT_STATES[bluetoothState] + " -> " + BT_STATES[state]);
         bluetoothState = state;
-        // TODO: Emit
-        // EventBus.getDefault().post(new BluetoothState(state));
+        EventBus.getDefault().post(new BluetoothState(state));
     }
 
     public synchronized void stop() {

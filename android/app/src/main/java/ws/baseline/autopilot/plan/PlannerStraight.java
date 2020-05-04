@@ -9,8 +9,11 @@ import androidx.annotation.NonNull;
 
 class PlannerStraight {
 
+    /**
+     * Fly straight forever.
+     */
     @NonNull
-    public static Path straight(PointV loc) {
+    static Path straight(PointV loc) {
         final Point target = new Point(loc.x + loc.vx, loc.y + loc.vy);
         return new Path(
                 new SegmentLine(loc, target)
