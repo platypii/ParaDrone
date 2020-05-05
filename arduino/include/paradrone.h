@@ -2,6 +2,11 @@
 #define _PARADRONE_H
 
 #include "dtypes.h"
+#include "geo.h"
+
+#define PARAMOTOR_GROUNDSPEED 11
+#define PARAMOTOR_DESCENTRATE 4
+#define PARAMOTOR_TURNRADIUS 100
 
 // Global vars
 extern LandingZone *current_landing_zone;
@@ -27,7 +32,7 @@ void parse_nmea(char *line);
 void update_location(GeoPointV *point);
 
 // Logger
-void log_point(GeoPointV point);
+void log_point(GeoPointV *loc);
 
 // Math
 double mod360(double degrees);

@@ -9,7 +9,7 @@ void blink(int count);
 
 void setup() {
   Heltec.begin(
-    true, // Display
+    false, // Display
     true, // LoRa
     true, // Serial
     true, // PABOOST
@@ -39,7 +39,7 @@ void loop() {
  * Called when GPS location is updated
  */
 void update_location(GeoPointV *point) {
-  // Serial.printf("GPS %f, %f, %.1f\n", point.lat, point.lng, point.alt);
+  // Serial.printf("GPS %f, %f, %.1f\n", point->lat, point->lng, point->alt);
   if (last_location) free(last_location);
   last_location = point;
   screen_update();

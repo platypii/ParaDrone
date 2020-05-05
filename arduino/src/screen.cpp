@@ -6,8 +6,8 @@ static long last_redraw_millis = 0;
 static void screen_draw();
 
 void screen_init() {
-  Wire.begin(SDA_OLED, SCL_OLED); //Scan OLED's I2C address via I2C0
-  Heltec.display->clear();
+  Heltec.display->init();
+  Heltec.display->flipScreenVertically();
   Heltec.display->setTextAlignment(TEXT_ALIGN_LEFT);
   Heltec.display->setFont(ArialMT_Plain_10);
   Heltec.display->drawString(3, 12, "BASEline");

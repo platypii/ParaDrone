@@ -15,8 +15,8 @@ LandingZone::LandingZone(double lat, double lng, double alt, double landingDir) 
   dest = {
     .x = 0,
     .y = 0,
-    .vx = cos(landingDirection),
-    .vy = sin(landingDirection)
+    .vx = sin(landingDirection),
+    .vy = cos(landingDirection)
   };
 }
 
@@ -70,10 +70,10 @@ struct PackedLZ {
 
 static LandingZone *unpack(PackedLZ *packed) {
   return new LandingZone(
-    packed->lat * 1e-6,
-    packed->lng * 1e-6,
-    packed->alt * 0.1,
-    packed->landingDirection * 0.001
+    packed->lat * 1e-6, // microdegrees
+    packed->lng * 1e-6, // microdegrees
+    packed->alt * 0.1, // decimeters
+    packed->landingDirection * 0.001 // milliradians
   );
 }
 

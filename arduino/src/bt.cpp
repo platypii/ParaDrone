@@ -2,36 +2,15 @@
 #include <BLEDevice.h>
 #include <BLEUtils.h>
 #include <BLEServer.h>
-#include "geo.h"
+#include "messages.h"
 #include "paradrone.h"
 
-#define SERVICE_PARADRONE       "ba5e0001-c55f-496f-a444-9855f5f14901"
-#define CHARACTERISTIC_LOCATION "ba5e0002-9235-47c8-b2f3-916cee33d802"
-#define CHARACTERISTIC_LZ       "ba5e0003-ed55-43fa-bb54-8e721e092603"
-#define CHARACTERISTIC_CTRL     "ba5e0004-be98-4de9-9e9a-080b5bb41404"
+#define AP_SERVICE        "ba5e0001-c55f-496f-a444-9855f5f14901"
+#define AP_CHARACTERISTIC "ba5e0002-9235-47c8-b2f3-916cee33d802"
 
 // Global bluetooth state
 bool bt_connected = false;
-static BLECharacteristic *ch_location;
-static BLECharacteristic *ch_lz;
-
-#pragma pack(1)
-struct LocationMessage {
-  char msg_type; // 'L'
-  long long millis; // ms since epoch
-  int lat; // microdegrees
-  int lng; // microdegrees
-  short alt; // decimeters
-};
-
-#pragma pack(1)
-struct SpeedMessage {
-  char msg_type; // 'S'
-  long long millis; // ms since epoch
-  short vN; // cm/s
-  short vE; // cm/s
-  short climb; // cm/s
-};
+static BLECharacteristic *ap_ch;
 
 class AutoPilotServer : public BLEServerCallbacks {
     void onConnect(BLEServer* pServer) {
@@ -79,37 +58,21 @@ void bt_init() {
   BLEDevice::init("ParaDrone"); // Device name
   BLEServer *pServer = BLEDevice::createServer();
   pServer->setCallbacks(new AutoPilotServer());
-  BLEService *pService = pServer->createService(SERVICE_PARADRONE);
+  BLEService *pService = pServer->createService(AP_SERVICE);
 
   // Characteristic location
-  ch_location = pService->createCharacteristic(
-    CHARACTERISTIC_LOCATION,
-    BLECharacteristic::PROPERTY_READ |
+  ap_ch = pService->createCharacteristic(
+    AP_CHARACTERISTIC,
+    BLECharacteristic::PROPERTY_WRITE |
     BLECharacteristic::PROPERTY_NOTIFY
   );
   BLEDescriptor *pDescriptor = new BLEDescriptor(BLEUUID((uint16_t)0x2902));
-  ch_location->addDescriptor(pDescriptor);
-
-  // Characteristic LZ
-  ch_lz = pService->createCharacteristic(
-    CHARACTERISTIC_LZ,
-    BLECharacteristic::PROPERTY_READ |
-    BLECharacteristic::PROPERTY_WRITE
-  );
-  ch_lz->setCallbacks(new LandingZoneCharacteristic());
-
-  // Characteristic controls
-  ch_lz = pService->createCharacteristic(
-    CHARACTERISTIC_CTRL,
-    BLECharacteristic::PROPERTY_READ |
-    BLECharacteristic::PROPERTY_WRITE
-  );
-  ch_lz->setCallbacks(new CtrlCharacteristic());
+  ap_ch->addDescriptor(pDescriptor);
 
   pService->start();
   // BLEAdvertising *pAdvertising = pServer->getAdvertising();  // this still is working for backward compatibility
   BLEAdvertising *pAdvertising = BLEDevice::getAdvertising();
-  pAdvertising->addServiceUUID(SERVICE_PARADRONE);
+  pAdvertising->addServiceUUID(AP_SERVICE);
   pAdvertising->setScanResponse(true);
   pAdvertising->setMinPreferred(0x06);  // functions that help with iPhone connections issue
   pAdvertising->setMinPreferred(0x12);
@@ -118,28 +81,17 @@ void bt_init() {
 
 void bt_notify(GeoPointV *point) {
   // Pack point into location message
-  LocationMessage msg = {
-    'L',
-    point->millis,
+  SpeedMessage msg = {
+    'S',
     (int)(point->lat * 1e6), // microdegrees
     (int)(point->lng * 1e6), // microdegrees
-    (short)(point->alt * 10) // decimeters
-  };
-  uint8_t *data = (uint8_t*) &msg;
-  size_t len = sizeof(msg);
-  ch_location->setValue(data, len);
-  ch_location->notify();
-
-  // Speed
-  SpeedMessage msg2 = {
-    'S',
-    point->millis,
+    (short)(point->alt * 10), // decimeters
     (short)(point->vN * 0.01), // cm/s
     (short)(point->vE * 0.01), // cm/s
     (short)(point->climb * 0.01) // cm/s
   };
-  uint8_t *data2 = (uint8_t*) &msg2;
-  size_t len2 = sizeof(msg2);
-  ch_location->setValue(data2, len2);
-  ch_location->notify();
+  uint8_t *data = (uint8_t*) &msg;
+  size_t len = sizeof(msg);
+  ap_ch->setValue(data, len);
+  ap_ch->notify();
 }
