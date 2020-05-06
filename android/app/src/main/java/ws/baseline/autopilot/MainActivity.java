@@ -8,15 +8,14 @@ import ws.baseline.autopilot.map.MapFragment;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import com.google.android.gms.maps.model.LatLng;
+import timber.log.Timber;
 
 public class MainActivity extends AppCompatActivity {
-    private static final String TAG = "Main";
 
     private static final int PERMISSION_REQUEST_LOCATION = 2010;
     private ActivityMainBinding binding;
@@ -43,16 +42,16 @@ public class MainActivity extends AppCompatActivity {
                 if (frag != null) {
                     final LatLng ll = frag.center();
                     final double landingDirection = frag.direction(); // radians
-                    Log.i(TAG, "Getting elevation " + ll);
+                    Timber.i("Getting elevation %s", ll);
                     Elevation.get(this, ll, (elevation) -> {
                         final LandingZone lz = new LandingZone(ll.latitude, ll.longitude, elevation, landingDirection);
-                        Log.i(TAG, "Setting landing zone " + lz);
+                        Timber.i("Setting landing zone %s", lz);
                         Services.flightComputer.lz = lz; // Set pending lz
                         Services.flightComputer.lzPending = true;
                         Services.bluetooth.setLandingZone(lz);
                     });
                 } else {
-                    Log.e(TAG, "Failed to find map fragment");
+                    Timber.e("Failed to find map fragment");
                 }
                 binding.landingArrow.setVisibility(View.GONE);
                 binding.setLandingZone.setText("✢ LZ");
