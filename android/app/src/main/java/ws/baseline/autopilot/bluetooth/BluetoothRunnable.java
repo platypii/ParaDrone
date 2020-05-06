@@ -14,11 +14,11 @@ import android.bluetooth.le.ScanResult;
 import android.bluetooth.le.ScanSettings;
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
+import timber.log.Timber;
 
 import static android.bluetooth.BluetoothGatt.GATT_SUCCESS;
 import static ws.baseline.autopilot.bluetooth.BluetoothState.BT_CONNECTED;
@@ -32,7 +32,6 @@ import static ws.baseline.autopilot.bluetooth.BluetoothState.BT_STOPPING;
  * Autopilot messages are emitted as events.
  */
 class BluetoothRunnable implements Runnable {
-    private static final String TAG = "BluetoothRunnable";
 
     @NonNull
     private final BluetoothService service;
@@ -60,9 +59,9 @@ class BluetoothRunnable implements Runnable {
      */
     @Override
     public void run() {
-        Log.i(TAG, "Autopilot bluetooth thread starting");
+        Timber.i("Autopilot bluetooth thread starting");
         if (!bluetoothAdapter.isEnabled()) {
-            Log.e(TAG, "Bluetooth is not enabled");
+            Timber.e("Bluetooth is not enabled");
             return;
         }
         // Scan for autopilot devices
@@ -73,11 +72,11 @@ class BluetoothRunnable implements Runnable {
      * Scan BLE for autopilot devices
      */
     private void scan() {
-        Log.i(TAG, "Scanning for autopilot");
+        Timber.i("Scanning for autopilot");
         service.setState(BT_STARTING);
         bluetoothScanner = bluetoothAdapter.getBluetoothLeScanner();
         if (bluetoothScanner == null) {
-            Log.e(TAG, "Failed to get bluetooth LE scanner");
+            Timber.e("Failed to get bluetooth LE scanner");
             return;
         }
         final ScanFilter scanFilter = new ScanFilter.Builder().build();
@@ -91,7 +90,7 @@ class BluetoothRunnable implements Runnable {
                     final BluetoothDevice device = result.getDevice();
                     final ScanRecord record = result.getScanRecord();
                     if (AutopilotProtocol.isAutopilot(device, record)) {
-                        Log.i(TAG, "Autopilot device found, connecting to: " + device.getName() + " " + device.getAddress());
+                        Timber.i("Autopilot device found, connecting to: " + device.getName() + " " + device.getAddress());
                         connect(device);
                         protocol = new AutopilotProtocol(bluetoothGatt);
                     }
@@ -113,7 +112,7 @@ class BluetoothRunnable implements Runnable {
 
     private void stopScan() {
         if (service.getState() != BT_STARTING) {
-            Log.e(TAG, "Scanner shouldn't exist in state " + service.getState());
+            Timber.e("Scanner shouldn't exist in state %s", service.getState());
         }
         // Stop scanning
         if (bluetoothScanner != null) {
@@ -126,26 +125,27 @@ class BluetoothRunnable implements Runnable {
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
             if (status == GATT_SUCCESS) {
                 if (newState == BluetoothProfile.STATE_CONNECTED) {
-                    Log.d(TAG, "Bluetooth profile connected");
+                    Timber.d("Bluetooth profile connected");
                     // TODO: If we have connected to a device before, skip discover services and connect directly.
                     bluetoothGatt.discoverServices();
                     service.setState(BT_CONNECTED);
                 } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                     // Disconnected our own request
-                    Log.i(TAG, "Autopilot disconnected");
+                    Timber.i("Autopilot disconnected");
+                    service.setState(BT_DISCONNECTED);
                     gatt.close();
                     onDisconnect();
                 } else {
                     // Connecting or disconnecting state
-                    Log.i(TAG, "Autopilot state " + newState);
+                    Timber.i("Autopilot state %s", newState);
                 }
             } else {
                 gatt.close();
                 if (newState == BluetoothProfile.STATE_DISCONNECTED) {
-                    Log.i(TAG, "Autopilot remote disconnect");
+                    Timber.i("Autopilot remote disconnect");
                     onDisconnect();
                 } else {
-                    Log.e(TAG, "Bluetooth connection state error " + status + " " + newState);
+                    Timber.e("Bluetooth connection state error %d %d", status, newState);
                 }
             }
         }
@@ -153,20 +153,20 @@ class BluetoothRunnable implements Runnable {
         @Override
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
             if (status == GATT_SUCCESS) {
-                Log.i(TAG, "Bluetooth services discovered");
+                Timber.i("Bluetooth services discovered");
                 protocol.onServicesDiscovered();
             } else {
-                Log.i(TAG, "Bluetooth service discovery failed");
+                Timber.i("Bluetooth service discovery failed");
             }
         }
 
         @Override
         public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic ch) {
             if (ch.getUuid().equals(protocol.characteristicLocation)) {
-//                Log.d(TAG, "Autopilot onCharacteristicChanged location");
+//                Timber.d("Autopilot onCharacteristicChanged location");
                 protocol.processBytes(ch.getValue());
             } else {
-                Log.i(TAG, "Autopilot onCharacteristicChanged unknown " + ch);
+                Timber.i("Autopilot onCharacteristicChanged unknown %s", ch);
             }
         }
 
@@ -174,13 +174,13 @@ class BluetoothRunnable implements Runnable {
         public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic ch, int status) {
             if (ch.getUuid().equals(protocol.characteristicLz)) {
                 if (status == GATT_SUCCESS) {
-                    Log.d(TAG, "Autopilot onCharacteristicRead lz");
+                    Timber.d("Autopilot onCharacteristicRead lz");
                     protocol.processBytes(ch.getValue());
                 } else {
-                    Log.w(TAG, "Autopilot onCharacteristicRead lz failed " + status);
+                    Timber.w("Autopilot onCharacteristicRead lz failed %s", status);
                 }
             } else {
-                Log.i(TAG, "Autopilot onCharacteristicRead unknown " + ch);
+                Timber.i("Autopilot onCharacteristicRead unknown %s", ch);
             }
         }
     };

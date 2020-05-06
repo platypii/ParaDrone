@@ -1,11 +1,10 @@
 package ws.baseline.autopilot.geo;
 
-import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
+import timber.log.Timber;
 
 public class SegmentTurn implements Segment {
-    private static final String TAG = "SegmentTurn";
 
     private final Circle circle;
     private final Point start;
@@ -32,7 +31,7 @@ public class SegmentTurn implements Segment {
     @Override
     public PathLike fly(double distance) {
         if (distance < 0) {
-            Log.e(TAG, "Flight distance cannot be negative " + distance);
+            Timber.e("Flight distance cannot be negative %s", distance);
         }
         final double len = length();
         if (distance < len) {

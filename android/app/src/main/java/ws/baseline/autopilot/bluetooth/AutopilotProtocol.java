@@ -9,19 +9,18 @@ import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
 import android.bluetooth.le.ScanRecord;
 import android.os.Build;
-import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.UUID;
+import timber.log.Timber;
 
 /**
  * Implements bluetooth two-way communication protocol with autopilot device.
  */
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 class AutopilotProtocol {
-    private static final String TAG = "AutopilotProtocol";
 
     // Autopilot service UUID
     private static final UUID apService = UUID.fromString("00ba5e00-c55f-496f-a444-9855f5f14992");
@@ -57,7 +56,7 @@ class AutopilotProtocol {
             final double lat = buf.getInt(9) * 1e-6; // microdegrees
             final double lng = buf.getInt(13) * 1e-6; // microdegrees
             final double alt = buf.getShort(17) * 0.1; // decimeters
-            Log.d(TAG, "ap -> phone: location " + lat + " " + lng + " " + alt);
+            Timber.d("ap -> phone: location " + lat + " " + lng + " " + alt);
             APLocationMsg.update(millis, lat, lng, alt);
         } else if (value[0] == 'S' && value.length == 15) {
             // 'S', millis, vN, vE, climb
@@ -66,7 +65,7 @@ class AutopilotProtocol {
             final double vD = buf.getShort(9) * 0.01; // cm/s
             final double vE = buf.getShort(11) * 0.01; // cm/s
             final double climb = buf.getShort(13) * 0.01; // cm/s
-            Log.d(TAG, "ap -> phone: speed " + vD + " " + vE + " " + climb);
+            Timber.d("ap -> phone: speed " + vD + " " + vE + " " + climb);
             APSpeedMsg.update(millis, vD, vE, climb);
         } else if (value[0] == 'Z' && value.length == 13) {
             // 'Z', lat, lng, alt, dir
@@ -76,10 +75,10 @@ class AutopilotProtocol {
             final double alt = buf.getShort(9) * 0.1; // decimeters
             final double dir = buf.getShort(11) * 0.001; // milliradians
             final LandingZone lz = new LandingZone(lat, lng, alt, dir);
-            Log.i(TAG, "ap -> phone: lz " + lz);
+            Timber.i("ap -> phone: lz %s", lz);
             APLandingZone.update(lz);
         } else {
-            Log.e(TAG, "ap -> phone: unknown " + Util.byteArrayToHex(value));
+            Timber.e("ap -> phone: unknown %s", Util.byteArrayToHex(value));
         }
     }
 
@@ -95,13 +94,13 @@ class AutopilotProtocol {
                 descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
                 bluetoothGatt.writeDescriptor(descriptor);
             } else {
-                Log.e(TAG, "Null descriptor for " + clientCharacteristicDescriptor);
+                Timber.e("Null descriptor for %s", clientCharacteristicDescriptor);
             }
         }
     }
 
     void setLandingZone(LandingZone lz) {
-        Log.i(TAG, "phone -> ap: set lz " + lz);
+        Timber.i("phone -> ap: set lz %s", lz);
         final BluetoothGattService service = bluetoothGatt.getService(apService);
         final BluetoothGattCharacteristic ch = service.getCharacteristic(characteristicLz);
         if (ch != null) {
@@ -115,7 +114,7 @@ class AutopilotProtocol {
             buf.putShort(11, (short)(lz.landingDirection * 1000)); // milliradians
             ch.setValue(value);
             if (!bluetoothGatt.writeCharacteristic(ch)) {
-                Log.e(TAG, "Failed to set lz");
+                Timber.e("Failed to set lz");
             }
             if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N) {
                 // TODO: Wait a sec...
@@ -130,12 +129,12 @@ class AutopilotProtocol {
             Thread.sleep(100);
         } catch (InterruptedException ignored) {
         }
-        Log.i(TAG, "phone -> ap: fetch lz");
+        Timber.i("phone -> ap: fetch lz");
         final BluetoothGattService service = bluetoothGatt.getService(apService);
         final BluetoothGattCharacteristic ch = service.getCharacteristic(characteristicLz);
         if (ch != null) {
             if (!bluetoothGatt.readCharacteristic(ch)) {
-                Log.e(TAG, "Failed to fetch lz");
+                Timber.e("Failed to fetch lz");
             }
         }
     }

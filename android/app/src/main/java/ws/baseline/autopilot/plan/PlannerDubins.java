@@ -7,11 +7,10 @@ import ws.baseline.autopilot.geo.PointV;
 import ws.baseline.autopilot.geo.SegmentLine;
 import ws.baseline.autopilot.geo.SegmentTurn;
 
-import android.util.Log;
 import androidx.annotation.Nullable;
+import timber.log.Timber;
 
 class PlannerDubins {
-    private static final String TAG = "PlannerDubins";
 
     /**
      * Find dubins path.
@@ -21,7 +20,7 @@ class PlannerDubins {
         // First dubins circle, perpendicular to velocity
         final double velocity = Math.hypot(loc.vx, loc.vy);
         if (velocity == 0) {
-            Log.w(TAG, "Zero velocity no tangent");
+            Timber.w("Zero velocity no tangent");
             return null;
         }
         final Circle c1 = new Circle(
@@ -57,7 +56,7 @@ class PlannerDubins {
         // const commute_length = Math.sqrt(c_dist * c_dist - turn_delta * turn_delta)
         if (Double.isNaN(commute_angle)) {
             // Happens when c1 intersects c2
-            Log.e(TAG, "NaN commute angle");
+            Timber.e("NaN commute angle");
         }
         // Last touch of first dubin circle (start of commute home)
         final Point comm1 = new Point(

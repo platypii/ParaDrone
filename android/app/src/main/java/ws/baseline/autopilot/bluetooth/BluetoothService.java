@@ -5,10 +5,10 @@ import ws.baseline.autopilot.geo.LandingZone;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
-import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import org.greenrobot.eventbus.EventBus;
+import timber.log.Timber;
 
 import static ws.baseline.autopilot.bluetooth.BluetoothState.BT_CONNECTING;
 import static ws.baseline.autopilot.bluetooth.BluetoothState.BT_STARTING;
@@ -21,7 +21,6 @@ import static ws.baseline.autopilot.bluetooth.BluetoothState.BT_STOPPING;
  * Note: instantiating this class will not automatically start bluetooth. Call startAsync to connect.
  */
 public class BluetoothService {
-    private static final String TAG = "Bluetooth";
 
     private static final int ENABLE_BLUETOOTH_CODE = 13;
 
@@ -37,7 +36,7 @@ public class BluetoothService {
             setState(BT_STARTING);
             // Start bluetooth thread
             if (bluetoothRunnable != null) {
-                Log.e(TAG, "Bluetooth thread already started");
+                Timber.e("Bluetooth thread already started");
             }
             final BluetoothAdapter bluetoothAdapter = getAdapter(activity);
             if (bluetoothAdapter != null) {
@@ -46,7 +45,7 @@ public class BluetoothService {
                 bluetoothThread.start();
             }
         } else {
-            Log.e(TAG, "Bluetooth already started: " + BT_STATES[bluetoothState]);
+            Timber.e("Bluetooth already started: %s", BT_STATES[bluetoothState]);
         }
     }
     public void setLandingZone(LandingZone lz) {
@@ -64,7 +63,7 @@ public class BluetoothService {
         final BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (bluetoothAdapter == null) {
             // Device not supported
-            Log.e(TAG, "Bluetooth not supported");
+            Timber.e("Bluetooth not supported");
         } else if (!bluetoothAdapter.isEnabled()) {
             // Turn on bluetooth
             // TODO: Handle result?
@@ -80,19 +79,19 @@ public class BluetoothService {
 
     void setState(int state) {
         if (bluetoothState == BT_STOPPING && state == BT_CONNECTING) {
-            Log.e(TAG, "Invalid bluetooth state transition: " + BT_STATES[bluetoothState] + " -> " + BT_STATES[state]);
+            Timber.e("Invalid bluetooth state transition: " + BT_STATES[bluetoothState] + " -> " + BT_STATES[state]);
         }
         if (bluetoothState == state) {
-            Log.e(TAG, "Null state transition: " + BT_STATES[bluetoothState] + " -> " + BT_STATES[state]);
+            Timber.e("Null state transition: " + BT_STATES[bluetoothState] + " -> " + BT_STATES[state]);
         }
-        Log.d(TAG, "Bluetooth state: " + BT_STATES[bluetoothState] + " -> " + BT_STATES[state]);
+        Timber.d("Bluetooth state: " + BT_STATES[bluetoothState] + " -> " + BT_STATES[state]);
         bluetoothState = state;
         EventBus.getDefault().post(new BluetoothState(state));
     }
 
     public synchronized void stop() {
         if (bluetoothState != BT_STOPPED) {
-            Log.i(TAG, "Stopping bluetooth service");
+            Timber.i("Stopping bluetooth service");
             // Stop thread
             if (bluetoothRunnable != null && bluetoothThread != null) {
                 bluetoothRunnable.stop();
@@ -103,14 +102,14 @@ public class BluetoothService {
                     bluetoothRunnable = null;
                     bluetoothThread = null;
                     if (bluetoothState != BT_STOPPED) {
-                        Log.e(TAG, "Unexpected bluetooth state, should be STOPPED when thread has stopped: " + BT_STATES[bluetoothState]);
+                        Timber.e("Unexpected bluetooth state, should be STOPPED when thread has stopped: %s", BT_STATES[bluetoothState]);
                     }
                 } catch (InterruptedException e) {
-                    Log.e(TAG, "Bluetooth thread interrupted while waiting for it to die", e);
+                    Timber.e(e, "Bluetooth thread interrupted while waiting for it to die");
                 }
-                Log.i(TAG, "Bluetooth service stopped");
+                Timber.i("Bluetooth service stopped");
             } else {
-                Log.e(TAG, "Cannot stop bluetooth, runnable is null: " + BT_STATES[bluetoothState]);
+                Timber.e("Cannot stop bluetooth, runnable is null: %s", BT_STATES[bluetoothState]);
                 // Set state to stopped since it prevents getting stuck in state STOPPING
             }
             setState(BT_STOPPED);
