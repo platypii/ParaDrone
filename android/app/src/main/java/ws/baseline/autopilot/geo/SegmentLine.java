@@ -1,13 +1,12 @@
 package ws.baseline.autopilot.geo;
 
-import android.util.Log;
 import java.util.Arrays;
 import java.util.List;
+import timber.log.Timber;
 
 import static ws.baseline.autopilot.util.Numbers.interpolate;
 
 public class SegmentLine implements Segment {
-    private static final String TAG = "SegmentLine";
 
     private final Point start;
     private final Point end;
@@ -30,7 +29,7 @@ public class SegmentLine implements Segment {
     @Override
     public PathLike fly(double distance) {
         if (distance < 0) {
-            Log.e(TAG, "Flight distance cannot be negative " + distance);
+            Timber.e("Flight distance cannot be negative %s", distance);
         }
         // Linear interpolate
         final double alpha = distance / this.length();

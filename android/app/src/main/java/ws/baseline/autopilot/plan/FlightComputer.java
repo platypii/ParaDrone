@@ -8,14 +8,13 @@ import ws.baseline.autopilot.bluetooth.APSpeedMsg;
 import ws.baseline.autopilot.geo.LandingZone;
 import ws.baseline.autopilot.geo.Path;
 
-import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+import timber.log.Timber;
 
 public class FlightComputer {
-    private static final String TAG = "FlightComputer";
 
     @Nullable
     public LandingZone lz;
@@ -51,7 +50,7 @@ public class FlightComputer {
     public void onApSpeed(@NonNull APSpeedMsg event) {
         this.speed = event;
         if (location.millis != speed.millis) {
-            Log.e(TAG, "Location/speed mismatch " + location.millis + " != " + speed.millis);
+            Timber.e("Location/speed mismatch " + location.millis + " != " + speed.millis);
         }
         // Combine location and speed data
         lastPoint = new GeoPoint(location.lat, location.lng, location.alt, speed.vN, speed.vE, speed.climb);

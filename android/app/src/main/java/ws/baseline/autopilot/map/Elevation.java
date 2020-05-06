@@ -3,15 +3,14 @@ package ws.baseline.autopilot.map;
 import ws.baseline.autopilot.R;
 
 import android.content.Context;
-import android.util.Log;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.ElevationApi;
 import com.google.maps.GeoApiContext;
 import com.google.maps.PendingResult;
 import com.google.maps.model.ElevationResult;
+import timber.log.Timber;
 
 public class Elevation {
-    private static final String TAG = "Elevation";
 
     public static void get(Context context, LatLng ll, ElevationCallback cb) {
         final GeoApiContext ctx = new GeoApiContext.Builder()
@@ -24,7 +23,7 @@ public class Elevation {
             }
             @Override
             public void onFailure(Throwable e) {
-                Log.e(TAG, "Failed to get elevation", e);
+                Timber.e(e, "Failed to get elevation");
             }
         });
     }
