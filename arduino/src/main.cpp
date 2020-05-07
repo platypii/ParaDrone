@@ -1,57 +1,64 @@
 #include <Arduino.h>
+#include <EEPROM.h>
+#include "heltec.h"
 #include "paradrone.h"
 
-// Use ESP32 secondary serial port, since primary interferes with programming
-#define RXD2 16
-#define TXD2 17
-
-#define LED_BUILTIN 2
 void blink(int count);
 
+#define LORA_BAND 915E6
+
 void setup() {
-  // Serial debugging
-  // Serial.begin(115200);
-  Serial.begin(9600);
-  Serial.println("ParaDrone");
+  Heltec.begin(
+    true, // Display
+    true, // LoRa
+    true, // Serial
+    true, // PABOOST
+    LORA_BAND
+  );
+  EEPROM.begin(512);
+  // WiFi.mode(WIFI_OFF);
+  // Serial.println("ParaDrone");
 
-  // Init GPS
-  Serial2.begin(9600, SERIAL_8N1, RXD2, TXD2);
-
-  // Init BLE
+  load_landing_zone();
+  screen_init();
+  init_gps();
   bt_init();
 
-  // Init LED
-  pinMode(LED_BUILTIN, OUTPUT);
+  // Welcome
   blink(4);
 }
 
 void loop() {
   read_gps();
-  delay(100); // wait a bit
+  screen_loop();
 }
 
 /**
  * Called when GPS location is updated
  */
-void update_location(GeoPointV point) {
-  Serial.printf("GPS %f, %f, %.1f\n", point.lat, point.lng, point.alt);
+void update_location(GeoPointV *point) {
+  // Serial.printf("GPS %f, %f, %.1f\n", point.lat, point.lng, point.alt);
+  if (last_location) free(last_location);
+  last_location = point;
+  screen_update();
   blink(1);
   bt_notify(point);
   // log_point(point);
   // TODO: Plan and update controls
+  // TODO: Free point
 }
 
 /**
  * Blink LED
  */
 void blink(int count) {
-  digitalWrite(LED_BUILTIN, HIGH); // LED on
+  digitalWrite(LED, HIGH); // LED on
   delay(50);
-  digitalWrite(LED_BUILTIN, LOW); // LED off
+  digitalWrite(LED, LOW); // LED off
   for (int i = 1; i < count; i++) {
     delay(50);
-    digitalWrite(LED_BUILTIN, HIGH); // LED on
+    digitalWrite(LED, HIGH); // LED on
     delay(50);
-    digitalWrite(LED_BUILTIN, LOW); // LED off
+    digitalWrite(LED, LOW); // LED off
   }
 }

@@ -5,4 +5,9 @@ build:
   stage: build
   script:
     - cd arduino
+    - platformio lib update
     - platformio run
+  cache:
+    key: pio-deps
+    paths:
+      - .pio/libdeps

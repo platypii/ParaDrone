@@ -84,6 +84,9 @@ double mod360(double degrees);
 double to_degrees(double radians);
 double to_radians(double degrees);
 
+// Convert
+void bearing2(char *str, double degrees);
+
 double geo_bearing(double lat1, double lng1, double lat2, double lng2);
 double geo_distance(double lat1, double lng1, double lat2, double lng2);
 

@@ -1,6 +1,16 @@
 #include <Arduino.h>
 #include "paradrone.h"
 
+#define GPS_TX 12 // white GPS output
+#define GPS_RX 33 // green GPS input
+
+GeoPointV *last_location;
+
+void init_gps() {
+  // Secondary serial port, since primary interferes with programming
+  Serial2.begin(9600, SERIAL_8N1, GPS_TX, GPS_RX);
+}
+
 void read_gps() {
   // Serial.println("Reading from GPS...");
   char line[256]; // Null terminated NMEA string

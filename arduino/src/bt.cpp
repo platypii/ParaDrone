@@ -5,12 +5,12 @@
 #include "geo.h"
 #include "paradrone.h"
 
-#define SERVICE_PARADRONE       "00ba5e00-c55f-496f-a444-9855f5f14992"
-#define CHARACTERISTIC_LOCATION "00b45300-9235-47c8-b2f3-916cee33d85c"
-#define CHARACTERISTIC_LZ       "00845300-ed55-43fa-bb54-8e721e0926ee"
+#define SERVICE_PARADRONE       "ba5e0001-c55f-496f-a444-9855f5f14901"
+#define CHARACTERISTIC_LOCATION "ba5e0002-9235-47c8-b2f3-916cee33d802"
+#define CHARACTERISTIC_LZ       "ba5e0003-ed55-43fa-bb54-8e721e092603"
 
 // Global bluetooth state
-static bool _BLEClientConnected = false;
+bool bt_connected = false;
 static BLECharacteristic *ch_location;
 static BLECharacteristic *ch_lz;
 
@@ -34,11 +34,13 @@ struct SpeedMessage {
 
 class AutoPilotServer : public BLEServerCallbacks {
     void onConnect(BLEServer* pServer) {
-      _BLEClientConnected = true;
+      bt_connected = true;
+      screen_update();
       Serial.println("BT client connected");
     };
     void onDisconnect(BLEServer* pServer) {
-      _BLEClientConnected = false;
+      bt_connected = false;
+      screen_update();
       Serial.println("BT client disconnected");
     }
 };
@@ -48,7 +50,11 @@ class LandingZoneCharacteristic : public BLECharacteristicCallbacks {
     };
     void onWrite(BLECharacteristic *pCharacteristic) {
       const char *value = pCharacteristic->getValue().c_str();
-      set_landing_zone(value);
+      if (value[0] == 'Z') {
+        set_landing_zone(value);
+      } else {
+        Serial.printf("Unexpected LZ write %02x", value[0]);
+      }
     }
 };
 
@@ -86,14 +92,14 @@ void bt_init() {
   BLEDevice::startAdvertising();
 }
 
-void bt_notify(GeoPointV point) {
+void bt_notify(GeoPointV *point) {
   // Pack point into location message
   LocationMessage msg = {
     'L',
-    point.millis,
-    (int)(point.lat * 1e6), // microdegrees
-    (int)(point.lng * 1e6), // microdegrees
-    (short)(point.alt * 10) // decimeters
+    point->millis,
+    (int)(point->lat * 1e6), // microdegrees
+    (int)(point->lng * 1e6), // microdegrees
+    (short)(point->alt * 10) // decimeters
   };
   uint8_t *data = (uint8_t*) &msg;
   size_t len = sizeof(msg);
@@ -103,10 +109,10 @@ void bt_notify(GeoPointV point) {
   // Speed
   SpeedMessage msg2 = {
     'S',
-    point.millis,
-    (short)(point.vN * 0.01), // cm/s
-    (short)(point.vE * 0.01), // cm/s
-    (short)(point.climb * 0.01) // cm/s
+    point->millis,
+    (short)(point->vN * 0.01), // cm/s
+    (short)(point->vE * 0.01), // cm/s
+    (short)(point->climb * 0.01) // cm/s
   };
   uint8_t *data2 = (uint8_t*) &msg2;
   size_t len2 = sizeof(msg2);
