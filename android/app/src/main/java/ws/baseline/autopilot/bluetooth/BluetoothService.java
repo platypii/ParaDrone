@@ -4,6 +4,7 @@ import ws.baseline.autopilot.geo.LandingZone;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
+import android.content.Context;
 import android.content.Intent;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -11,7 +12,7 @@ import org.greenrobot.eventbus.EventBus;
 import timber.log.Timber;
 
 import static ws.baseline.autopilot.bluetooth.BluetoothState.BT_CONNECTING;
-import static ws.baseline.autopilot.bluetooth.BluetoothState.BT_STARTING;
+import static ws.baseline.autopilot.bluetooth.BluetoothState.BT_SEARCHING;
 import static ws.baseline.autopilot.bluetooth.BluetoothState.BT_STATES;
 import static ws.baseline.autopilot.bluetooth.BluetoothState.BT_STOPPED;
 import static ws.baseline.autopilot.bluetooth.BluetoothState.BT_STOPPING;
@@ -27,30 +28,24 @@ public class BluetoothService {
     // Bluetooth state
     private int bluetoothState = BT_STOPPED;
     @Nullable
-    private BluetoothRunnable bluetoothRunnable;
-    @Nullable
-    private Thread bluetoothThread;
+    private BluetoothHandler bluetoothHandler;
 
-    public void start(@NonNull Activity activity) {
+    public void start(@NonNull Context context) {
         if (bluetoothState == BT_STOPPED) {
-            setState(BT_STARTING);
+            setState(BT_SEARCHING);
             // Start bluetooth thread
-            if (bluetoothRunnable != null) {
-                Timber.e("Bluetooth thread already started");
+            if (bluetoothHandler != null) {
+                Timber.e("Bluetooth handler already started");
             }
-            final BluetoothAdapter bluetoothAdapter = getAdapter(activity);
-            if (bluetoothAdapter != null) {
-                bluetoothRunnable = new BluetoothRunnable(BluetoothService.this, activity, bluetoothAdapter);
-                bluetoothThread = new Thread(bluetoothRunnable);
-                bluetoothThread.start();
-            }
+            bluetoothHandler = new BluetoothHandler(this, context);
+            bluetoothHandler.start();
         } else {
             Timber.e("Bluetooth already started: %s", BT_STATES[bluetoothState]);
         }
     }
     public void setLandingZone(LandingZone lz) {
-        if (bluetoothRunnable != null && bluetoothRunnable.protocol != null) {
-            bluetoothRunnable.protocol.setLandingZone(lz);
+        if (bluetoothHandler != null) {
+            bluetoothHandler.setLandingZone(lz);
         }
     }
 
@@ -93,25 +88,18 @@ public class BluetoothService {
         if (bluetoothState != BT_STOPPED) {
             Timber.i("Stopping bluetooth service");
             // Stop thread
-            if (bluetoothRunnable != null && bluetoothThread != null) {
-                bluetoothRunnable.stop();
-                try {
-                    bluetoothThread.join(1000);
+            if (bluetoothHandler != null) {
+                bluetoothHandler.stop();
+                bluetoothHandler = null;
 
-                    // Thread is dead, clean up
-                    bluetoothRunnable = null;
-                    bluetoothThread = null;
-                    if (bluetoothState != BT_STOPPED) {
-                        Timber.e("Unexpected bluetooth state, should be STOPPED when thread has stopped: %s", BT_STATES[bluetoothState]);
-                    }
-                } catch (InterruptedException e) {
-                    Timber.e(e, "Bluetooth thread interrupted while waiting for it to die");
+                if (bluetoothState != BT_STOPPED) {
+                    Timber.e("Unexpected bluetooth state, should be STOPPED when thread has stopped: %s", BT_STATES[bluetoothState]);
                 }
                 Timber.i("Bluetooth service stopped");
             } else {
-                Timber.e("Cannot stop bluetooth, runnable is null: %s", BT_STATES[bluetoothState]);
-                // Set state to stopped since it prevents getting stuck in state STOPPING
+                Timber.e("Cannot stop bluetooth, handler is null: %s", BT_STATES[bluetoothState]);
             }
+            // Always set state to stopped since it prevents getting stuck in state STOPPING
             setState(BT_STOPPED);
         }
     }
