@@ -20,7 +20,4 @@ class Util {
         return sb.toString();
     }
 
-    static short bytesToShort(byte b1, byte b2) {
-        return (short) (((b1 & 0xff) << 8) | (b2 & 0xff));
-    }
 }
