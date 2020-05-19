@@ -8,6 +8,9 @@
 #define PARAMOTOR_DESCENTRATE 4
 #define PARAMOTOR_TURNRADIUS 100
 
+// LoRa North America
+#define LORA_BAND 915E6
+
 // Global vars
 extern LandingZone *current_landing_zone;
 extern GeoPointV *last_location;
@@ -39,6 +42,11 @@ void update_location(GeoPointV *point);
 
 // Logger
 void log_point(GeoPointV *loc);
+
+// LoRa
+void lora_init();
+void lora_loop();
+void lora_send_location(GeoPointV *point);
 
 // Math
 double mod360(double degrees);

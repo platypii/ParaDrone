@@ -24,6 +24,7 @@ void setup() {
   motor_init();
   gps_init();
   bt_init();
+  lora_init();
 
   // Welcome
   blink(4);
@@ -32,6 +33,7 @@ void setup() {
 void loop() {
   gps_loop();
   screen_loop();
+  lora_loop();
   delay(20);
 }
 
@@ -40,7 +42,7 @@ void loop() {
  * This orchestrates the services that depend on location updates.
  */
 void update_location(GeoPointV *point) {
-  // Serial.printf("GPS %f, %f, %.1f\n", point->lat, point->lng, point->alt);
+  Serial.printf("GPS %f, %f, %.1f\n", point->lat, point->lng, point->alt);
   if (last_location) free(last_location);
   last_location = point;
   last_fix_millis = millis();
@@ -48,6 +50,7 @@ void update_location(GeoPointV *point) {
   screen_update();
   blink(1);
   bt_notify(point);
+  lora_send_location(point);
   // log_point(point);
   // TODO: Plan and update controls
   // TODO: Free point

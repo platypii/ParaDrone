@@ -9,3 +9,15 @@ autopilot:
     key: pio-deps
     paths:
       - .pio/libdeps
+
+relay:
+  stage: build
+  image: baselinews/paradrone:platformio
+  script:
+    - cd LoRaRelay
+    - platformio lib update
+    - platformio run
+  cache:
+    key: pio-deps
+    paths:
+      - .pio/libdeps
