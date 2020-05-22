@@ -17,6 +17,13 @@
             android:layout_width="match_parent"
             android:layout_height="400dp" />
 
+        <fragment
+            android:id="@+id/ap_screen"
+            android:name="ws.baseline.autopilot.ApScreenFragment"
+            android:layout_margin="8dp"
+            android:layout_width="180dp"
+            android:layout_height="90dp" />
+
         <Button
             android:id="@+id/set_landing_zone"
             android:layout_width="wrap_content"
