@@ -37,12 +37,20 @@ public class BluetoothService {
             if (bluetoothHandler != null) {
                 Timber.e("Bluetooth handler already started");
             }
+            // TODO: Prompt to start bluetooth if needed
             bluetoothHandler = new BluetoothHandler(this, context);
             bluetoothHandler.start();
         } else {
             Timber.e("Bluetooth already started: %s", BT_STATES[bluetoothState]);
         }
     }
+
+    public void setControls(byte left, byte right) {
+        if (bluetoothHandler != null) {
+            bluetoothHandler.setControls(left, right);
+        }
+    }
+
     public void setLandingZone(LandingZone lz) {
         if (bluetoothHandler != null) {
             bluetoothHandler.setLandingZone(lz);
