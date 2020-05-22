@@ -18,7 +18,6 @@ import java.util.UUID;
 import timber.log.Timber;
 
 import static android.bluetooth.BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT;
-import static android.bluetooth.BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE;
 import static ws.baseline.autopilot.bluetooth.BluetoothState.BT_SEARCHING;
 import static ws.baseline.autopilot.bluetooth.Util.byteArrayToHex;
 import static android.bluetooth.BluetoothGatt.CONNECTION_PRIORITY_HIGH;
@@ -42,9 +41,13 @@ class BluetoothHandler {
     private static final UUID relayServiceId = UUID.fromString("ba5e0005-228f-4d36-b9fa-8b99e1672005");
     private static final UUID relayCharacteristicId = UUID.fromString("ba5e0006-a35e-42fc-87e3-3775cc158906");
 
+    private final Handler handler = new Handler();
     private final BluetoothService service;
     private final BluetoothCentral central;
     private BluetoothPeripheral peripheral;
+
+    private boolean connected_ap = false;
+    private boolean connected_relay = false;
 
     BluetoothHandler(@NonNull BluetoothService service, @NonNull Context context) {
         this.service = service;
@@ -69,6 +72,10 @@ class BluetoothHandler {
             // Turn on notifications for AutoPilot Service
             if (peripheral.getService(apServiceId) != null) {
                 peripheral.setNotify(peripheral.getCharacteristic(apServiceId, characteristicLocationId), true);
+            }
+            // Turn on notifications for LoRa Relay Service
+            if (peripheral.getService(relayServiceId) != null) {
+                peripheral.setNotify(peripheral.getCharacteristic(relayServiceId, relayCharacteristicId), true);
             }
 
             fetchLandingZone();
@@ -117,6 +124,12 @@ class BluetoothHandler {
         public void onConnectedPeripheral(BluetoothPeripheral connectedPeripheral) {
             peripheral = connectedPeripheral;
             Timber.i("Connected to '%s'", peripheral.getName());
+            if (peripheral.getService(apServiceId) != null) {
+                connected_ap = true;
+            }
+            if (peripheral.getService(relayServiceId) != null) {
+                connected_relay = true;
+            }
             service.setState(BT_CONNECTED);
         }
 
@@ -132,13 +145,13 @@ class BluetoothHandler {
             // We were connected, and we're not stopping
             if (service.getState() == BT_CONNECTED) {
                 service.setState(BT_SEARCHING);
-//                // Reconnect to this device when it becomes available again
-//                handler.postDelayed(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        central.autoConnectPeripheral(peripheral, peripheralCallback);
-//                    }
-//                }, 5000);
+                // Reconnect to this device when it becomes available again
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        central.autoConnectPeripheral(peripheral, peripheralCallback);
+                    }
+                }, 5000);
             }
         }
 
@@ -219,14 +232,19 @@ class BluetoothHandler {
     void setControls(byte left, byte right) {
         Timber.i("phone -> ap: set controls %d %d", left, right);
         if (peripheral != null) {
-            final BluetoothGattCharacteristic ch = peripheral.getCharacteristic(apServiceId, characteristicCtrlId);
+            BluetoothGattCharacteristic ch = null;
+            if (connected_ap) {
+                ch = peripheral.getCharacteristic(apServiceId, characteristicCtrlId);
+            } else if (connected_relay) {
+                ch = peripheral.getCharacteristic(relayServiceId, relayCharacteristicId);
+            }
             if (ch != null) {
                 // Pack controls into bytes
                 final byte[] value = new byte[3];
                 value[0] = 'C';
                 value[1] = left;
                 value[2] = right;
-                if (!peripheral.writeCharacteristic(ch, value, WRITE_TYPE_NO_RESPONSE)) {
+                if (!peripheral.writeCharacteristic(ch, value, WRITE_TYPE_DEFAULT)) {
                     Timber.e("Failed to set controls");
                 }
             }

@@ -9,13 +9,13 @@
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="400dp">
+        android:layout_height="420dp">
 
         <fragment
             android:id="@+id/map"
             android:name="ws.baseline.autopilot.map.DroneMap"
             android:layout_width="match_parent"
-            android:layout_height="400dp" />
+            android:layout_height="420dp" />
 
         <fragment
             android:id="@+id/ap_screen"
@@ -37,18 +37,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_arrow"
-            android:layout_marginTop="180dp"
+            android:layout_marginTop="210dp"
             android:layout_gravity="center_horizontal"
             android:visibility="gone"
             tools:ignore="ContentDescription" />
 
     </FrameLayout>
 
-    <fragment
-        android:id="@+id/status"
-        android:name="ws.baseline.autopilot.StatusFragment"
+    <ws.baseline.autopilot.ControlView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_weight="1"/>
 
 </LinearLayout>

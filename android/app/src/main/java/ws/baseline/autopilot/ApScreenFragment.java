@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import java.util.Locale;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -66,9 +67,9 @@ public class ApScreenFragment extends Fragment {
 
         // LL
         if (ll != null) {
-            binding.statusLocation.setText("LL: " + ll);
+            binding.statusLocation.setText(String.format(Locale.getDefault(), "%.6f, %6f", ll.lat, ll.lng));
         } else {
-            binding.statusLocation.setText("LL:");
+            binding.statusLocation.setText("");
         }
 
         // LZ
