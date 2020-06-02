@@ -76,7 +76,7 @@ public class ApScreenFragment extends Fragment {
         if (ll != null && lz != null) {
             final double distance = Geo.distance(ll.lat, ll.lng, lz.destination.lat, lz.destination.lng);
             final double bearing = Geo.bearing(ll.lat, ll.lng, lz.destination.lat, lz.destination.lng);
-            binding.statusLandingZone.setText("LZ: " + Convert.distance(distance) + " AGL  " + Convert.bearing2(bearing));
+            binding.statusLandingZone.setText("LZ: " + Convert.distance(distance) + " " + Convert.bearing2(bearing));
         } else {
             binding.statusLandingZone.setText("LZ:");
         }
