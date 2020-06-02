@@ -9,13 +9,13 @@
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="420dp">
+        android:layout_height="400dp">
 
         <fragment
             android:id="@+id/map"
             android:name="ws.baseline.autopilot.map.DroneMap"
             android:layout_width="match_parent"
-            android:layout_height="420dp" />
+            android:layout_height="400dp" />
 
         <fragment
             android:id="@+id/ap_screen"
@@ -28,7 +28,7 @@
             android:id="@+id/set_landing_zone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="✢ LZ"
+            android:text="↑ LZ"
             android:background="#77000000"
             android:layout_gravity="bottom"/>
 
@@ -37,7 +37,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_arrow"
-            android:layout_marginTop="210dp"
+            android:layout_marginTop="200dp"
             android:layout_gravity="center_horizontal"
             android:visibility="gone"
             tools:ignore="ContentDescription" />

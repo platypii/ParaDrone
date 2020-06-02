@@ -8,10 +8,11 @@ import java.util.Locale;
 
 public class LandingZone {
     public final LatLngAlt destination;
-    public final double landingDirection; // radians
+    /** Landing direction in radians */
+    public final double landingDirection;
 
     // Ground length of final approach
-    public final double finalDistance = 100; // meters
+    public final double finalDistance = 150; // meters
 
     // Destination, as origin of coordinate system
     public final PointV dest;
@@ -22,8 +23,8 @@ public class LandingZone {
         this.dest = new PointV(
                 0,
                 0,
-                Math.cos(this.landingDirection),
-                Math.sin(this.landingDirection)
+                Math.sin(landingDirection),
+                Math.cos(landingDirection)
         );
     }
 

@@ -1,6 +1,7 @@
 package ws.baseline.autopilot.map;
 
 import ws.baseline.autopilot.bluetooth.APEvent;
+import ws.baseline.autopilot.plan.PlanEvent;
 
 import androidx.annotation.NonNull;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -11,8 +12,6 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 public class DroneMap extends MapFragment {
-
-    private PathLayer pathLayer;
 
     @Override
     public void onStart() {
@@ -30,11 +29,16 @@ public class DroneMap extends MapFragment {
         addLayer(new PlanLayer());
 
         // TODO: Zoom to current phone location if available
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(47.6, -122.3), 12));
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(47.6, -122.34), 14));
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onUpdate(@NonNull APEvent event) {
+        updateLayers();
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onPlan(@NonNull PlanEvent event) {
         updateLayers();
     }
 

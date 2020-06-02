@@ -5,7 +5,7 @@ import androidx.annotation.Nullable;
 import java.util.Locale;
 import org.greenrobot.eventbus.EventBus;
 
-public class APSpeedMsg {
+public class APSpeedMsg implements APEvent {
     public final long millis;
     public final double vN;
     public final double vE;
