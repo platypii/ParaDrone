@@ -6,7 +6,7 @@ import com.google.android.gms.maps.model.LatLng;
 import java.util.Locale;
 import org.greenrobot.eventbus.EventBus;
 
-public class APLocationMsg {
+public class APLocationMsg implements APEvent {
     public final long millis;
     public final double lat;
     public final double lng;

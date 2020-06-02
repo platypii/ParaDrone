@@ -202,7 +202,7 @@ class BluetoothHandler {
             final double dir = buf.getShort(11) * 0.001; // milliradians
             final LandingZone lz = new LandingZone(lat, lng, alt, dir);
             Timber.i("ap -> phone: lz %s", lz);
-            APLandingZone.update(lz);
+            APLandingZone.update(lz, false);
         } else {
             Timber.e("ap -> phone: unknown %s", byteArrayToHex(value));
         }

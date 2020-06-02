@@ -1,48 +1,50 @@
 package ws.baseline.autopilot.map;
 
 import ws.baseline.autopilot.R;
-import ws.baseline.autopilot.Services;
-import ws.baseline.autopilot.geo.LandingZone;
+import ws.baseline.autopilot.bluetooth.APLandingZone;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.GroundOverlay;
+import com.google.android.gms.maps.model.GroundOverlayOptions;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
+import timber.log.Timber;
 
 public class LandingLayer extends MapLayer {
 
     @Nullable
-    private Marker landingMarker;
+    private GroundOverlay arrow;
 
     @Override
     public void onAdd(@NonNull GoogleMap map) {
-        // Add projected landing zone
-        landingMarker = map.addMarker(new MarkerOptions()
-                .position(new LatLng(0, 0))
+        arrow = map.addGroundOverlay(new GroundOverlayOptions()
+                .position(new LatLng(0, 0), 20)
+                .image(BitmapDescriptorFactory.fromResource(R.drawable.arrow))
+                .anchor(0.5f, 0)
                 .visible(false)
-                .title("landing")
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_target))
-                .anchor(0.5f, 0.5f)
         );
     }
 
     @Override
     public void update() {
-        if (landingMarker != null) {
-            final LandingZone lz = Services.flightComputer.lz;
+        Timber.i("WTF update landing zone %s %s", arrow, APLandingZone.lastLz);
+        if (arrow != null) {
+            final APLandingZone lz = APLandingZone.lastLz;
             if (lz != null) {
-                landingMarker.setPosition(lz.destination.toLatLng());
-                landingMarker.setVisible(true);
-                if (Services.flightComputer.lzPending) {
-                    landingMarker.setAlpha(0.5f);
+                Timber.i("WTF update landing zone %s", lz);
+                arrow.setPosition(lz.lz.destination.toLatLng());
+                arrow.setDimensions((float) lz.lz.finalDistance * 0.2f);
+                arrow.setBearing((float) Math.toDegrees(lz.lz.landingDirection));
+                if (lz.pending) {
+                    arrow.setTransparency(0.25f);
                 } else {
-                    landingMarker.setAlpha(1);
+                    arrow.setTransparency(0);
                 }
+                arrow.setVisible(true);
             } else {
-                landingMarker.setVisible(false);
+                arrow.setVisible(false);
             }
         }
     }

@@ -1,5 +1,6 @@
 package ws.baseline.autopilot;
 
+import ws.baseline.autopilot.bluetooth.APLandingZone;
 import ws.baseline.autopilot.databinding.ActivityMainBinding;
 import ws.baseline.autopilot.geo.LandingZone;
 import ws.baseline.autopilot.map.Elevation;
@@ -38,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
         binding.setLandingZone.setOnClickListener((e) -> {
             if (!settingLz) {
                 binding.landingArrow.setVisibility(View.VISIBLE);
-                binding.setLandingZone.setText("✢ Set");
+                binding.setLandingZone.setText("↑ Set");
             } else {
                 final MapFragment frag = (MapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
                 if (frag != null) {
@@ -48,15 +49,14 @@ public class MainActivity extends AppCompatActivity {
                     Elevation.get(this, ll, (elevation) -> {
                         final LandingZone lz = new LandingZone(ll.latitude, ll.longitude, elevation, landingDirection);
                         Timber.i("Setting landing zone %s", lz);
-                        Services.flightComputer.lz = lz; // Set pending lz
-                        Services.flightComputer.lzPending = true;
+                        APLandingZone.update(lz, true);
                         Services.bluetooth.setLandingZone(lz);
                     });
                 } else {
                     Timber.e("Failed to find map fragment");
                 }
                 binding.landingArrow.setVisibility(View.GONE);
-                binding.setLandingZone.setText("✢ LZ");
+                binding.setLandingZone.setText("↑ LZ");
             }
             settingLz = !settingLz;
         });
