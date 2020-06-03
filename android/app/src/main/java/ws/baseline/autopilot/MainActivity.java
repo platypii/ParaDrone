@@ -7,6 +7,7 @@ import ws.baseline.autopilot.map.Elevation;
 import ws.baseline.autopilot.map.MapFragment;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.View;
@@ -23,6 +24,7 @@ public class MainActivity extends AppCompatActivity {
 
     private boolean settingLz = false;
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
                     Elevation.get(this, ll, (elevation) -> {
                         final LandingZone lz = new LandingZone(ll.latitude, ll.longitude, elevation, landingDirection);
                         Timber.i("Setting landing zone %s", lz);
-                        APLandingZone.update(lz, true);
+                        APLandingZone.setPending(lz);
                         Services.bluetooth.setLandingZone(lz);
                     });
                 } else {

@@ -1,7 +1,7 @@
 package ws.baseline.autopilot.map;
 
-import ws.baseline.autopilot.bluetooth.APLocationMsg;
-import ws.baseline.autopilot.bluetooth.APSpeedMsg;
+import ws.baseline.autopilot.GeoPoint;
+import ws.baseline.autopilot.Services;
 import ws.baseline.autopilot.util.Numbers;
 import ws.baseline.autopilot.R;
 
@@ -36,21 +36,16 @@ public class MyPositionLayer extends MapLayer {
 
     @Override
     public void update() {
-        final APLocationMsg ll = APLocationMsg.lastLocation;
-        final APSpeedMsg ss = APSpeedMsg.lastSpeed;
+        final GeoPoint ll = Services.location.lastPoint;
         if (myPositionMarker != null && ll != null) {
             myPositionMarker.setVisible(true);
             myPositionMarker.setPosition(ll.toLatLng());
-            if (ss != null) {
-                final double groundSpeed = ss.groundSpeed();
-                final double bearing = ss.bearing();
-                if (Numbers.isReal(bearing) && groundSpeed > 0.1) {
-                    // Speed > 0.2mph
-                    myPositionMarker.setIcon(myposition1);
-                    myPositionMarker.setRotation((float) bearing);
-                } else {
-                    myPositionMarker.setIcon(myposition2);
-                }
+            final double groundSpeed = ll.groundSpeed();
+            final double bearing = ll.bearing();
+            if (Numbers.isReal(bearing) && groundSpeed > 0.1) {
+                // Speed > 0.2mph
+                myPositionMarker.setIcon(myposition1);
+                myPositionMarker.setRotation((float) bearing);
             } else {
                 myPositionMarker.setIcon(myposition2);
             }
