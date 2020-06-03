@@ -8,21 +8,24 @@ import static ws.baseline.autopilot.util.Numbers.interpolate;
 
 public class SegmentLine implements Segment {
 
-    private final Point start;
-    private final Point end;
+    private final PointV start;
+    private final PointV end;
 
     public SegmentLine(Point start, Point end) {
-        this.start = start;
-        this.end = end;
+        final double dx = end.x - start.x;
+        final double dy = end.x - start.y;
+        final double len = Math.hypot(dx, dy);
+        this.start = new PointV(start.x, start.y, dx / len, dy / len);
+        this.end = new PointV(end.x, end.y, dx / len, dy / len);
     }
 
     @Override
-    public Point start() {
+    public PointV start() {
         return start;
     }
 
     @Override
-    public Point end() {
+    public PointV end() {
         return end;
     }
 

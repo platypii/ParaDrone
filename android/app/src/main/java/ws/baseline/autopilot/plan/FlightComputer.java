@@ -2,8 +2,8 @@ package ws.baseline.autopilot.plan;
 
 import ws.baseline.autopilot.GeoPoint;
 import ws.baseline.autopilot.bluetooth.APLandingZone;
-import ws.baseline.autopilot.bluetooth.APLocationMsg;
-import ws.baseline.autopilot.bluetooth.APSpeedMsg;
+import ws.baseline.autopilot.bluetooth.ApLocationMsg;
+import ws.baseline.autopilot.bluetooth.ApSpeedMsg;
 import ws.baseline.autopilot.geo.LandingZone;
 import ws.baseline.autopilot.geo.Path;
 
@@ -11,7 +11,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
-import timber.log.Timber;
 
 public class FlightComputer {
 
@@ -24,9 +23,6 @@ public class FlightComputer {
     @Nullable
     public Path plan;
 
-    // Raw bluetooth messages
-    private APLocationMsg location;
-
     public void start() {
         EventBus.getDefault().register(this);
     }
@@ -38,17 +34,14 @@ public class FlightComputer {
     }
 
     @Subscribe
-    public void onApLocation(@NonNull APLocationMsg event) {
-        this.location = event;
+    public void onApLocation(@NonNull ApLocationMsg event) {
+        // TODO: Use kalman filter to estimate velocities
+        lastPoint = new GeoPoint(event.lat, event.lng, event.alt, Double.NaN, Double.NaN, Double.NaN);
     }
 
     @Subscribe
-    public void onApSpeed(@NonNull APSpeedMsg speed) {
-        if (location.millis != speed.millis) {
-            Timber.e("Location/speed mismatch " + location.millis + " != " + speed.millis);
-        }
-        // Combine location and speed data
-        lastPoint = new GeoPoint(location.lat, location.lng, location.alt, speed.vN, speed.vE, speed.climb);
+    public void onApSpeed(@NonNull ApSpeedMsg event) {
+        lastPoint = new GeoPoint(event.lat, event.lng, event.alt, event.vN, event.vE, event.climb);
         replan();
     }
 

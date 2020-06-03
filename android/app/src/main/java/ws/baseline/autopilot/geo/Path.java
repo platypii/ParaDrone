@@ -15,12 +15,12 @@ public class Path implements PathLike {
     }
 
     @Override
-    public Point start() {
+    public PointV start() {
         return segments.get(0).start();
     }
 
     @Override
-    public Point end() {
+    public PointV end() {
         return segments.get(segments.size() - 1).end();
     }
 

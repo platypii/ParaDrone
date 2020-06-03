@@ -11,16 +11,19 @@ public class Services {
 
     public static final BluetoothService bluetooth = new BluetoothService();
     public static final FlightComputer flightComputer = new FlightComputer();
+    public static final LocationService location = new LocationService();
 
     public static void start(@NonNull Activity activity) {
         Timber.i("Starting services...");
         bluetooth.start(activity);
         flightComputer.start();
+        location.start();
     }
 
     static void stop() {
         Timber.i("Stopping services...");
         flightComputer.stop();
         bluetooth.stop();
+        location.stop();
     }
 }
