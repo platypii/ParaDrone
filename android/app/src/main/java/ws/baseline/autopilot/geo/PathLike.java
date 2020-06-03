@@ -4,8 +4,8 @@ import java.util.List;
 
 public interface PathLike {
 
-    Point start();
-    Point end();
+    PointV start();
+    PointV end();
 
     PathLike fly(double distance);
 

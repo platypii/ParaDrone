@@ -11,8 +11,9 @@ import androidx.annotation.Nullable;
 import org.greenrobot.eventbus.EventBus;
 import timber.log.Timber;
 
+import static ws.baseline.autopilot.bluetooth.BluetoothPreferences.DeviceMode.AP;
+import static ws.baseline.autopilot.bluetooth.BluetoothPreferences.DeviceMode.RELAY;
 import static ws.baseline.autopilot.bluetooth.BluetoothState.BT_CONNECTING;
-import static ws.baseline.autopilot.bluetooth.BluetoothState.BT_SEARCHING;
 import static ws.baseline.autopilot.bluetooth.BluetoothState.BT_STATES;
 import static ws.baseline.autopilot.bluetooth.BluetoothState.BT_STOPPED;
 import static ws.baseline.autopilot.bluetooth.BluetoothState.BT_STOPPING;
@@ -25,14 +26,17 @@ public class BluetoothService {
 
     private static final int ENABLE_BLUETOOTH_CODE = 13;
 
+    private BluetoothPreferences prefs = new BluetoothPreferences();
+    public BluetoothPreferences.DeviceMode deviceMode = AP;
+
     // Bluetooth state
     private int bluetoothState = BT_STOPPED;
     @Nullable
     private BluetoothHandler bluetoothHandler;
 
     public void start(@NonNull Context context) {
+        deviceMode = prefs.load(context);
         if (bluetoothState == BT_STOPPED) {
-            setState(BT_SEARCHING);
             // Start bluetooth thread
             if (bluetoothHandler != null) {
                 Timber.e("Bluetooth handler already started");
@@ -45,15 +49,33 @@ public class BluetoothService {
         }
     }
 
+    public void switchDeviceMode() {
+        if (bluetoothHandler != null) {
+            bluetoothHandler.disconnect();
+        }
+        if (deviceMode == AP) {
+            deviceMode = RELAY;
+        } else {
+            deviceMode = AP;
+        }
+        prefs.save(deviceMode);
+    }
+
     public void setControls(byte left, byte right) {
         if (bluetoothHandler != null) {
             bluetoothHandler.setControls(left, right);
         }
     }
 
-    public void setLandingZone(LandingZone lz) {
+    public void setLandingZone(@NonNull LandingZone lz) {
         if (bluetoothHandler != null) {
             bluetoothHandler.setLandingZone(lz);
+        }
+    }
+
+    public void fetchLandingZone() {
+        if (bluetoothHandler != null) {
+            bluetoothHandler.fetchLandingZone();
         }
     }
 
@@ -90,6 +112,14 @@ public class BluetoothService {
         Timber.d("Bluetooth state: " + BT_STATES[bluetoothState] + " -> " + BT_STATES[state]);
         bluetoothState = state;
         EventBus.getDefault().post(new BluetoothState(state));
+    }
+
+    public String getBtString() {
+        if (deviceMode == AP) {
+            return "AP";
+        } else {
+            return "RL";
+        }
     }
 
     public synchronized void stop() {

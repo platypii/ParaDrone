@@ -7,24 +7,28 @@ import timber.log.Timber;
 public class SegmentTurn implements Segment {
 
     private final Circle circle;
-    private final Point start;
-    private final Point end;
+    private final PointV start;
+    private final PointV end;
     private final int turn;
 
     public SegmentTurn(Circle circle, Point start, Point end, int turn) {
         this.circle = circle;
-        this.start = start;
-        this.end = end;
+        final double start_dx = start.x - circle.x;
+        final double start_dy = start.y - circle.y;
+        this.start = new PointV(start.x, start.y, start_dx / circle.radius, start_dy / circle.radius);
+        final double end_dx = end.x - circle.x;
+        final double end_dy = end.y - circle.y;
+        this.end = new PointV(end.x, end.y, end_dx / circle.radius, end_dy / circle.radius);
         this.turn = turn;
     }
 
     @Override
-    public Point start() {
+    public PointV start() {
         return start;
     }
 
     @Override
-    public Point end() {
+    public PointV end() {
         return end;
     }
 

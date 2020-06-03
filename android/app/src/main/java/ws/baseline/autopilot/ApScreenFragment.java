@@ -1,8 +1,6 @@
 package ws.baseline.autopilot;
 
-import ws.baseline.autopilot.bluetooth.APEvent;
 import ws.baseline.autopilot.bluetooth.APLandingZone;
-import ws.baseline.autopilot.bluetooth.APLocationMsg;
 import ws.baseline.autopilot.bluetooth.BluetoothState;
 import ws.baseline.autopilot.databinding.ApScreenBinding;
 import ws.baseline.autopilot.geo.Geo;
@@ -11,6 +9,7 @@ import ws.baseline.autopilot.util.Convert;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,10 +26,23 @@ import org.greenrobot.eventbus.ThreadMode;
  */
 public class ApScreenFragment extends Fragment {
     private ApScreenBinding binding;
+    private Handler handler = new Handler();
+    Runnable updateRunner;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = ApScreenBinding.inflate(inflater, container, false);
+        binding.statusLandingZone.setOnClickListener((event) -> {
+            // Refresh LZ
+            Services.bluetooth.fetchLandingZone();
+            if (APLandingZone.lastLz != null && APLandingZone.lastLz.lz != null) {
+                APLandingZone.setPending(APLandingZone.lastLz.lz);
+            }
+        });
+        binding.statusBt.setOnClickListener((event) -> {
+            Services.bluetooth.switchDeviceMode();
+            update();
+        });
         return binding.getRoot();
     }
 
@@ -38,13 +50,18 @@ public class ApScreenFragment extends Fragment {
     public void onStart() {
         super.onStart();
         EventBus.getDefault().register(this);
-        update();
+        updateRunner = () -> {
+            update();
+            handler.postDelayed(updateRunner, 1000);
+        };
+        updateRunner.run();
     }
 
     @Override
     public void onStop() {
         super.onStop();
         EventBus.getDefault().unregister(this);
+        handler.removeCallbacks(updateRunner);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -53,7 +70,12 @@ public class ApScreenFragment extends Fragment {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onApEvent(@NonNull APEvent event) {
+    public void onApLandingZone(@NonNull APLandingZone event) {
+        update();
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onApEvent(@NonNull GeoPoint event) {
         update();
     }
 
@@ -62,12 +84,17 @@ public class ApScreenFragment extends Fragment {
      */
     @SuppressLint("SetTextI18n")
     private void update() {
-        final APLocationMsg ll = APLocationMsg.lastLocation;
+        final GeoPoint ll = Services.location.lastPoint;
         final LandingZone lz = APLandingZone.lastLz != null ? APLandingZone.lastLz.lz : null;
 
         // LL
         if (ll != null) {
             binding.statusLocation.setText(String.format(Locale.getDefault(), "%.6f, %6f", ll.lat, ll.lng));
+            if (Services.location.lastMillis >= System.currentTimeMillis() - 5000) {
+                binding.statusLocation.setTextColor(0xff11ccff);
+            } else {
+                binding.statusLocation.setTextColor(0xff666666);
+            }
         } else {
             binding.statusLocation.setText("");
         }
@@ -93,6 +120,7 @@ public class ApScreenFragment extends Fragment {
         }
 
         // BT
+        binding.statusBt.setText(Services.bluetooth.getBtString());
         if (Services.bluetooth.getState() == BluetoothState.BT_CONNECTED) {
             binding.statusBt.setTextColor(0xff11ccff);
         } else {
