@@ -1,0 +1,68 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+body {
+  background: url('img/grid.png');
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: #333;
+}
+a {
+  color: #337ab7;
+  text-decoration: none;
+}
+.content {
+  background: white;
+  width: 420px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 20px;
+  padding-top: 20px;
+  padding-left: 40px;
+  padding-right: 40px;
+  padding-bottom: 20px;
+  border-radius: 10px;
+}
+h1 {
+  font-size: 32px;
+  font-weight: normal;
+}
+h2 {
+  margin-top: 20px;
+  font-size: 24px;
+}
+.subtitle {
+  display: block;
+  font-size: 12px;
+  line-height: 12px;
+}
+p {
+  margin-bottom: 20px;
+}
+label {
+  display: block;
+  margin-top: 20px;
+  font-weight: bold;
+}
+video {
+  background-color: black;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  width: 300px;
+  height: 169px;
+}
+.file-link {
+  display: flex;
+  align-items: center;
+  margin-top: 5px;
+  margin-bottom: 20px;
+}
+.file-link img {
+  height: 36px;
+  width: 36px;
+  margin-right: 8px;
+}
+.rounded {
+  border-radius: 4px;
+}

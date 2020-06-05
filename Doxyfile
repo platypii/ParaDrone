@@ -3,7 +3,7 @@
 PROJECT_NAME           = "DubFlight"
 PROJECT_BRIEF          =
 PROJECT_LOGO           =
-OUTPUT_DIRECTORY       =
+OUTPUT_DIRECTORY       = docs
 TAB_SIZE               = 4
 OPTIMIZE_OUTPUT_FOR_C  = YES
 CASE_SENSE_NAMES       = YES

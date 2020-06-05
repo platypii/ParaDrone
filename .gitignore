@@ -8,7 +8,7 @@
 /infer-out
 
 # doxygen
-/html
+/docs
 
 # node
 node_modules
