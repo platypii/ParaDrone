@@ -2,6 +2,7 @@
 #define _DTYPES_H
 
 #include <stdint.h>
+#include "messages.h"
 
 #define TURN_LEFT -1
 #define TURN_RIGHT 1
@@ -98,6 +99,8 @@ public:
   PointV dest;
 
   LandingZone(double lat, double lng, double alt, double landingDir);
+
+  LandingZoneMessage pack();
 
   /**
    * Convert lat, lng to x, y meters centered at current location

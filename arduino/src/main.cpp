@@ -22,7 +22,7 @@ void setup() {
   load_landing_zone();
   screen_init();
   motor_init();
-  init_gps();
+  gps_init();
   bt_init();
 
   // Welcome
@@ -30,18 +30,21 @@ void setup() {
 }
 
 void loop() {
-  read_gps();
+  gps_loop();
   screen_loop();
   delay(20);
 }
 
 /**
- * Called when GPS location is updated
+ * Called when GPS location is updated.
+ * This orchestrates the services that depend on location updates.
  */
 void update_location(GeoPointV *point) {
   // Serial.printf("GPS %f, %f, %.1f\n", point->lat, point->lng, point->alt);
   if (last_location) free(last_location);
   last_location = point;
+  last_fix_millis = millis();
+  motor_loop();
   screen_update();
   blink(1);
   bt_notify(point);

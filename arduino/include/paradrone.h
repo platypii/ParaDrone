@@ -11,10 +11,16 @@
 // Global vars
 extern LandingZone *current_landing_zone;
 extern GeoPointV *last_location;
+extern long last_fix_millis;
 extern bool bt_connected;
 
-extern signed char control_left;
-extern signed char control_right;
+// Current motor position
+extern short motor_position_left;
+extern short motor_position_right;
+
+// Target motor position
+extern short motor_target_left;
+extern short motor_target_right;
 
 // Screen
 void screen_init();
@@ -26,8 +32,8 @@ void bt_init();
 void bt_notify(GeoPointV *point);
 
 // GPS
-void init_gps();
-void read_gps();
+void gps_init();
+void gps_loop();
 void parse_nmea(char *line);
 void update_location(GeoPointV *point);
 
@@ -45,6 +51,8 @@ void set_landing_zone(const char *packed);
 
 // Motors
 void motor_init();
-void set_controls(signed char left, signed char right);
+void motor_loop();
+void set_controls(const short left, const short right);
+void set_position(uint8_t new_left, uint8_t new_right);
 
 #endif

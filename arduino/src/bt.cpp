@@ -12,7 +12,9 @@
 bool bt_connected = false;
 static BLECharacteristic *ap_ch;
 
-class AutoPilotServer : public BLEServerCallbacks {
+static void bt_send_lz();
+
+class AutopilotServer : public BLEServerCallbacks {
     void onConnect(BLEServer* pServer) {
       bt_connected = true;
       screen_update();
@@ -25,30 +27,22 @@ class AutoPilotServer : public BLEServerCallbacks {
     }
 };
 
-class LandingZoneCharacteristic : public BLECharacteristicCallbacks {
-    void onRead(BLECharacteristic *pCharacteristic) {
-    };
-    void onWrite(BLECharacteristic *pCharacteristic) {
-      const char *value = pCharacteristic->getValue().c_str();
-      if (value[0] == 'Z') {
-        set_landing_zone(value);
-        screen_update();
-      } else {
-        Serial.printf("Unexpected LZ write %02x", value[0]);
-      }
-    }
-};
-
-class CtrlCharacteristic : public BLECharacteristicCallbacks {
+class AutopilotCharacteristic : public BLECharacteristicCallbacks {
     void onRead(BLECharacteristic *pCharacteristic) {
     };
     void onWrite(BLECharacteristic *pCharacteristic) {
       const char *value = pCharacteristic->getValue().c_str();
       if (value[0] == 'C') {
-        set_controls(value[1], value[2]);
+        set_position(value[1], value[2]);
+        screen_update();
+      } else if (value[0] == 'Q') {
+        // Send LZ in response
+        bt_send_lz();
+      } else if (value[0] == 'Z') {
+        set_landing_zone(value);
         screen_update();
       } else {
-        Serial.printf("Unexpected ctrl write %02x", value[0]);
+        Serial.printf("Unexpected AP write %02x", value[0]);
       }
     }
 };
@@ -57,10 +51,10 @@ void bt_init() {
   // Init BLE
   BLEDevice::init("ParaDrone"); // Device name
   BLEServer *pServer = BLEDevice::createServer();
-  pServer->setCallbacks(new AutoPilotServer());
+  pServer->setCallbacks(new AutopilotServer());
   BLEService *pService = pServer->createService(AP_SERVICE);
 
-  // Characteristic location
+  // Autopilot characteristic
   ap_ch = pService->createCharacteristic(
     AP_CHARACTERISTIC,
     BLECharacteristic::PROPERTY_WRITE |
@@ -68,6 +62,7 @@ void bt_init() {
   );
   BLEDescriptor *pDescriptor = new BLEDescriptor(BLEUUID((uint16_t)0x2902));
   ap_ch->addDescriptor(pDescriptor);
+  ap_ch->setCallbacks(new AutopilotCharacteristic());
 
   pService->start();
   // BLEAdvertising *pAdvertising = pServer->getAdvertising();  // this still is working for backward compatibility
@@ -94,4 +89,16 @@ void bt_notify(GeoPointV *point) {
   size_t len = sizeof(msg);
   ap_ch->setValue(data, len);
   ap_ch->notify();
+}
+
+static void bt_send_lz() {
+  if (current_landing_zone) {
+    LandingZoneMessage msg = current_landing_zone->pack();
+    uint8_t *data = (uint8_t*) &msg;
+    size_t len = sizeof(msg);
+    ap_ch->setValue(data, len);
+    ap_ch->notify();
+  } else {
+    // TODO: Send no-lz message
+  }
 }

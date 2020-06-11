@@ -16,6 +16,12 @@ node_modules
 # IntelliJ
 .idea
 *.iml
+build
+.gradle
+local.properties
 
 # PlatformIO
 .pio
+
+# Misc
+.DS_Store

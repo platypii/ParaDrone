@@ -17,13 +17,12 @@
 #define DRIVE_FLOAT 2
 #define DRIVE_BRAKE 3
 
+// Drive mode when not changing position.
+// Brake uses H-bridge to inhibit turning.
 #define IDLE_MODE DRIVE_BRAKE
 
-static void set_motor1(int drive, uint8_t speed);
-static void set_motor2(int drive, uint8_t speed);
-
-signed char control_left = 0;
-signed char control_right = 0;
+static void set_motor1(const int drive, uint8_t speed);
+static void set_motor2(const int drive, uint8_t speed);
 
 void motor_init() {
   ledcAttachPin(PIN_M1_IN1, CHANNEL_M1_IN1);
@@ -36,26 +35,28 @@ void motor_init() {
   ledcSetup(CHANNEL_M2_IN2, 20000, 8);
 }
 
-void set_controls(signed char left, signed char right) {
-  control_left = left;
-  control_right = right;
+/**
+ * Set motor controls.
+ * -255 = full speed down, 255 = full speed up
+ */
+void set_controls(const short left, const short right) {
   if (left < 0) {
-    set_motor2(DRIVE_FORWARD, -left * 2);
+    set_motor2(DRIVE_FORWARD, -left);
   } else if (left > 0) {
-    set_motor2(DRIVE_BACKWARD, left * 2);
+    set_motor2(DRIVE_BACKWARD, left);
   } else {
     set_motor2(IDLE_MODE, 0);
   }
   if (right < 0) {
-    set_motor1(DRIVE_FORWARD, -right * 2);
+    set_motor1(DRIVE_FORWARD, -right);
   } else if (right > 0) {
-    set_motor1(DRIVE_BACKWARD, right * 2);
+    set_motor1(DRIVE_BACKWARD, right);
   } else {
     set_motor1(IDLE_MODE, 0);
   }
 }
 
-static void set_motor1(int drive, uint8_t speed) {
+static void set_motor1(const int drive, uint8_t speed) {
   Serial.printf("Set motor1 %d %d\n", drive, speed);
   if (drive == DRIVE_FORWARD) {
     ledcWrite(CHANNEL_M1_IN1, speed);
@@ -72,7 +73,7 @@ static void set_motor1(int drive, uint8_t speed) {
   }
 }
 
-static void set_motor2(int drive, uint8_t speed) {
+static void set_motor2(const int drive, uint8_t speed) {
   Serial.printf("Set motor2 %d %d\n", drive, speed);
   if (drive == DRIVE_FORWARD) {
     ledcWrite(CHANNEL_M2_IN1, speed);

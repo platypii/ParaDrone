@@ -1,3 +1,5 @@
+#ifndef _MESSAGES_H
+#define _MESSAGES_H
 
 /**
  * Message with just location.
@@ -36,5 +38,7 @@ struct LandingZoneMessage {
   int lat; // microdegrees
   int lng; // microdegrees
   short alt; // decimeters
-  short dir; // milliradians
+  short landing_direction; // milliradians
 };
+
+#endif
