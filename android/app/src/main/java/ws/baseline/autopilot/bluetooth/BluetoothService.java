@@ -14,6 +14,7 @@ import timber.log.Timber;
 import static ws.baseline.autopilot.bluetooth.BluetoothPreferences.DeviceMode.AP;
 import static ws.baseline.autopilot.bluetooth.BluetoothPreferences.DeviceMode.RELAY;
 import static ws.baseline.autopilot.bluetooth.BluetoothState.BT_CONNECTING;
+import static ws.baseline.autopilot.bluetooth.BluetoothState.BT_STARTED;
 import static ws.baseline.autopilot.bluetooth.BluetoothState.BT_STATES;
 import static ws.baseline.autopilot.bluetooth.BluetoothState.BT_STOPPED;
 import static ws.baseline.autopilot.bluetooth.BluetoothState.BT_STOPPING;
@@ -37,6 +38,7 @@ public class BluetoothService {
     public void start(@NonNull Context context) {
         deviceMode = prefs.load(context);
         if (bluetoothState == BT_STOPPED) {
+            bluetoothState = BT_STARTED;
             // Start bluetooth thread
             if (bluetoothHandler != null) {
                 Timber.e("Bluetooth handler already started");
@@ -50,13 +52,13 @@ public class BluetoothService {
     }
 
     public void switchDeviceMode() {
-        if (bluetoothHandler != null) {
-            bluetoothHandler.disconnect();
-        }
         if (deviceMode == AP) {
             deviceMode = RELAY;
         } else {
             deviceMode = AP;
+        }
+        if (bluetoothHandler != null) {
+            bluetoothHandler.disconnect();
         }
         prefs.save(deviceMode);
     }

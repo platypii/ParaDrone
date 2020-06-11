@@ -29,11 +29,9 @@ public class LandingLayer extends MapLayer {
 
     @Override
     public void update() {
-        Timber.i("WTF update landing zone %s %s", arrow, APLandingZone.lastLz);
         if (arrow != null) {
             final APLandingZone lz = APLandingZone.lastLz;
             if (lz != null) {
-                Timber.i("WTF update landing zone %s", lz);
                 arrow.setPosition(lz.lz.destination.toLatLng());
                 arrow.setDimensions((float) lz.lz.finalDistance * 0.2f);
                 arrow.setBearing((float) Math.toDegrees(lz.lz.landingDirection));
