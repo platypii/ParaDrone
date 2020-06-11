@@ -23,6 +23,8 @@ import static ws.baseline.autopilot.bluetooth.BluetoothPreferences.DeviceMode.AP
 import static ws.baseline.autopilot.bluetooth.BluetoothPreferences.DeviceMode.RELAY;
 import static ws.baseline.autopilot.bluetooth.BluetoothState.BT_CONNECTING;
 import static ws.baseline.autopilot.bluetooth.BluetoothState.BT_SEARCHING;
+import static ws.baseline.autopilot.bluetooth.BluetoothState.BT_STARTED;
+import static ws.baseline.autopilot.bluetooth.BluetoothState.BT_STOPPED;
 import static ws.baseline.autopilot.bluetooth.Util.byteArrayToHex;
 import static android.bluetooth.BluetoothGatt.CONNECTION_PRIORITY_HIGH;
 import static android.bluetooth.BluetoothGatt.GATT_SUCCESS;
@@ -57,17 +59,33 @@ class BluetoothHandler {
     }
 
     public void start() {
-        service.setState(BT_SEARCHING);
+        if (service.getState() == BT_STARTED) {
+            service.setState(BT_SEARCHING);
+            scan();
+        } else if (service.getState() == BT_SEARCHING) {
+            Timber.w("Already searching");
+        } else if (service.getState() == BT_STOPPING || service.getState() != BT_STOPPED) {
+            // Stopping or stopped, don't search
+        }
+    }
+
+    private void scan() {
         // Scan for peripherals with a certain service UUIDs
         central.startPairingPopupHack();
-        central.scanForPeripheralsWithServices(new UUID[]{apServiceId, relayServiceId});
+        if (service.deviceMode == RELAY) {
+            Timber.i("Scanning for relay");
+            central.scanForPeripheralsWithServices(new UUID[]{relayServiceId});
+        } else {
+            Timber.i("Scanning for AP");
+            central.scanForPeripheralsWithServices(new UUID[]{apServiceId});
+        }
     }
 
     // Callback for peripherals
     private final BluetoothPeripheralCallback peripheralCallback = new BluetoothPeripheralCallback() {
         @Override
         public void onServicesDiscovered(BluetoothPeripheral peripheral) {
-            Timber.i("Bluetooth services discovered");
+            Timber.i("Bluetooth services discovered for '%s'", peripheral.getName());
 
             // Request a new connection priority
             peripheral.requestConnectionPriority(CONNECTION_PRIORITY_HIGH);
@@ -190,9 +208,7 @@ class BluetoothHandler {
             Timber.i("bluetooth adapter changed state to %d", state);
             if (state == BluetoothAdapter.STATE_ON) {
                 // Bluetooth is on now, start scanning again
-                // Scan for peripherals with a certain service UUIDs
-                central.startPairingPopupHack();
-                central.scanForPeripheralsWithServices(new UUID[]{apServiceId});
+                start();
             }
         }
     };
@@ -231,6 +247,8 @@ class BluetoothHandler {
                 Timber.e("Failed to set lz");
             }
             fetchLandingZone();
+        } else {
+            Timber.e("Failed to get characteristic");
         }
     }
 
@@ -246,6 +264,8 @@ class BluetoothHandler {
             if (!peripheral.writeCharacteristic(ch, value, WRITE_TYPE_DEFAULT)) {
                 Timber.e("Failed to set controls");
             }
+        } else {
+            Timber.e("Failed to get characteristic");
         }
     }
 
@@ -258,6 +278,8 @@ class BluetoothHandler {
             if (!peripheral.writeCharacteristic(ch, value, WRITE_TYPE_DEFAULT)) {
                 Timber.e("Failed to request lz");
             }
+        } else {
+            Timber.e("Failed to get characteristic");
         }
     }
 
@@ -284,13 +306,14 @@ class BluetoothHandler {
     }
 
     void stop() {
+        service.setState(BT_STOPPING);
         // Stop scanning
         central.stopScan();
         if (peripheral != null) {
             peripheral.cancelConnection();
         }
 //        central.close();
-        service.setState(BT_STOPPING);
+        service.setState(BT_STOPPED);
     }
 
 }
