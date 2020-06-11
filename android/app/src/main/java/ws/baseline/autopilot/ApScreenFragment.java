@@ -1,6 +1,7 @@
 package ws.baseline.autopilot;
 
 import ws.baseline.autopilot.bluetooth.APLandingZone;
+import ws.baseline.autopilot.bluetooth.BluetoothPreferences;
 import ws.baseline.autopilot.bluetooth.BluetoothState;
 import ws.baseline.autopilot.databinding.ApScreenBinding;
 import ws.baseline.autopilot.geo.Geo;
@@ -39,7 +40,11 @@ public class ApScreenFragment extends Fragment {
                 APLandingZone.setPending(APLandingZone.lastLz.lz);
             }
         });
-        binding.statusBt.setOnClickListener((event) -> {
+        binding.buttonAp.setOnClickListener((event) -> {
+            Services.bluetooth.switchDeviceMode();
+            update();
+        });
+        binding.buttonRl.setOnClickListener((event) -> {
             Services.bluetooth.switchDeviceMode();
             update();
         });
@@ -84,28 +89,14 @@ public class ApScreenFragment extends Fragment {
      */
     @SuppressLint("SetTextI18n")
     private void update() {
-        final GeoPoint ll = Services.location.lastPoint;
+        final GeoPoint ll = Services.location.lastLoc;
         final LandingZone lz = APLandingZone.lastLz != null ? APLandingZone.lastLz.lz : null;
 
         // LL
         if (ll != null) {
             binding.statusLocation.setText(String.format(Locale.getDefault(), "%.6f, %6f", ll.lat, ll.lng));
-            if (Services.location.lastMillis >= System.currentTimeMillis() - 5000) {
-                binding.statusLocation.setTextColor(0xff11ccff);
-            } else {
-                binding.statusLocation.setTextColor(0xff666666);
-            }
         } else {
             binding.statusLocation.setText("");
-        }
-
-        // LZ
-        if (ll != null && lz != null) {
-            final double distance = Geo.distance(ll.lat, ll.lng, lz.destination.lat, lz.destination.lng);
-            final double bearing = Geo.bearing(ll.lat, ll.lng, lz.destination.lat, lz.destination.lng);
-            binding.statusLandingZone.setText("LZ: " + Convert.distance(distance) + " " + Convert.bearing2(bearing));
-        } else {
-            binding.statusLandingZone.setText("LZ:");
         }
 
         // Alt
@@ -119,8 +110,34 @@ public class ApScreenFragment extends Fragment {
             binding.statusAltitude.setText("Alt:");
         }
 
+        // GPS last fix
+        final long delta = System.currentTimeMillis() - Services.location.lastMillis;
+        if (delta < 60000) {
+            binding.statusLastFix.setText(String.format(Locale.getDefault(), "%ds", delta / 1000));
+        } else if (delta < 3600000) {
+            binding.statusLastFix.setText(String.format(Locale.getDefault(), "%dm", delta / 60000));
+        } else if (delta < 86400000) {
+            binding.statusLastFix.setText(String.format(Locale.getDefault(), "%dh", delta / 3600000));
+        }
+
+        // LZ
+        if (ll != null && lz != null) {
+            final double distance = Geo.distance(ll.lat, ll.lng, lz.destination.lat, lz.destination.lng);
+            final double bearing = Geo.bearing(ll.lat, ll.lng, lz.destination.lat, lz.destination.lng);
+            binding.statusLandingZone.setText("LZ: " + Convert.distance(distance) + " " + Convert.bearing2(bearing));
+        } else {
+            binding.statusLandingZone.setText("LZ:");
+        }
+
         // BT
         binding.statusBt.setText(Services.bluetooth.getBtString());
+        if (Services.bluetooth.deviceMode == BluetoothPreferences.DeviceMode.AP) {
+            binding.buttonAp.setEnabled(false);
+            binding.buttonRl.setEnabled(true);
+        } else {
+            binding.buttonAp.setEnabled(true);
+            binding.buttonRl.setEnabled(false);
+        }
         if (Services.bluetooth.getState() == BluetoothState.BT_CONNECTED) {
             binding.statusBt.setTextColor(0xff11ccff);
         } else {

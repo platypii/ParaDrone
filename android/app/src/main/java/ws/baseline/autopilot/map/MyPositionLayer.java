@@ -36,7 +36,7 @@ public class MyPositionLayer extends MapLayer {
 
     @Override
     public void update() {
-        final GeoPoint ll = Services.location.lastPoint;
+        final GeoPoint ll = Services.location.lastLoc;
         if (myPositionMarker != null && ll != null) {
             myPositionMarker.setVisible(true);
             myPositionMarker.setPosition(ll.toLatLng());

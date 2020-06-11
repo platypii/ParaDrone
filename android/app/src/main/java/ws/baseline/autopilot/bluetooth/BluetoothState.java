@@ -6,12 +6,13 @@ public class BluetoothState {
 
     // Bluetooth finite state machine
     static final int BT_STOPPED = 0;
-    static final int BT_SEARCHING = 1;
-    static final int BT_CONNECTING = 2;
-    public static final int BT_CONNECTED = 3;
-    static final int BT_STOPPING = 4;
+    static final int BT_STARTED = 1;
+    static final int BT_SEARCHING = 2;
+    static final int BT_CONNECTING = 3;
+    public static final int BT_CONNECTED = 4;
+    static final int BT_STOPPING = 5;
 
-    static final String[] BT_STATES = {"stopped", "searching", "connecting", "connected", "stopping"};
+    static final String[] BT_STATES = {"stopped", "started", "searching", "connecting", "connected", "stopping"};
 
     BluetoothState(int state) {
         this.state = state;

@@ -11,7 +11,7 @@ import static ws.baseline.autopilot.bluetooth.BluetoothPreferences.DeviceMode.RE
 public class BluetoothPreferences {
     private static final String PREF_RELAY_MODE = "bt_relay_mode";
 
-    enum DeviceMode {AP, RELAY}
+    public enum DeviceMode {AP, RELAY}
 
     private SharedPreferences prefs;
 
