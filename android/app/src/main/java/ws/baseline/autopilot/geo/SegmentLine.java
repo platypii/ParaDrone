@@ -30,7 +30,7 @@ public class SegmentLine implements Segment {
     }
 
     @Override
-    public PathLike fly(double distance) {
+    public Path fly(double distance) {
         if (distance < 0) {
             Timber.e("Flight distance cannot be negative %s", distance);
         }
@@ -40,7 +40,7 @@ public class SegmentLine implements Segment {
                 interpolate(this.start.x, this.end.x, alpha),
                 interpolate(this.start.y, this.end.y, alpha)
         );
-        return new SegmentLine(start, proj);
+        return new Path("line-fly", new SegmentLine(start, proj));
     }
 
     @Override

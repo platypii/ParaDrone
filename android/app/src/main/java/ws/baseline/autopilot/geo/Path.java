@@ -3,15 +3,21 @@ package ws.baseline.autopilot.geo;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import timber.log.Timber;
 
 public class Path implements PathLike {
-    private final List<Segment> segments;
+    public final String name;
+    public final List<Segment> segments;
 
-    public Path(Segment... segments) {
-        this.segments = Arrays.asList(segments);
+    public Path(String name, Segment... segments) {
+        this(name, Arrays.asList(segments));
     }
-    private Path(List<Segment> segments) {
+    public Path(String name, List<Segment> segments) {
+        this.name = name;
         this.segments = segments;
+        if (this.segments.isEmpty()) {
+            Timber.e("Invalid empty path");
+        }
     }
 
     @Override
@@ -21,6 +27,9 @@ public class Path implements PathLike {
 
     @Override
     public PointV end() {
+        if (segments.isEmpty()) {
+            Timber.e("Empty path %s", name);
+        }
         return segments.get(segments.size() - 1).end();
     }
 
@@ -29,7 +38,7 @@ public class Path implements PathLike {
         final List<Segment> trimmed = new ArrayList<>();
         double flown = 0;
         int i = 0;
-        for (; i < segments.size(); i++) {
+        for (; i < segments.size() - 1; i++) {
             final Segment segment = segments.get(i);
             final double segmentLength = segment.length();
             if (distance < flown + segmentLength) {
@@ -40,7 +49,9 @@ public class Path implements PathLike {
                 flown += segmentLength;
             }
         }
-        return new Path(trimmed);
+        // Fly last segment
+        trimmed.addAll(segments.get(i).fly(distance - flown).segments);
+        return new Path(name, trimmed);
     }
 
     @Override

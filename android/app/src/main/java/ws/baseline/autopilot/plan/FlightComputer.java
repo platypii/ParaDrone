@@ -6,6 +6,7 @@ import ws.baseline.autopilot.bluetooth.ApLocationMsg;
 import ws.baseline.autopilot.bluetooth.ApSpeedMsg;
 import ws.baseline.autopilot.geo.LandingZone;
 import ws.baseline.autopilot.geo.Path;
+import ws.baseline.autopilot.geo.Point3V;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -51,8 +52,9 @@ public class FlightComputer {
 
     private void replan() {
         if (lastPoint != null && lastLz != null) {
+            final Point3V point = lastLz.toPoint3V(lastPoint);
             // Recompute plan
-            plan = Search.search(lastPoint, lastLz);
+            plan = Search.search(point, lastLz);
             EventBus.getDefault().post(new PlanEvent());
         }
     }

@@ -18,9 +18,9 @@ public class ControlView extends View {
     private Point touch1;
     private Point touch2;
 
-    // Toggle control -1..1
-    private double left_toggle;
-    private double right_toggle;
+    // 0 = no deflection, 255 = full deflection
+    private short left_toggle;
+    private short right_toggle;
 
     private final float density = getResources().getDisplayMetrics().density;
     private final Paint paint = new Paint();
@@ -42,7 +42,7 @@ public class ControlView extends View {
 
         // Axes
         paint.setColor(0xffeeeeee);
-        canvas.drawLine(0, h / 2, w, h /2, paint);
+        canvas.drawLine(0, 2, w, 2, paint); // TODO: Draw at high point margin
         canvas.drawLine(w / 2, 0, w / 2, h, paint);
 
         paint.setTextAlign(Paint.Align.LEFT);
@@ -60,8 +60,8 @@ public class ControlView extends View {
         }
 
         // Draw toggles
-        final float l = (float) (-left_toggle + 1) * h / 2;
-        final float r = (float) (-right_toggle + 1) * h / 2;
+        final float l = (float) (left_toggle * h / 255);
+        final float r = (float) (right_toggle * h / 255);
         paint.setColor(0x88eeeeee);
         canvas.drawRect(0, l - 30 * density, 15 * density, l + 30 * density, paint);
         canvas.drawRect(w - 15 * density, r - 30 * density, w, r + 30 * density, paint);
@@ -115,40 +115,39 @@ public class ControlView extends View {
         right_toggle = 0;
         if (touch1 != null && touch2 != null) {
             if (touch1.x < w * 0.4) {
-                left_toggle = touch1.y * -2 / h + 1; // -1..1
+                left_toggle = (short) (255 * touch1.y / h); // 0..255
             }
             if (touch2.x < w * 0.4) {
-                left_toggle = touch2.y * -2 / h + 1; // -1..1
+                left_toggle = (short) (255 * touch2.y / h); // 0..255
             }
             if (w * 0.6 < touch1.x) {
-                right_toggle = touch1.y * -2 / h + 1; // -1..1
+                right_toggle = (short) (255 * touch1.y / h); // 0..255
             }
             if (w * 0.6 < touch2.x) {
-                right_toggle = touch2.y * -2 / h + 1; // -1..1
+                right_toggle = (short) (255 * touch2.y / h); // 0..255
             }
         } else if (touch1 != null) {
-            // Normalize to -1..1
+            // Normalize x to -1..1
             final double x_norm = touch1.x * 2 / w - 1;
-            final double y_norm = touch1.y * 2 / h - 1;
+            // Normalize y to 0..1
+            final double y_norm = touch1.y / h;
 
             // ReLU
             final double left_weight = clip(0, -2.5 * x_norm + 1.5, 1);
             final double right_weight = clip(0, 2.5 * x_norm + 1.5, 1);
 
-            left_toggle = -y_norm * left_weight;
-            right_toggle = -y_norm * right_weight;
+            left_toggle = (short) (255 * y_norm * left_weight);
+            right_toggle = (short) (255 * y_norm * right_weight);
         }
 
-        left_toggle = clip(-1, left_toggle, 1);
-        right_toggle = clip(-1, right_toggle, 1);
+        left_toggle = normalize(left_toggle);
+        right_toggle = normalize(right_toggle);
 
         // Send control message at most every 100ms
         // TODO: Except when let go?
         if (System.currentTimeMillis() - last_controls_sent >= control_rate) {
             last_controls_sent = System.currentTimeMillis();
-            final byte left_byte = (byte) (left_toggle * 127);
-            final byte right_byte = (byte) (right_toggle * 127);
-            Services.bluetooth.setControls(left_byte, right_byte);
+            Services.bluetooth.setControls((byte) left_toggle, (byte) right_toggle);
         }
 
         invalidate();
@@ -156,5 +155,9 @@ public class ControlView extends View {
 
     private static double clip(double min, double d, double max) {
         return Math.max(min, Math.min(d, max));
+    }
+
+    private static short normalize(short d) {
+        return d < 0 ? 0 : d > 255 ? 255 : d;
     }
 }

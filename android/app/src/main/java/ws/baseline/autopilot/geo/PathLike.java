@@ -7,7 +7,7 @@ public interface PathLike {
     PointV start();
     PointV end();
 
-    PathLike fly(double distance);
+    Path fly(double distance);
 
     double length();
 

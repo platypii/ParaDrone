@@ -48,7 +48,7 @@ class BluetoothHandler {
     private final Handler handler = new Handler();
     private final BluetoothService service;
     private final BluetoothCentral central;
-    private BluetoothPeripheral peripheral;
+    private BluetoothPeripheral currentPeripheral;
 
     boolean connected_ap = false;
     boolean connected_relay = false;
@@ -60,7 +60,6 @@ class BluetoothHandler {
 
     public void start() {
         if (service.getState() == BT_STARTED) {
-            service.setState(BT_SEARCHING);
             scan();
         } else if (service.getState() == BT_SEARCHING) {
             Timber.w("Already searching");
@@ -70,6 +69,7 @@ class BluetoothHandler {
     }
 
     private void scan() {
+        service.setState(BT_SEARCHING);
         // Scan for peripherals with a certain service UUIDs
         central.startPairingPopupHack();
         if (service.deviceMode == RELAY) {
@@ -106,7 +106,7 @@ class BluetoothHandler {
 
         @Override
         public void onNotificationStateUpdate(BluetoothPeripheral peripheral, BluetoothGattCharacteristic characteristic, int status) {
-            if ( status == GATT_SUCCESS) {
+            if (status == GATT_SUCCESS) {
                 if (peripheral.isNotifying(characteristic)) {
                     Timber.d("SUCCESS: Notify set to 'on' for %s", characteristic.getUuid());
                 } else {
@@ -119,10 +119,10 @@ class BluetoothHandler {
 
         @Override
         public void onCharacteristicWrite(BluetoothPeripheral peripheral, byte[] value, BluetoothGattCharacteristic characteristic, int status) {
-            if ( status == GATT_SUCCESS) {
-                Timber.i("SUCCESS: Writing <%s> to <%s>", byteArrayToHex(value), characteristic.getUuid().toString());
+            if (status == GATT_SUCCESS) {
+//                Timber.d("SUCCESS: Writing <%s> to <%s>", byteArrayToHex(value), characteristic.getUuid().toString());
             } else {
-                Timber.i("ERROR: Failed writing <%s> to <%s>", byteArrayToHex(value), characteristic.getUuid().toString());
+                Timber.w("ERROR: Failed writing <%s> to <%s>", byteArrayToHex(value), characteristic.getUuid().toString());
             }
         }
 
@@ -132,6 +132,7 @@ class BluetoothHandler {
             if (value.length == 0) return;
             final UUID characteristicUUID = characteristic.getUuid();
 
+//            Timber.d("onCharacteristicUpdate %s", characteristicUUID);
             if (characteristicUUID.equals(apCharacteristicId)) {
                 processBytes(value);
             } else if (characteristicUUID.equals(relayCharacteristicId)) {
@@ -145,11 +146,11 @@ class BluetoothHandler {
 
         @Override
         public void onConnectedPeripheral(BluetoothPeripheral connectedPeripheral) {
-            peripheral = connectedPeripheral;
-            Timber.i("Connected to '%s'", peripheral.getName());
-            if (peripheral.getService(apServiceId) != null) {
+            currentPeripheral = connectedPeripheral;
+            Timber.i("Connected to '%s'", connectedPeripheral.getName());
+            if (connectedPeripheral.getService(apServiceId) != null) {
                 connected_ap = true;
-            } else if (peripheral.getService(relayServiceId) != null) {
+            } else if (connectedPeripheral.getService(relayServiceId) != null) {
                 connected_relay = true;
             } else {
                 Timber.e("Connected to device with no service?");
@@ -167,19 +168,27 @@ class BluetoothHandler {
         public void onDisconnectedPeripheral(final BluetoothPeripheral peripheral, final int status) {
             Timber.i("Autopilot disconnected '%s' with status %d", peripheral.getName(), status);
             if (connected_ap && service.deviceMode == AP) {
+                Timber.d("Auto reconnecting to AP");
+                connected_ap = false;
                 autoreconnect();
             } else if (connected_relay && service.deviceMode == RELAY) {
+                Timber.d("Auto reconnecting to relay");
+                connected_relay = false;
                 autoreconnect();
             } else {
+                Timber.d("Back to searching");
+                connected_ap = false;
+                connected_relay = false;
+                currentPeripheral = null;
                 // Go back to searching
-                start();
+                scan();
             }
         }
 
         private void autoreconnect() {
             // Reconnect to this device when it becomes available again
             service.setState(BT_SEARCHING);
-            handler.postDelayed(() -> central.autoConnectPeripheral(peripheral, peripheralCallback), 5000);
+            handler.postDelayed(() -> central.autoConnectPeripheral(currentPeripheral, peripheralCallback), 5000);
         }
 
         @Override
@@ -243,7 +252,7 @@ class BluetoothHandler {
             buf.putInt(5, (int)(lz.destination.lng * 1e6)); // microdegrees
             buf.putShort(9, (short)(lz.destination.alt * 10)); // decimeters
             buf.putShort(11, (short)(lz.landingDirection * 1000)); // milliradians
-            if (!peripheral.writeCharacteristic(ch, value, WRITE_TYPE_DEFAULT)) {
+            if (!currentPeripheral.writeCharacteristic(ch, value, WRITE_TYPE_DEFAULT)) {
                 Timber.e("Failed to set lz");
             }
             fetchLandingZone();
@@ -253,7 +262,7 @@ class BluetoothHandler {
     }
 
     void setControls(byte left, byte right) {
-        Timber.i("phone -> ap: set controls %d %d", left, right);
+        Timber.i("phone -> ap: set controls %d %d", left & 0xff, right & 0xff);
         BluetoothGattCharacteristic ch = getCharacteristic();
         if (ch != null) {
             // Pack controls into bytes
@@ -261,10 +270,10 @@ class BluetoothHandler {
             value[0] = 'C';
             value[1] = left;
             value[2] = right;
-            if (!peripheral.writeCharacteristic(ch, value, WRITE_TYPE_DEFAULT)) {
+            if (!currentPeripheral.writeCharacteristic(ch, value, WRITE_TYPE_DEFAULT)) {
                 Timber.e("Failed to set controls");
             }
-        } else {
+        } else if (service.getState() == BT_CONNECTED) {
             Timber.e("Failed to get characteristic");
         }
     }
@@ -275,7 +284,7 @@ class BluetoothHandler {
         if (ch != null) {
             // Request LZ from device
             final byte[] value = {'Q'};
-            if (!peripheral.writeCharacteristic(ch, value, WRITE_TYPE_DEFAULT)) {
+            if (!currentPeripheral.writeCharacteristic(ch, value, WRITE_TYPE_DEFAULT)) {
                 Timber.e("Failed to request lz");
             }
         } else {
@@ -285,11 +294,11 @@ class BluetoothHandler {
 
     @Nullable
     private BluetoothGattCharacteristic getCharacteristic() {
-        if (peripheral != null) {
+        if (currentPeripheral != null) {
             if (connected_ap) {
-                return peripheral.getCharacteristic(apServiceId, apCharacteristicId);
+                return currentPeripheral.getCharacteristic(apServiceId, apCharacteristicId);
             } else if (connected_relay) {
-                return peripheral.getCharacteristic(relayServiceId, relayCharacteristicId);
+                return currentPeripheral.getCharacteristic(relayServiceId, relayCharacteristicId);
             }
         }
         return null;
@@ -299,9 +308,15 @@ class BluetoothHandler {
      * Terminate an existing connection (because we're switching devices)
      */
     void disconnect() {
-        if (peripheral != null) {
+        if (currentPeripheral != null) {
             // will receive callback in onDisconnectedPeripheral
-            peripheral.cancelConnection();
+            currentPeripheral.cancelConnection();
+        } else if (service.getState() == BT_SEARCHING) {
+            // Searching for other device, stop and restart search
+            Timber.d("Restarting current scan");
+            central.stopScan();
+            service.setState(BT_STARTED);
+            scan();
         }
     }
 
@@ -309,8 +324,8 @@ class BluetoothHandler {
         service.setState(BT_STOPPING);
         // Stop scanning
         central.stopScan();
-        if (peripheral != null) {
-            peripheral.cancelConnection();
+        if (currentPeripheral != null) {
+            currentPeripheral.cancelConnection();
         }
 //        central.close();
         service.setState(BT_STOPPED);

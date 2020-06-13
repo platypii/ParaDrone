@@ -69,6 +69,7 @@ class PlannerDubins {
                 c2.y + turn2 * turnRadius * Math.sin(commute_angle)
         );
         return new Path(
+                "dubins",
                 new SegmentTurn(c1, loc, comm1, turn1),
                 new SegmentLine(comm1, comm2),
                 new SegmentTurn(c2, comm2, dest, turn2)

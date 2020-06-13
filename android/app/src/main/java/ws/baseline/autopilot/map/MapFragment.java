@@ -15,16 +15,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Implements a map
+ * Implements a generic map
  */
-public class MapFragment extends SupportMapFragment implements OnMapReadyCallback {
+public class MapFragment extends SupportMapFragment implements OnMapReadyCallback, GoogleMap.OnCameraMoveStartedListener, GoogleMap.OnCameraIdleListener {
+    // Drag listener
+    boolean draging = false;
+    long lastDrag = 0;
 
     // Null if Google Play services APK is not available
     @Nullable
-    private GoogleMap map;
+    GoogleMap map;
 
     private final List<MapLayer> layers = new ArrayList<>();
 
+    @Nullable
     public LatLng center() {
         if (map != null) {
             return map.getCameraPosition().target;
@@ -58,6 +62,10 @@ public class MapFragment extends SupportMapFragment implements OnMapReadyCallbac
         if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             map.setMyLocationEnabled(true);
         }
+
+        // Drag listener
+        map.setOnCameraMoveStartedListener(this);
+        map.setOnCameraIdleListener(this);
     }
 
     void addLayer(@NonNull MapLayer layer) {
@@ -73,4 +81,18 @@ public class MapFragment extends SupportMapFragment implements OnMapReadyCallbac
         }
     }
 
+    @Override
+    public void onCameraMoveStarted(int reason) {
+        if (reason == REASON_GESTURE) {
+            draging = true;
+        }
+    }
+
+    @Override
+    public void onCameraIdle() {
+        if (draging) {
+            lastDrag = System.currentTimeMillis();
+            draging = false;
+        }
+    }
 }

@@ -1,27 +1,25 @@
 package ws.baseline.autopilot.plan;
 
-import ws.baseline.autopilot.GeoPoint;
 import ws.baseline.autopilot.Paramotor;
 import ws.baseline.autopilot.geo.LandingZone;
 import ws.baseline.autopilot.geo.Path;
+import ws.baseline.autopilot.geo.Point3V;
 import ws.baseline.autopilot.geo.PointV;
 
 import androidx.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
 
-import static ws.baseline.autopilot.geo.Turn.TURN_LEFT;
-import static ws.baseline.autopilot.geo.Turn.TURN_RIGHT;
-import static ws.baseline.autopilot.plan.PlannerDubins.dubins;
 import static ws.baseline.autopilot.plan.PlannerNaive.naive;
 import static ws.baseline.autopilot.plan.PlannerStraight.straight;
+import static ws.baseline.autopilot.plan.PlannerWaypoints.viaWaypoints;
 
 public class Search {
     private static final double no_turns_below = 30; // meters
 
-    public static Path search(GeoPoint point, LandingZone lz) {
-        final PointV loc = lz.toPointV(point);
-
+    public static Path search(Point3V loc, LandingZone lz) {
         // How much farther can we fly with available altitude?
-        final double alt_agl = point.alt - lz.destination.alt;
+        final double alt_agl = loc.alt - lz.destination.alt;
         final double turn_distance_remaining = Paramotor.flightDistanceRemaining(alt_agl - no_turns_below);
         final double flight_distance_remaining = Paramotor.flightDistanceRemaining(alt_agl);
 
@@ -30,7 +28,7 @@ public class Search {
         final double distance = Math.hypot(loc.x, loc.y);
 
         // Construct flight paths
-        final Path straightPath = straight(loc).fly(flight_distance_remaining);
+        final Path straightPath = straight(loc).fly(Math.min(1, flight_distance_remaining));
         final Path naivePath = naive(loc, sof, r);
 
         if (alt_agl < no_turns_below) {
@@ -39,17 +37,18 @@ public class Search {
         } else if (distance > 1000 && naivePath != null) {
             return naivePath.fly(turn_distance_remaining).fly(flight_distance_remaining);
         } else {
-            final Path[] paths = {
-                    dubins(loc, sof, r, TURN_RIGHT, TURN_RIGHT), // rsr
-                    dubins(loc, sof, r, TURN_RIGHT, TURN_LEFT), // rsl
-                    dubins(loc, sof, r, TURN_LEFT, TURN_RIGHT), // lsr
-                    dubins(loc, sof, r, TURN_LEFT, TURN_LEFT), // lsl
-                    // naivePath,
-                    straightPath
-            };
-            for (int i = 0; i < paths.length; i++) {
-                if (paths[i] != null) {
-                    paths[i] = paths[i].fly(turn_distance_remaining).fly(flight_distance_remaining);
+            final List<Path> paths = new ArrayList<>();
+            paths.addAll(viaWaypoints(loc, lz));
+//            paths.add(dubins(loc, sof, r, TURN_RIGHT, TURN_RIGHT)); // rsr
+//            paths.add(dubins(loc, sof, r, TURN_RIGHT, TURN_LEFT)); // rsl
+//            paths.add(dubins(loc, sof, r, TURN_LEFT, TURN_RIGHT)); // lsr
+//            paths.add(dubins(loc, sof, r, TURN_LEFT, TURN_LEFT)); // lsl
+//            paths.add(naivePath);
+            paths.add(straightPath);
+            for (int i = 0; i < paths.size(); i++) {
+                if (paths.get(i) != null) {
+                    // Trim to turnable altitude
+                    paths.set(i, paths.get(i).fly(turn_distance_remaining).fly(flight_distance_remaining));
                 }
             }
             Path best = bestPlan(lz, paths);
@@ -64,7 +63,7 @@ public class Search {
      * Find the path that minimizes landing error
      */
     @Nullable
-    private static Path bestPlan(LandingZone lz, Path[] paths) {
+    private static Path bestPlan(LandingZone lz, List<Path> paths) {
         Path best = null;
         double bestScore = Double.POSITIVE_INFINITY;
         for (Path path : paths) {
