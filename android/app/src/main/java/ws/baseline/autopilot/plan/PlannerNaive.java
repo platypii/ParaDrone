@@ -52,6 +52,7 @@ class PlannerNaive {
                 c1.y + turn1 * turnRadius * Math.sin(commute_angle)
         );
         return new Path(
+                "naive",
                 new SegmentTurn(c1, loc, comm1, turn1),
                 new SegmentLine(comm1, dest)
         );

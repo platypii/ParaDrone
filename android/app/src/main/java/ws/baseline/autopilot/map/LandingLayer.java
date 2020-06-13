@@ -10,7 +10,6 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.GroundOverlay;
 import com.google.android.gms.maps.model.GroundOverlayOptions;
 import com.google.android.gms.maps.model.LatLng;
-import timber.log.Timber;
 
 public class LandingLayer extends MapLayer {
 
@@ -31,7 +30,7 @@ public class LandingLayer extends MapLayer {
     public void update() {
         if (arrow != null) {
             final APLandingZone lz = APLandingZone.lastLz;
-            if (lz != null) {
+            if (lz != null && lz.lz != null) {
                 arrow.setPosition(lz.lz.destination.toLatLng());
                 arrow.setDimensions((float) lz.lz.finalDistance * 0.2f);
                 arrow.setBearing((float) Math.toDegrees(lz.lz.landingDirection));

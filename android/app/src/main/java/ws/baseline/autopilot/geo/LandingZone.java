@@ -1,6 +1,7 @@
 package ws.baseline.autopilot.geo;
 
 import ws.baseline.autopilot.GeoPoint;
+import ws.baseline.autopilot.Paramotor;
 import ws.baseline.autopilot.util.Convert;
 
 import androidx.annotation.NonNull;
@@ -15,58 +16,77 @@ public class LandingZone {
     public final double finalDistance = 150; // meters
 
     // Destination, as origin of coordinate system
-    public final PointV dest;
+    public final Point3V dest;
 
     public LandingZone(double lat, double lng, double alt, double landingDirection) {
         this.destination = new LatLngAlt(lat, lng, alt);
         this.landingDirection = landingDirection;
-        this.dest = new PointV(
+        this.dest = new Point3V(
                 0,
                 0,
+                destination.alt,
                 Math.sin(landingDirection),
-                Math.cos(landingDirection)
+                Math.cos(landingDirection),
+                0
         );
     }
 
     /**
      * Landing pattern: start of final approach
      */
-    public PointV startOfFinal() {
-        return new PointV(
+    public Point3V startOfFinal() {
+        return new Point3V(
                 -finalDistance * this.dest.vx,
                 -finalDistance * this.dest.vy,
+                dest.alt + finalDistance / Paramotor.glide,
                 dest.vx,
-                dest.vy
+                dest.vy,
+                Paramotor.descentRate
         );
     }
 
     /**
      * Landing pattern: start of base leg
      */
-    Point startOfBase(int turn) {
-        return new Point(
+    public Point3V startOfBase(int turn) {
+        return new Point3V(
                 -finalDistance * (this.dest.vx - turn * this.dest.vy),
-                -finalDistance * (turn * this.dest.vx + this.dest.vy)
+                -finalDistance * (turn * this.dest.vx + this.dest.vy),
+                dest.alt + 2 * finalDistance / Paramotor.glide,
+                -dest.vx,
+                -dest.vy,
+                Paramotor.descentRate
         );
     }
 
     /**
      * Landing pattern: start of downwind leg
      */
-    Point startOfDownwind(int turn) {
-        return new Point(
+    public Point3V startOfDownwind(int turn) {
+        return new Point3V(
                 finalDistance * turn * this.dest.vy,
-                -finalDistance * turn * this.dest.vx
+                -finalDistance * turn * this.dest.vx,
+                dest.alt + 3 * finalDistance / Paramotor.glide,
+                -dest.vx,
+                -dest.vy,
+                Paramotor.descentRate
         );
     }
 
     /**
      * Convert lat, lng to x, y meters centered at current location
      */
-    public PointV toPointV(GeoPoint point) {
+    public Point3V toPoint3V(GeoPoint point) {
         final double bearing = Math.toRadians(Geo.bearing(this.destination.lat, this.destination.lng, point.lat, point.lng));
         final double distance = Geo.distance(this.destination.lat, this.destination.lng, point.lat, point.lng);
-        return new PointV(distance * Math.sin(bearing),distance * Math.cos(bearing), point.vE, point.vN);
+        return new Point3V(
+                distance * Math.sin(bearing),
+                distance * Math.cos(bearing),
+                point.alt,
+                point.vE,
+                point.vN,
+                point.climb
+        );
     }
 
     /**
