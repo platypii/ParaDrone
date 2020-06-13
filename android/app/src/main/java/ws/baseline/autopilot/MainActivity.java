@@ -3,6 +3,7 @@ package ws.baseline.autopilot;
 import ws.baseline.autopilot.bluetooth.APLandingZone;
 import ws.baseline.autopilot.databinding.ActivityMainBinding;
 import ws.baseline.autopilot.geo.LandingZone;
+import ws.baseline.autopilot.map.DroneMap;
 import ws.baseline.autopilot.map.Elevation;
 import ws.baseline.autopilot.map.MapFragment;
 
@@ -43,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
                 binding.landingArrow.setVisibility(View.VISIBLE);
                 binding.setLandingZone.setText("↑ Set");
             } else {
-                final MapFragment frag = (MapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+                final DroneMap frag = (DroneMap) getSupportFragmentManager().findFragmentById(R.id.map);
                 if (frag != null) {
                     final LatLng ll = frag.center();
                     final double landingDirection = frag.direction(); // radians

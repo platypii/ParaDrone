@@ -33,7 +33,7 @@ public class SegmentTurn implements Segment {
     }
 
     @Override
-    public PathLike fly(double distance) {
+    public Path fly(double distance) {
         if (distance < 0) {
             Timber.e("Flight distance cannot be negative %s", distance);
         }
@@ -44,7 +44,7 @@ public class SegmentTurn implements Segment {
                     circle.x + circle.radius * Math.sin(theta),
                     circle.y + circle.radius * Math.cos(theta)
             );
-            return new SegmentTurn(circle, start, end, turn);
+            return new Path("turn-fly", new SegmentTurn(circle, start, end, turn));
         } else {
             final double remaining = distance - len;
             final double dx = end.x - circle.x;
@@ -54,7 +54,7 @@ public class SegmentTurn implements Segment {
                     end.y - turn * remaining * dx / circle.radius
             );
             final SegmentLine line = new SegmentLine(end, proj);
-            return new Path(this, line);
+            return new Path("turn-fly", this, line);
         }
     }
 
@@ -67,7 +67,7 @@ public class SegmentTurn implements Segment {
     public List<Point> render() {
         final List<Point> points = new ArrayList<>();
         final double angle1 = angle1();
-        final double step = 0.05; // ~3 degrees
+        final double step = 0.1; // ~5 degrees
         final double arcs = arcs();
         for (double delta = 0; delta < arcs; delta += step) {
             final double theta = angle1 + turn * delta;
