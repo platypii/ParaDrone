@@ -4,7 +4,7 @@
 #include "paradrone.h"
 
 #define TIME_START long start_time = millis()
-#define TIME_END long time_delta = millis() - start_time; if (time_delta >= 30) Serial.printf("Slow loop %ld %ldms thread %d\n", millis(), time_delta, xPortGetCoreID())
+#define TIME_END long time_delta = millis() - start_time; if (time_delta >= 100) Serial.printf("Slow loop %ld %ldms thread %d\n", millis(), time_delta, xPortGetCoreID())
 
 void blink(int count);
 

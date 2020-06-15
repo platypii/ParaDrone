@@ -32,6 +32,8 @@ static bool valid_point(GeoPointV * p) {
 void rc_set_speed(const short new_left, const short new_right) {
   last_rc_millis = millis();
   set_motor_speed(new_left, new_right);
+  // Special case for full up
+  if (new_left <= -254 && new_right <= -254) set_motor_position(0, 0);
 }
 
 /**
@@ -74,6 +76,8 @@ void planner_update_location(GeoPointV *point) {
       current_plan = new_plan;
       ParaControls ctrl = path_controls(current_plan);
       ap_set_position(ctrl.left, ctrl.right);
+      const double landing_error = hypot(current_plan->end.x, current_plan->end.y);
+      Serial.printf("Got plan length %f landing error %f\n", path_length(current_plan), landing_error);
     } else {
       // Do nothing
     }

@@ -65,6 +65,7 @@ void set_motor_position(uint8_t new_left, uint8_t new_right);
 
 // Planner
 void planner_loop();
+void rc_set_position(uint8_t new_left, uint8_t new_right);
 void planner_update_location(GeoPointV *point);
 double plan_score(LandingZone *lz, Path *plan);
 

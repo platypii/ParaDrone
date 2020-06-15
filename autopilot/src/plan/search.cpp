@@ -46,9 +46,15 @@ Path *search(Point3V loc3, LandingZone *lz, const double r) {
     return naive_path;
   } else {
     vector<Path*> plans = {
+      // dubins(loc, dest, r, TURN_RIGHT, TURN_RIGHT),
+      // dubins(loc, dest, r, TURN_RIGHT, TURN_LEFT),
+      // dubins(loc, dest, r, TURN_LEFT, TURN_RIGHT),
+      // dubins(loc, dest, r, TURN_LEFT, TURN_LEFT),
       naive_path,
       straight_path
     };
+    vector<Path*> ways = via_waypoints(loc3, lz);
+    plans.insert(plans.end(), ways.begin(), ways.end());
     // Fly path to ground
     for (int i = 0; i < plans.size(); i ++) {
       if (plans[i]) {
