@@ -11,9 +11,9 @@ void lora_init() {
     Serial.println("LoRa init failed");
   }
   // LoRa.setPreambleLength();
-  // LoRa.setSignalBandwidth(125E3);
+  // LoRa.setSignalBandwidth(125E3); // 250E3, 125E3*, 62.5E3, ...
   // LoRa.setSPIFrequency();
-  // LoRa.setSpreadingFactor(); // 7..12 lower = more chirp/s = faster data, higher = better sensitivity. Default 11
+  LoRa.setSpreadingFactor(9); // 7..12 lower = more chirp/s = faster data, higher = better sensitivity. Default 11
   // LoRa.setTxPower(20, ); // Default 14
   // LoRa.setTxPowerMax(20);
   LoRa.setCodingRate4(8); // 5..8
@@ -31,9 +31,11 @@ void lora_loop() {
 }
 
 static void lora_send_raw(uint8_t *msg, size_t size) {
+  // long start_time = millis();
   LoRa.beginPacket(); // Explicit header mode for variable size packets
   LoRa.write(msg, size);
   LoRa.endPacket();
+  // Serial.printf("LoRa sent %d bytes in %ld ms\n", size, millis() - start_time);
 }
 
 void lora_send_location(GeoPointV *point) {
@@ -84,6 +86,7 @@ static void lora_read() {
     // Parse controls
     uint8_t left = packet[1];
     uint8_t right = packet[2];
+    rc_set_position(left, right);
     Serial.printf("LoRa controls %d, %d\n", left, right);
   } else if (packet[0] == 'Q' && bytes_ready == 1) {
     // Send LZ in response

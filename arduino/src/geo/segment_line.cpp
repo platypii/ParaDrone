@@ -4,6 +4,13 @@
 
 static double interpolate(double start, double end, double alpha);
 
+PointV *line_start(Line *line) {
+  const double dx = line->end.x - line->start.x;
+  const double dy = line->end.y - line->start.y;
+  const double len = hypot(dx, dy);
+  return new PointV {line->start.x, line->start.y, dx / len, dy / len};
+}
+
 PointV *line_end(Line *line) {
   const double dx = line->end.x - line->start.x;
   const double dy = line->end.y - line->start.y;
@@ -32,7 +39,7 @@ Path *line_fly(Line *line, double distance) {
   };
   Line extension = {'L', line->start, proj};
   Line *singleton = &extension;
-  return new_path(line->start, proj, 1, (Segment**) &singleton);
+  return new_path(1, (Segment**) &singleton);
 }
 
 Point *line_render(Line *line) {

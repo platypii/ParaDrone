@@ -6,9 +6,15 @@
 static double angle1(Turn *turn);
 static double angle2(Turn *turn);
 
+PointV *turn_start(Turn *turn) {
+  const double dx = turn->start.x - turn->circle.x;
+  const double dy = turn->start.y - turn->circle.y;
+  return new PointV {turn->start.x, turn->start.y, dx / turn->circle.radius, dy / turn->circle.radius};
+}
+
 PointV *turn_end(Turn *turn) {
-  const double dx = turn->end.x - turn->start.x;
-  const double dy = turn->end.y - turn->start.y;
+  const double dx = turn->end.x - turn->circle.x;
+  const double dy = turn->end.y - turn->circle.y;
   return new PointV {turn->end.x, turn->end.y, dx / turn->circle.radius, dy / turn->circle.radius};
 }
 
@@ -40,7 +46,7 @@ Path *turn_fly(Turn *turn, double distance) {
       turn->turn
     };
     Segment *segments = (Segment*) &proj;
-    return new_path(turn->start, point, 1, &segments);
+    return new_path(1, &segments);
   } else {
     // Line extending from end of this turn
     const double remaining = distance - len;
@@ -54,7 +60,7 @@ Path *turn_fly(Turn *turn, double distance) {
     Segment *segments[2];
     segments[0] = (Segment*) turn;
     segments[1] = (Segment*) &line;
-    return new_path(turn->start, extension, 2, segments);
+    return new_path(2, segments);
   }
 }
 

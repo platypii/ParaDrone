@@ -7,6 +7,7 @@
 #define PARAMOTOR_GROUNDSPEED 11
 #define PARAMOTOR_DESCENTRATE 4
 #define PARAMOTOR_TURNRADIUS 100
+#define PARAMOTOR_GLIDE (PARAMOTOR_GROUNDSPEED / PARAMOTOR_DESCENTRATE)
 
 // LoRa North America
 #define LORA_BAND 915E6
@@ -62,5 +63,11 @@ void motor_init();
 void motor_loop();
 void set_controls(const short left, const short right);
 void set_position(uint8_t new_left, uint8_t new_right);
+
+// Planner
+void planner_loop();
+void planner_update_location(GeoPointV *point);
+double plan_score(LandingZone *lz, Path *plan);
+void rc_set_position(uint8_t new_left, uint8_t new_right);
 
 #endif

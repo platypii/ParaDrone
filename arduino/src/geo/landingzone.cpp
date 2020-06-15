@@ -18,8 +18,10 @@ LandingZone::LandingZone(double lat, double lng, double alt, double landingDir) 
   dest = {
     .x = 0,
     .y = 0,
+    .alt = alt,
     .vx = sin(landingDirection),
-    .vy = cos(landingDirection)
+    .vy = cos(landingDirection),
+    .climb = 0
   };
 }
 
@@ -37,14 +39,33 @@ Point LandingZone::to_point(double lat, double lng) {
 }
 
 /**
+ * Convert lat, lng to x, y meters centered at current location
+ */
+Point3V LandingZone::to_point3V(GeoPointV *loc) {
+  const double bearing = geo_bearing(destination.lat, destination.lng, loc->lat, loc->lng);
+  const double distance = geo_distance(destination.lat, destination.lng, loc->lat, loc->lng);
+  Point3V point = {
+    .x = distance * sin(bearing),
+    .y = distance * cos(bearing),
+    .alt = loc->alt,
+    .vx = loc->vE,
+    .vy = loc->vN,
+    .climb = loc->climb
+  };
+  return point;
+}
+
+/**
  * Landing pattern: start of final approach
  */
-PointV LandingZone::start_of_final() {
-  PointV point = {
+Point3V LandingZone::start_of_final() {
+  Point3V point = {
     .x = -finalDistance * dest.vx,
     .y = -finalDistance * dest.vy,
+    .alt = dest.alt + finalDistance / PARAMOTOR_GLIDE,
     .vx = dest.vx,
-    .vy = dest.vy
+    .vy = dest.vy,
+    .climb = PARAMOTOR_DESCENTRATE
   };
   return point;
 }
@@ -52,12 +73,29 @@ PointV LandingZone::start_of_final() {
 /**
  * Landing pattern: start of base leg
  */
-PointV LandingZone::start_of_base(int turn) {
-  PointV point = {
+Point3V LandingZone::start_of_base(int turn) {
+  Point3V point = {
     .x = -finalDistance * (dest.vx - turn * dest.vy),
     .y = -finalDistance * (turn * dest.vx + dest.vy),
-    .vx = -turn * dest.vy,
-    .vy = turn * dest.vx
+    .alt = dest.alt + 2 * finalDistance / PARAMOTOR_GLIDE,
+    .vx = -dest.vx,
+    .vy = -dest.vy,
+    .climb = PARAMOTOR_DESCENTRATE
+  };
+  return point;
+}
+
+/**
+ * Landing pattern: start of base leg
+ */
+Point3V LandingZone::start_of_downwind(int turn) {
+  Point3V point = {
+    .x = -finalDistance * turn * dest.vy,
+    .y = -finalDistance * turn * dest.vx,
+    .alt = dest.alt + 3 * finalDistance / PARAMOTOR_GLIDE,
+    .vx = -dest.vx,
+    .vy = -dest.vy,
+    .climb = PARAMOTOR_DESCENTRATE
   };
   return point;
 }

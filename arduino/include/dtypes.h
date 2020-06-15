@@ -9,12 +9,12 @@
 
 /**
  * Paramotor input controls (left and right toggle)
- * 0.0 = no deflection
- * 1.0 = full deflection
+ * 0 = no deflection
+ * 255 = full deflection
  */
 struct ParaControls {
-  double left;
-  double right;
+  uint8_t left;
+  uint8_t right;
 };
 
 struct LatLngAlt {
@@ -52,6 +52,14 @@ struct Point3V {
   double vx;
   double vy;
   double climb;
+
+  operator Point() {
+    return Point {x, y};
+  }
+
+  operator PointV() {
+    return PointV {x, y, vx, vy};
+  }
 };
 
 struct Circle {
@@ -81,8 +89,8 @@ struct Turn {
 };
 
 struct Path {
-  Point start;
-  Point end;
+  PointV start;
+  PointV end;
   uint8_t segment_count;
   Segment *segments[];
 };
@@ -96,26 +104,36 @@ public:
   const double finalDistance = 100; // meters
 
   /** Destination, as origin of coordinate system */
-  PointV dest;
+  Point3V dest;
 
   LandingZone(double lat, double lng, double alt, double landingDir);
 
   LandingZoneMessage pack();
 
   /**
-   * Convert lat, lng to x, y meters centered at current location
+   * Convert lat, lng to x, y meters centered at destination
    */
   Point to_point(double lat, double lng);
 
   /**
+   * Convert GeoPointV to 3D point with velocity
+   */
+  Point3V to_point3V(GeoPointV *point);
+
+  /**
    * Landing pattern: start of final approach
    */
-  PointV start_of_final();
+  Point3V start_of_final();
 
   /**
    * Landing pattern: start of base leg
    */
-  PointV start_of_base(int turn);
+  Point3V start_of_base(int turn);
+
+  /**
+   * Landing pattern: start of downwind leg
+   */
+  Point3V start_of_downwind(int turn);
 };
 
 #endif

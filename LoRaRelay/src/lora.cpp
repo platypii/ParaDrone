@@ -18,9 +18,9 @@ void lora_init() {
     Serial.println("LoRa init failed");
   }
   // LoRa.setPreambleLength();
-  // LoRa.setSignalBandwidth(125E3);
+  // LoRa.setSignalBandwidth(125E3); // 250E3, 125E3*, 62.5E3, ...
   // LoRa.setSPIFrequency();
-  // LoRa.setSpreadingFactor(); // 7..12 lower = more chirp/s = faster data, higher = better sensitivity. Default 11
+  LoRa.setSpreadingFactor(9); // 7..12 lower = more chirp/s = faster data, higher = better sensitivity. Default 11
   // LoRa.setTxPower(20, ); // Default 14
   // LoRa.setTxPowerMax(20);
   LoRa.setCodingRate4(8); // 5..8

@@ -32,6 +32,7 @@ void setup() {
 
 void loop() {
   gps_loop();
+  planner_loop();
   screen_loop();
   lora_loop();
   delay(20);
@@ -49,11 +50,12 @@ void update_location(GeoPointV *point) {
   motor_loop();
   screen_update();
   blink(1);
+  // Plan and update controls
+  planner_update_location(point);
+  // log_point(point);
+  // Notify listeners
   bt_notify(point);
   lora_send_location(point);
-  // log_point(point);
-  // TODO: Plan and update controls
-  // TODO: Free point
 }
 
 /**

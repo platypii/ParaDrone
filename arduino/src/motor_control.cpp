@@ -40,6 +40,7 @@ void motor_init() {
  * -255 = full speed down, 255 = full speed up
  */
 void set_controls(const short left, const short right) {
+  // Serial.printf("Set ctrl %d %d\n", left, right);
   if (left < 0) {
     set_motor2(DRIVE_FORWARD, -left);
   } else if (left > 0) {
@@ -57,7 +58,7 @@ void set_controls(const short left, const short right) {
 }
 
 static void set_motor1(const int drive, uint8_t speed) {
-  Serial.printf("Set motor1 %d %d\n", drive, speed);
+  // Serial.printf("Set motor1 %d %d\n", drive, speed);
   if (drive == DRIVE_FORWARD) {
     ledcWrite(CHANNEL_M1_IN1, speed);
     ledcWrite(CHANNEL_M1_IN2, 0);
@@ -74,7 +75,7 @@ static void set_motor1(const int drive, uint8_t speed) {
 }
 
 static void set_motor2(const int drive, uint8_t speed) {
-  Serial.printf("Set motor2 %d %d\n", drive, speed);
+  // Serial.printf("Set motor2 %d %d\n", drive, speed);
   if (drive == DRIVE_FORWARD) {
     ledcWrite(CHANNEL_M2_IN1, speed);
     ledcWrite(CHANNEL_M2_IN2, 0);
