@@ -12,6 +12,11 @@ Path *naive(PointV loc, PointV dest, double r) {
     // printf("Naive planner on top of lz");
     return NULL;
   }
+  const double velocity = hypot(loc.vx, loc.vy);
+  if (velocity == 0) {
+    // printf("Zero velocity no tangent");
+    return NULL;
+  }
   // bearing from loc to destination
   const double bearing = atan2(dest.x - loc.x, dest.y - loc.y);
   // velocity bearing
@@ -19,8 +24,6 @@ Path *naive(PointV loc, PointV dest, double r) {
   // shorter to turn right or left?
   const double delta = bearing - yaw;
   const int turn1 = delta < 0 ? TURN_LEFT : TURN_RIGHT;
-  // Compute path for naive
-  const double velocity = hypot(loc.vx, loc.vy);
   Circle c1 = {
     .x = loc.x + turn1 * r * loc.vy / velocity,
     .y = loc.y - turn1 * r * loc.vx / velocity,
@@ -39,10 +42,10 @@ Path *naive(PointV loc, PointV dest, double r) {
     y: c1.y + turn1 * r * sin(commute_angle)
   };
   // Construct path
-  Turn arc1 = {'T', {loc.x, loc.y}, comm1, c1, turn1};
-  Line line = {'L', comm1, {dest.x, dest.y}};
+  Turn *arc1 = new Turn {'T', {loc.x, loc.y}, comm1, c1, turn1};
+  Line *line = new Line {'L', comm1, {dest.x, dest.y}};
   Segment **segments = new Segment*[2];
-  segments[0] = (Segment *) &arc1;
-  segments[1] = (Segment *) &line;
-  return new_path(2, segments);
+  segments[0] = (Segment *) arc1;
+  segments[1] = (Segment *) line;
+  return new_path("naive", 2, segments);
 }

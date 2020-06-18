@@ -12,8 +12,9 @@ extern long last_packet_millis;
 extern int last_packet_rssi;
 extern float last_packet_snr;
 
-extern float last_lat;
-extern float last_lng;
+extern double last_lat;
+extern double last_lng;
+extern float last_alt;
 
 void screen_init();
 void screen_loop();

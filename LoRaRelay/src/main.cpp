@@ -18,4 +18,5 @@ void setup() {
 void loop() {
   lora_loop();
   screen_loop();
+  delay(20);
 }

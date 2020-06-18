@@ -5,8 +5,6 @@
 
 void blink(int count);
 
-#define LORA_BAND 915E6
-
 void setup() {
   Heltec.begin(
     false, // Display
@@ -43,7 +41,7 @@ void loop() {
  * This orchestrates the services that depend on location updates.
  */
 void update_location(GeoPointV *point) {
-  Serial.printf("GPS %f, %f, %.1f\n", point->lat, point->lng, point->alt);
+  Serial.printf("GPS %.1fs %f, %f, %.1f, %.1f m/s\n", millis() * 1e-3, point->lat, point->lng, point->alt, hypot(point->vE, point->vN));
   if (last_location) free(last_location);
   last_location = point;
   last_fix_millis = millis();

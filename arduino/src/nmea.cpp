@@ -70,7 +70,12 @@ static void parse_rmc(char *line) {
   const double lng = parse_degrees_minutes(lngDM, lngEW);
   const double climb = NAN; // TODO: Kalman
   const double hspeed = parse_double(hspeedStr);
-  const double bearing = parse_double(bearingStr);
+  double bearing = parse_double(bearingStr);
+  if (isnan(bearing)) {
+    // At low speeds, bearing is often NaN
+    // Setting it to north is weird but better than throwing away the point
+    bearing = 0;
+  }
   const double vN = hspeed * cos(to_radians(bearing));
   const double vE = hspeed * sin(to_radians(bearing));
 

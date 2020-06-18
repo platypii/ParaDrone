@@ -3,6 +3,7 @@
 
 #include "dtypes.h"
 #include "geo.h"
+#include "landingzone.h"
 
 #define PARAMOTOR_GROUNDSPEED 11
 #define PARAMOTOR_DESCENTRATE 4
@@ -17,11 +18,11 @@ extern LandingZone *current_landing_zone;
 extern GeoPointV *last_location;
 extern long last_fix_millis;
 extern bool bt_connected;
+extern bool lora_enabled;
 
 // Current motor position
 extern short motor_position_left;
 extern short motor_position_right;
-
 // Target motor position
 extern short motor_target_left;
 extern short motor_target_right;
@@ -49,25 +50,25 @@ void lora_init();
 void lora_loop();
 void lora_send_location(GeoPointV *point);
 
-// Math
-double mod360(double degrees);
-double to_degrees(double radians);
-double to_radians(double degrees);
-
 // Landing zone
 void load_landing_zone();
 void set_landing_zone(const char *packed);
 
+ParaControls path_controls(Path *path);
+
 // Motors
 void motor_init();
 void motor_loop();
-void set_controls(const short left, const short right);
-void set_position(uint8_t new_left, uint8_t new_right);
+void set_motor_controls(const short left, const short right);
+void set_motor_position(uint8_t new_left, uint8_t new_right);
 
 // Planner
 void planner_loop();
 void planner_update_location(GeoPointV *point);
 double plan_score(LandingZone *lz, Path *plan);
 void rc_set_position(uint8_t new_left, uint8_t new_right);
+
+double flight_distance_remaining(const double alt);
+Path *search(Point3V loc3, LandingZone *lz, const double r);
 
 #endif

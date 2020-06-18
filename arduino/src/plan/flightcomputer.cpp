@@ -9,7 +9,7 @@
 #define GPS_EXPIRATION 60000
 
 // last_fix_millis
-static long last_rc_millis = -1;
+static long last_rc_millis = -10000; // Don't wait on reboot when millis = 0
 static Path *current_plan;
 
 String current_plan_name = "";
@@ -22,12 +22,22 @@ static bool gps_expired() {
   return millis() - last_fix_millis < GPS_EXPIRATION;
 }
 
+static bool valid_point(GeoPointV * p) {
+  return !isnan(p->alt) && !isnan(p->vN) && !isnan(p->vE);
+}
+
 /**
  * Called when we receive an R/C control command
  */
 void rc_set_position(uint8_t new_left, uint8_t new_right) {
   last_rc_millis = millis();
-  set_position(new_left, new_right);
+  set_motor_position(new_left, new_right);
+}
+
+void ap_set_position(uint8_t new_left, uint8_t new_right) {
+  if (!rc_override()) {
+    set_motor_position(new_left, new_right);
+  }
 }
 
 /**
@@ -37,17 +47,24 @@ void planner_update_location(GeoPointV *point) {
   if (current_landing_zone && !rc_override()) {
     const double alt_agl = point->alt - current_landing_zone->destination.alt;
 
-    // Time to act, no more planning
-    if (alt_agl < ALT_FLARE) {
-      set_position(255, 255);
+    if (isnan(alt_agl)) {
+      // No alt, do nothing
+    } else if (alt_agl < ALT_FLARE) {
+      // Flare!!
+      ap_set_position(255, 255);
     } else if (alt_agl < ALT_NO_TURNS_BELOW) {
-      set_position(0, 0); // TODO: Full speed up
-    } else {
+      // Hands up for landing
+      ap_set_position(0, 0); // TODO: Full speed up
+    } else if (valid_point(point)) {
       // Compute plan
       Point3V loc3 = current_landing_zone->to_point3V(point);
-      current_plan = search(loc3, current_landing_zone);
+      Path *new_plan = search(loc3, current_landing_zone, PARAMOTOR_TURNRADIUS);
+      if (current_plan) free_path(current_plan);
+      current_plan = new_plan;
       ParaControls ctrl = path_controls(current_plan);
-      set_position(ctrl.left, ctrl.right);
+      ap_set_position(ctrl.left, ctrl.right);
+    } else {
+      // Do nothing
     }
   }
 }
@@ -58,6 +75,6 @@ void planner_update_location(GeoPointV *point) {
 void planner_loop() {
   // If its been X seconds since GPS, then put glider into slight right turn
   if (gps_expired()) {
-    set_position(0, 10);
+    ap_set_position(0, 10);
   }
 }

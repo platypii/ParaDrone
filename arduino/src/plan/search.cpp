@@ -1,3 +1,4 @@
+#include <Arduino.h>
 #include <math.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -11,7 +12,7 @@ static Path* best_plan(LandingZone *lz, vector<Path*> plans);
 /**
  * Search across a set of path plans
  */
-Path *search(Point3V loc3, LandingZone *lz) {
+Path *search(Point3V loc3, LandingZone *lz, const double r) {
   PointV loc = {
     .x = loc3.x,
     .y = loc3.y,
@@ -23,14 +24,14 @@ Path *search(Point3V loc3, LandingZone *lz) {
   const double fdr = flight_distance_remaining(alt_agl);
 
   PointV dest = lz->start_of_final();
-  const double r = PARAMOTOR_TURNRADIUS;
   const double distance = hypot(loc.x, loc.y);
 
   Path *straight_path = straight(loc);
-  straight_path = path_fly(straight_path, fdr);
+  straight_path = path_fly_free(straight_path, fdr);
+
   Path *naive_path = naive(loc, dest, r);
-  naive_path = path_fly(naive_path, turn_distance_remaining);
-  naive_path = path_fly(naive_path, fdr);
+  naive_path = path_fly_free(naive_path, turn_distance_remaining);
+  naive_path = path_fly_free(naive_path, fdr);
 
   if (alt_agl < ALT_NO_TURNS_BELOW) {
     // No turns under 100ft
@@ -43,13 +44,20 @@ Path *search(Point3V loc3, LandingZone *lz) {
       straight_path
     };
     // Fly path to ground
-    for (int i = 0; i < 5; i ++) {
+    for (int i = 0; i < plans.size(); i ++) {
       if (plans[i]) {
-        plans[i] = path_fly(plans[i], turn_distance_remaining);
-        plans[i] = path_fly(plans[i], fdr);
+        plans[i] = path_fly_free(plans[i], turn_distance_remaining);
+        plans[i] = path_fly_free(plans[i], fdr);
       }
     }
-    return best_plan(lz, plans);
+    Path *best = best_plan(lz, plans);
+    // Free non-best
+    for (int i = 0; i < plans.size(); i ++) {
+      if (plans[i] != best && plans[i]) {
+        free_path(plans[i]);
+      }
+    }
+    return best;
   }
 }
 

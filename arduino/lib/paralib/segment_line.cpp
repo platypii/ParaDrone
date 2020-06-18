@@ -4,18 +4,18 @@
 
 static double interpolate(double start, double end, double alpha);
 
-PointV *line_start(Line *line) {
+PointV line_start(Line *line) {
   const double dx = line->end.x - line->start.x;
   const double dy = line->end.y - line->start.y;
   const double len = hypot(dx, dy);
-  return new PointV {line->start.x, line->start.y, dx / len, dy / len};
+  return PointV {line->start.x, line->start.y, dx / len, dy / len};
 }
 
-PointV *line_end(Line *line) {
+PointV line_end(Line *line) {
   const double dx = line->end.x - line->start.x;
   const double dy = line->end.y - line->start.y;
   const double len = hypot(dx, dy);
-  return new PointV {line->end.x, line->end.y, dx / len, dy / len};
+  return PointV {line->end.x, line->end.y, dx / len, dy / len};
 }
 
 double line_length(Line *line) {
@@ -27,7 +27,7 @@ double line_length(Line *line) {
 /**
  * Fly a given distance along the path
  */
-Path *line_fly(Line *line, double distance) {
+Path *line_fly(Line *line, const double distance) {
   if (distance < 0) {
     printf("Flight distance cannot be negative %f", distance);
   }
@@ -37,9 +37,8 @@ Path *line_fly(Line *line, double distance) {
     interpolate(line->start.x, line->end.x, alpha),
     interpolate(line->start.y, line->end.y, alpha)
   };
-  Line extension = {'L', line->start, proj};
-  Line *singleton = &extension;
-  return new_path(1, (Segment**) &singleton);
+  Line *extension = new Line {'L', line->start, proj};
+  return new_path("line-fly", 1, (Segment**) &extension);
 }
 
 Point *line_render(Line *line) {

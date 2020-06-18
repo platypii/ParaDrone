@@ -33,7 +33,8 @@ class AutopilotCharacteristic : public BLECharacteristicCallbacks {
     void onWrite(BLECharacteristic *pCharacteristic) {
       const char *value = pCharacteristic->getValue().c_str();
       if (value[0] == 'C') {
-        set_position(value[1], value[2]);
+        Serial.printf("BT ctrl %d %d\n", value[1], value[2]);
+        rc_set_position(value[1], value[2]);
         screen_update();
       } else if (value[0] == 'Q') {
         // Send LZ in response
@@ -93,7 +94,7 @@ void bt_notify(GeoPointV *point) {
 
 static void bt_send_lz() {
   if (current_landing_zone) {
-    LandingZoneMessage msg = current_landing_zone->pack();
+    LandingZoneMessage msg = pack_lz(current_landing_zone);
     uint8_t *data = (uint8_t*) &msg;
     size_t len = sizeof(msg);
     ap_ch->setValue(data, len);

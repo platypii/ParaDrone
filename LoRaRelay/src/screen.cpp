@@ -2,7 +2,7 @@
 #include "relay.h"
 
 static boolean should_redraw = false;
-static long last_redraw_millis = 0;
+static long last_redraw_millis = -1;
 static void screen_draw();
 
 void screen_init() {
@@ -20,7 +20,7 @@ void screen_init() {
 
 void screen_loop() {
   // Refresh at least once per second
-  if (last_redraw_millis > 0 && millis() - last_redraw_millis >= 1000) {
+  if (last_redraw_millis >= 0 && millis() - last_redraw_millis >= 1000) {
     should_redraw = true;
   }
   if (should_redraw) {

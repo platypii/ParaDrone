@@ -36,7 +36,9 @@ void motor_loop() {
   short new_speed_left = speed(motor_target_left - motor_position_left);
   short new_speed_right = speed(motor_target_right - motor_position_right);
   if (new_speed_left != motor_speed_left || new_speed_right != motor_speed_right) {
-    set_controls(motor_speed_left, motor_speed_right);
+    motor_speed_left = new_speed_left;
+    motor_speed_right = new_speed_right;
+    set_motor_controls(motor_speed_left, motor_speed_right);
   }
 }
 
@@ -45,7 +47,7 @@ void motor_loop() {
  * 0 = no deflection
  * 255 = full deflection
  */
-void set_position(uint8_t new_left, uint8_t new_right) {
+void set_motor_position(uint8_t new_left, uint8_t new_right) {
   motor_target_left = new_left;
   motor_target_right = new_right;
 }

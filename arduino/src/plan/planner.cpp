@@ -4,7 +4,7 @@
 /**
  * Return the horizontal distance we could cover until landing
  */
-double flight_distance_remaining(double alt) {
+double flight_distance_remaining(const double alt) {
   const double timeToGround = alt / PARAMOTOR_DESCENTRATE;
   return PARAMOTOR_GROUNDSPEED * timeToGround;
 }
@@ -14,7 +14,8 @@ double flight_distance_remaining(double alt) {
  */
 double plan_score(LandingZone *lz, Path *plan) {
   if (plan) {
-    const double distance = hypot(plan->end.x - lz->dest.x, plan->end.y - lz->dest.y);
+    // LZ is at origin
+    const double distance = hypot(plan->end.x, plan->end.y);
     return distance;
   } else {
     return 100000;

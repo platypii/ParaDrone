@@ -1,6 +1,8 @@
 #ifndef _MESSAGES_H
 #define _MESSAGES_H
 
+#include "landingzone.h"
+
 /**
  * Message with just location.
  * sizeof 11
@@ -40,5 +42,8 @@ struct LandingZoneMessage {
   short alt; // decimeters
   short landing_direction; // milliradians
 };
+
+LandingZoneMessage pack_lz(LandingZone *lz);
+LandingZone *unpack_lz(LandingZoneMessage *lz);
 
 #endif

@@ -9,7 +9,6 @@ Path *straight(PointV loc) {
     x: loc.x + loc.vx,
     y: loc.y + loc.vy
   };
-  Line line = {'L', {loc.x, loc.y}, dest};
-  Segment *segment = (Segment *) &line;
-  return new_path(1, &segment);
+  Line *line = new Line {'L', {loc.x, loc.y}, dest};
+  return new_path("str", 1, (Segment**) &line);
 }

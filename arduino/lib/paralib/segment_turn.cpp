@@ -6,16 +6,16 @@
 static double angle1(Turn *turn);
 static double angle2(Turn *turn);
 
-PointV *turn_start(Turn *turn) {
+PointV turn_start(Turn *turn) {
   const double dx = turn->start.x - turn->circle.x;
   const double dy = turn->start.y - turn->circle.y;
-  return new PointV {turn->start.x, turn->start.y, dx / turn->circle.radius, dy / turn->circle.radius};
+  return PointV {turn->start.x, turn->start.y, dx / turn->circle.radius, dy / turn->circle.radius};
 }
 
-PointV *turn_end(Turn *turn) {
+PointV turn_end(Turn *turn) {
   const double dx = turn->end.x - turn->circle.x;
   const double dy = turn->end.y - turn->circle.y;
-  return new PointV {turn->end.x, turn->end.y, dx / turn->circle.radius, dy / turn->circle.radius};
+  return PointV {turn->end.x, turn->end.y, dx / turn->circle.radius, dy / turn->circle.radius};
 }
 
 double turn_length(Turn *turn) {
@@ -27,7 +27,7 @@ double turn_length(Turn *turn) {
 /**
  * Fly a given distance along the path
  */
-Path *turn_fly(Turn *turn, double distance) {
+Path *turn_fly(Turn *turn, const double distance) {
   if (distance < 0) {
     printf("Flight distance cannot be negative %f", distance);
   }
@@ -38,15 +38,14 @@ Path *turn_fly(Turn *turn, double distance) {
       turn->circle.x + turn->circle.radius * sin(theta),
       turn->circle.y + turn->circle.radius * cos(theta)
     };
-    Turn proj = {
+    Turn *proj = new Turn {
       'T',
       turn->start,
       point,
       turn->circle,
       turn->turn
     };
-    Segment *segments = (Segment*) &proj;
-    return new_path(1, &segments);
+    return new_path("turn-fly1", 1, (Segment**) &proj);
   } else {
     // Line extending from end of this turn
     const double remaining = distance - len;
@@ -56,11 +55,11 @@ Path *turn_fly(Turn *turn, double distance) {
       turn->end.x + turn->turn * remaining * dy / turn->circle.radius,
       turn->end.y - turn->turn * remaining * dx / turn->circle.radius
     };
-    Line line = {'L', turn->end, extension};
-    Segment *segments[2];
-    segments[0] = (Segment*) turn;
-    segments[1] = (Segment*) &line;
-    return new_path(2, segments);
+    Line *line = new Line {'L', turn->end, extension};
+    Segment **segments = new Segment*[2];
+    segments[0] = segment_copy((Segment*) turn);
+    segments[1] = (Segment*) line;
+    return new_path("turn-fly2", 2, segments);
   }
 }
 

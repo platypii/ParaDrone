@@ -1,8 +1,8 @@
 #include "heltec.h"
 #include "paradrone.h"
 
-static boolean should_redraw = false;
-static long last_redraw_millis = 0;
+static bool should_redraw = false;
+static long last_redraw_millis = -1;
 static void screen_draw();
 
 void screen_init() {
@@ -20,7 +20,7 @@ void screen_init() {
 
 void screen_loop() {
   // Refresh at least once per second
-  if (last_redraw_millis > 0 && millis() - last_redraw_millis >= 1000) {
+  if (last_redraw_millis >= 0 && millis() - last_redraw_millis >= 1000) {
     should_redraw = true;
   }
   if (should_redraw) {
@@ -102,6 +102,11 @@ static void screen_draw() {
     prewidth = Heltec.display->getStringWidth(buf);
     sprintf(buf, "%d | %d", motor_target_left, motor_target_right);
     Heltec.display->drawString(DISPLAY_WIDTH / 2 - prewidth, 44, buf);
+  }
+
+  // LoRa enabled?
+  if (lora_enabled) {
+    Heltec.display->drawString(0, 54, "LoRa");
   }
 
   // Phone connected?
