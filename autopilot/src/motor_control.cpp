@@ -36,10 +36,10 @@ void motor_init() {
 }
 
 /**
- * Set motor controls.
- * -255 = full speed down, 255 = full speed up
+ * Set motor speeds directly.
+ * -255 = full speed up, 255 = full speed down
  */
-void set_motor_controls(const short left, const short right) {
+void set_motor_speed_raw(const short left, const short right) {
   // Serial.printf("Set ctrl %d %d\n", left, right);
   if (left < 0) {
     set_motor2(DRIVE_FORWARD, -left);

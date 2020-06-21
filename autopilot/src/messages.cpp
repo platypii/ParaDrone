@@ -2,14 +2,18 @@
 #include "messages.h"
 
 LandingZoneMessage pack_lz(LandingZone *lz) {
-  LandingZoneMessage msg = {
-    'Z',
-    (int)(lz->destination.lat * 1e6), // microdegrees
-    (int)(lz->destination.lng * 1e6), // microdegrees
-    (short)(lz->destination.alt * 10), // decimeters
-    (short)(lz->landingDirection * 1000) // milliradians
-  };
-  return msg;
+  if (lz) {
+    return LandingZoneMessage {
+      'Z',
+      (int)(lz->destination.lat * 1e6), // microdegrees
+      (int)(lz->destination.lng * 1e6), // microdegrees
+      (short)(lz->destination.alt * 10), // decimeters
+      (short)(lz->landingDirection * 1000) // milliradians
+    };
+  } else {
+    // No LZ
+    return LandingZoneMessage {'Z'};
+  }
 }
 
 LandingZone *unpack_lz(LandingZoneMessage *packed) {

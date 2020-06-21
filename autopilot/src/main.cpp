@@ -3,6 +3,9 @@
 #include "heltec.h"
 #include "paradrone.h"
 
+#define TIME_START long start_time = millis()
+#define TIME_END long time_delta = millis() - start_time; if (time_delta >= 30) Serial.printf("Slow loop %ld %ldms thread %d\n", millis(), time_delta, xPortGetCoreID())
+
 void blink(int count);
 
 void setup() {
@@ -29,11 +32,14 @@ void setup() {
 }
 
 void loop() {
+  TIME_START;
   gps_loop();
   planner_loop();
+  motor_loop();
   screen_loop();
   lora_loop();
-  delay(20);
+  TIME_END;
+  delay(50);
 }
 
 /**
@@ -52,7 +58,7 @@ void update_location(GeoPointV *point) {
   planner_update_location(point);
   // log_point(point);
   // Notify listeners
-  bt_notify(point);
+  bt_send_location(point);
   lora_send_location(point);
 }
 

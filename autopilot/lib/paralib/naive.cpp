@@ -17,13 +17,9 @@ Path *naive(PointV loc, PointV dest, double r) {
     // printf("Zero velocity no tangent");
     return NULL;
   }
-  // bearing from loc to destination
-  const double bearing = atan2(dest.x - loc.x, dest.y - loc.y);
-  // velocity bearing
-  const double yaw = atan2(loc.vx, loc.vy);
-  // shorter to turn right or left?
-  const double delta = bearing - yaw;
-  const int turn1 = delta < 0 ? TURN_LEFT : TURN_RIGHT;
+  // Is dest on our left or right?
+  const double dot = (dest.y - loc.y) * loc.vx - (dest.x - loc.x) * loc.vy;
+  const int turn1 = dot > 0 ? TURN_LEFT : TURN_RIGHT;
   Circle c1 = {
     .x = loc.x + turn1 * r * loc.vy / velocity,
     .y = loc.y - turn1 * r * loc.vx / velocity,

@@ -1,4 +1,4 @@
-#include <Arduino.h>
+#include <heltec.h>
 #include <BLEDevice.h>
 #include <BLEUtils.h>
 #include <BLEServer.h>
@@ -31,19 +31,28 @@ class AutopilotCharacteristic : public BLECharacteristicCallbacks {
     void onRead(BLECharacteristic *pCharacteristic) {
     };
     void onWrite(BLECharacteristic *pCharacteristic) {
-      const char *value = pCharacteristic->getValue().c_str();
-      if (value[0] == 'C') {
-        Serial.printf("BT ctrl %d %d\n", value[1], value[2]);
+      std::string value = pCharacteristic->getValue();
+      if (value[0] == 'C' && value.length() == 3) {
+        // Serial.printf("BT ctrl %d %d\n", value[1], value[2]);
         rc_set_position(value[1], value[2]);
-        screen_update();
-      } else if (value[0] == 'Q') {
+      } else if (value[0] == 'M' && value.length() == 3) {
+        // Message is -127..127, speeds are -255..255
+        const short left = ((short)(int8_t) value[1]) * 2;
+        const short right = ((short)(int8_t) value[2]) * 2;
+        Serial.printf("BT %.1fs motor %d %d\n", millis() * 1e-3, left, right);
+        rc_set_speed(left, right);
+      } else if (value[0] == 'F' && value.length() == 5) {
+        const int freq = *(int*)(value.c_str() + 1);
+        Serial.printf("BT %.1fs set lora freq %f\n", millis() * 1e-3, freq * 1e-6);
+        LoRa.setFrequency(freq);
+      } else if (value[0] == 'Q' && value.length() == 1) {
         // Send LZ in response
         bt_send_lz();
-      } else if (value[0] == 'Z') {
-        set_landing_zone(value);
+      } else if (value[0] == 'Z' && value.length() == 13) {
+        set_landing_zone(value.c_str());
         screen_update();
       } else {
-        Serial.printf("Unexpected AP write %02x", value[0]);
+        Serial.printf("Unexpected BT msg %02x %d\n", value[0], value.length());
       }
     }
 };
@@ -75,7 +84,7 @@ void bt_init() {
   BLEDevice::startAdvertising();
 }
 
-void bt_notify(GeoPointV *point) {
+void bt_send_location(GeoPointV *point) {
   // Pack point into location message
   SpeedMessage msg = {
     'S',
@@ -93,13 +102,9 @@ void bt_notify(GeoPointV *point) {
 }
 
 static void bt_send_lz() {
-  if (current_landing_zone) {
-    LandingZoneMessage msg = pack_lz(current_landing_zone);
-    uint8_t *data = (uint8_t*) &msg;
-    size_t len = sizeof(msg);
-    ap_ch->setValue(data, len);
-    ap_ch->notify();
-  } else {
-    // TODO: Send no-lz message
-  }
+  LandingZoneMessage msg = pack_lz(current_landing_zone);
+  uint8_t *data = (uint8_t*) &msg;
+  size_t len = sizeof(msg);
+  ap_ch->setValue(data, len);
+  ap_ch->notify();
 }

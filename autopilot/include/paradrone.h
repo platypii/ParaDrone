@@ -21,8 +21,8 @@ extern bool bt_connected;
 extern bool lora_enabled;
 
 // Current motor position
-extern short motor_position_left;
-extern short motor_position_right;
+extern float motor_position_left;
+extern float motor_position_right;
 // Target motor position
 extern short motor_target_left;
 extern short motor_target_right;
@@ -34,7 +34,7 @@ void screen_update();
 
 // Bluetooth
 void bt_init();
-void bt_notify(GeoPointV *point);
+void bt_send_location(GeoPointV *point);
 
 // GPS
 void gps_init();
@@ -49,6 +49,7 @@ void log_point(GeoPointV *loc);
 void lora_init();
 void lora_loop();
 void lora_send_location(GeoPointV *point);
+void lora_send_lz();
 
 // Landing zone
 void load_landing_zone();
@@ -59,13 +60,16 @@ ParaControls path_controls(Path *path);
 // Motors
 void motor_init();
 void motor_loop();
-void set_motor_controls(const short left, const short right);
+void set_motor_speed(const short left, const short right);
 void set_motor_position(uint8_t new_left, uint8_t new_right);
 
 // Planner
 void planner_loop();
 void planner_update_location(GeoPointV *point);
 double plan_score(LandingZone *lz, Path *plan);
+
+// Flight computer
+void rc_set_speed(const short new_left, const short new_right);
 void rc_set_position(uint8_t new_left, uint8_t new_right);
 
 double flight_distance_remaining(const double alt);

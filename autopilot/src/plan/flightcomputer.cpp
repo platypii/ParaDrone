@@ -27,13 +27,24 @@ static bool valid_point(GeoPointV * p) {
 }
 
 /**
- * Called when we receive an R/C control command
+ * Called when we receive an R/C motor speed command
+ */
+void rc_set_speed(const short new_left, const short new_right) {
+  last_rc_millis = millis();
+  set_motor_speed(new_left, new_right);
+}
+
+/**
+ * Called when we receive an R/C toggle position command
  */
 void rc_set_position(uint8_t new_left, uint8_t new_right) {
   last_rc_millis = millis();
   set_motor_position(new_left, new_right);
 }
 
+/**
+ * Called when autopilot updates the plan
+ */
 void ap_set_position(uint8_t new_left, uint8_t new_right) {
   if (!rc_override()) {
     set_motor_position(new_left, new_right);

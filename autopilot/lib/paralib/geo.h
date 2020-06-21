@@ -5,9 +5,6 @@
 #include <stdlib.h>
 #include "gtypes.h"
 
-#define ALT_NO_TURNS_BELOW 15 // meters // TODO: 30m
-#define ALT_FLARE 7 // meters
-
 // Math
 double mod360(double degrees);
 double to_degrees(double radians);

@@ -26,6 +26,12 @@ Path *search(Point3V loc3, LandingZone *lz, const double r) {
   PointV dest = lz->start_of_final();
   const double distance = hypot(loc.x, loc.y);
 
+  if (loc.vx == 0 && loc.vy == 0) {
+    Line *default_line = new Line {'L', {loc.x, loc.y}, lz->dest};
+    Path *default_path = new_path("default", 1, (Segment**) &default_line);
+    return default_path;
+  }
+
   Path *straight_path = straight(loc);
   straight_path = path_fly_free(straight_path, fdr);
 
@@ -33,7 +39,7 @@ Path *search(Point3V loc3, LandingZone *lz, const double r) {
   naive_path = path_fly_free(naive_path, turn_distance_remaining);
   naive_path = path_fly_free(naive_path, fdr);
 
-  if (alt_agl < ALT_NO_TURNS_BELOW) {
+  if (alt_agl <= ALT_NO_TURNS_BELOW) {
     // No turns under 100ft
     return straight_path;
   } else if (distance > 1000 && naive_path) {

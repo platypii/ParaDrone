@@ -4,17 +4,18 @@
 static boolean should_redraw = false;
 static long last_redraw_millis = -1;
 static void screen_draw();
+static void sprintd(char *buf, long delta);
 
 void screen_init() {
   Heltec.display->init();
   Heltec.display->flipScreenVertically();
   Heltec.display->setTextAlignment(TEXT_ALIGN_LEFT);
   Heltec.display->setFont(ArialMT_Plain_10);
-  Heltec.display->drawString(3, 12, "BASEline");
+  Heltec.display->drawString(7, 12, "BASEline");
   Heltec.display->setFont(ArialMT_Plain_24);
-  Heltec.display->drawString(2, 19, "ParaDrone");
+  Heltec.display->drawString(6, 19, "ParaDrone");
   Heltec.display->setFont(ArialMT_Plain_16);
-  Heltec.display->drawString(54, 41, "<=> Relay");
+  Heltec.display->drawString(66, 40, "<=> RC");
   Heltec.display->display();
 }
 
@@ -44,23 +45,35 @@ static void screen_draw() {
     sprintf(buf, "%f, %f", last_lat, last_lng);
     Heltec.display->drawString(0, 0, buf);
   } else {
-    Heltec.display->drawString(14, 0, "ParaDrone <=> Relay");
+    Heltec.display->drawString(20, 0, "ParaDrone <=> RC");
+  }
+
+  // Alt
+  if (!isnan(last_alt)) {
+    sprintf(buf, "Alt: %.0f m MSL", last_alt);
+    Heltec.display->drawString(0, 10, buf);
+  }
+
+  // GPS lastfix
+  if (last_fix_millis >= 0) {
+    long delta = millis() - last_fix_millis;
+    Heltec.display->setTextAlignment(TEXT_ALIGN_RIGHT);
+    sprintd(buf, delta);
+    Heltec.display->drawString(DISPLAY_WIDTH, 10, buf);
+    Heltec.display->setTextAlignment(TEXT_ALIGN_LEFT);
   }
 
   if (last_packet_millis > 0) {
     long delta = millis() - last_packet_millis;
 
-    if (delta <= 5000) {
-      sprintf(buf, "SNR %.2f", last_packet_snr);
+    if (delta <= 15000) {
+      sprintf(buf, "Snr %.2f", last_packet_snr);
       Heltec.display->drawString(0, 30, buf);
 
-      sprintf(buf, "RSSI %d", last_packet_rssi);
+      sprintf(buf, "Rssi %d", last_packet_rssi);
       Heltec.display->drawString(0, 42, buf);
-    }
 
-    if (delta <= 60 * 60 * 1000) {
-      sprintf(buf, "LoRa %lds", delta / 1000);
-      Heltec.display->drawString(0, 54, buf);
+      Heltec.display->drawString(0, 54, "LoRa");
     }
   }
 
@@ -70,4 +83,20 @@ static void screen_draw() {
   }
 
   Heltec.display->display();
+}
+
+/**
+ * Print time duration to a buffer (2h, 5m, 6s)
+ * @param delta time duration in milliseconds
+ */
+static void sprintd(char *buf, long delta) {
+  if (delta < 1100) {
+    sprintf(buf, "0s");
+  } else if (delta < 60000) {
+    sprintf(buf, "%lds", delta / 1000);
+  } else if (delta < 3600000) {
+    sprintf(buf, "%ldm", delta / 60000);
+  } else if (delta < 86400000) {
+    sprintf(buf, "%ldh", delta / 3600000);
+  }
 }

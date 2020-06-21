@@ -2,7 +2,7 @@ autopilot:
   stage: build
   image: baselinews/paradrone:platformio
   script:
-    - cd arduino
+    - cd autopilot
     - platformio lib update
     - platformio run
   cache:
@@ -14,7 +14,7 @@ relay:
   stage: build
   image: baselinews/paradrone:platformio
   script:
-    - cd LoRaRelay
+    - cd remotecontrol
     - platformio lib update
     - platformio run
   cache:
