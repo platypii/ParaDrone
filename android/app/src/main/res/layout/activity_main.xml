@@ -13,13 +13,13 @@
 
         <fragment
             android:id="@+id/map"
-            android:name="ws.baseline.autopilot.map.DroneMap"
+            android:name="ws.baseline.paradrone.map.DroneMap"
             android:layout_width="match_parent"
             android:layout_height="400dp" />
 
         <fragment
             android:id="@+id/ap_screen"
-            android:name="ws.baseline.autopilot.ApScreenFragment"
+            android:name="ws.baseline.paradrone.ApScreenFragment"
             android:layout_margin="8dp"
             android:layout_width="180dp"
             android:layout_height="wrap_content" />
@@ -44,7 +44,7 @@
 
     </FrameLayout>
 
-    <ws.baseline.autopilot.ControlView
+    <ws.baseline.paradrone.ControlView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"/>
