@@ -19,11 +19,11 @@ export function init() {
   // Setup map
   map = new DroneMap()
   map.setState({lz})
-  map.map.addListener("click", (e) => {
+  map.onClick((e) => {
     player.stop()
     setStart({
-      lat: e.latLng.lat(),
-      lng: e.latLng.lng(),
+      lat: e.lat,
+      lng: e.lng,
       alt: 800 // TODO: Get elevation
     })
   })
@@ -69,7 +69,6 @@ function update() {
 
     // Update map
     map.setState({
-      start,
       current: loc,
       plan: rendered,
       lz,

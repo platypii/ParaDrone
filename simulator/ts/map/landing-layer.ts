@@ -1,30 +1,51 @@
 import { LandingZone } from "../geo/landingzone"
+import { latLngToCart } from "../geo/latlng"
 import { MapLayer } from "./basemap"
 
 export class LandingLayer implements MapLayer {
-  private readonly arrowhead = {path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW}
-  private arrow?: google.maps.Polyline
+  private entity?: Cesium.Entity
+  private lz?: LandingZone
 
-  public onAdd(map: google.maps.Map) {
-    this.arrow = new google.maps.Polyline({
-      map,
-      path: [],
-      strokeColor: "#eee",
-      icons: [{
-        icon: this.arrowhead,
-        offset: "100%"
-      }]
+  public onAdd(map: Cesium.Viewer) {
+    this.entity = map.entities.add({
+      name: "Final",
+      polyline: {
+        positions: this.positions(),
+        material: Cesium.Color.BLUE,
+        width: 4
+      }
     })
+
+    this.update()
   }
 
   public setLz(lz: LandingZone) {
-    this.arrow!.setPath([lz.toLatLng(lz.startOfFinal()), lz.destination])
+    if (this.lz !== lz) {
+      this.lz = lz
+      this.update()
+    }
   }
 
-  public onRemove() {
-    if (this.arrow) {
-      this.arrow.setMap(null)
-      this.arrow = undefined
+  public onRemove(map: Cesium.Viewer) {
+    if (this.entity) {
+      map.entities.remove(this.entity)
+      this.entity = undefined
+    }
+  }
+
+  private update() {
+    if (this.entity) {
+      this.entity.polyline.positions = this.positions()
+    }
+  }
+
+  private positions(): Cesium.Cartesian3[] {
+    if (this.lz) {
+      const final = this.lz.toLatLngAlt(this.lz.startOfFinal())
+      const lz = this.lz.destination
+      return [final, lz].map((p) => latLngToCart(p))
+    } else {
+      return []
     }
   }
 }
