@@ -47,8 +47,8 @@ export class SegmentLine {
    * If the end of the path is reached, extend a straight line out to infinity.
    */
   public fly(distance: number): Path {
-    if (distance < 0) {
-      console.error("flight distance cannot be negative", distance)
+    if (distance <= 0) {
+      console.error("line flight distance must be positive", distance)
     }
     // Linear interpolate
     const alpha = distance / this.length()

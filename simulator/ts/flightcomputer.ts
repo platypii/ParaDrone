@@ -5,7 +5,6 @@ import { search } from "./plan/search"
 
 export function getPlan(loc: GeoPointV, lz: LandingZone): Path {
   // Convert to coordinate space
-  const currentLocation = lz.toPoint(loc)
-  const point = {...currentLocation, alt: loc.alt, vx: loc.vE, vy: loc.vN, climb: loc.climb}
+  const point = lz.toPoint3V(loc)
   return search(point, lz)
 }

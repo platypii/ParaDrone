@@ -10,9 +10,9 @@ export class PointsLayer implements MapLayer {
     this.update()
   }
 
-  public onAdd(googleMap: google.maps.Map) {
+  public onAdd(map: google.maps.Map) {
     this.polyline = new google.maps.Polyline({
-      map: googleMap,
+      map,
       strokeColor: "#eee",
       strokeWeight: 4
     })

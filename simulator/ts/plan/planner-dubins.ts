@@ -19,9 +19,14 @@ export function dubins(loc: PointV, dest: PointV, r: number, turn1: Turn, turn2:
     radius: r
   }
   // Second dubins circle
+  const dest_velocity = Math.hypot(dest.vx, dest.vy)
+  if (dest_velocity === 0) {
+    console.error("Zero dest velocity no tangent")
+    return undefined
+  }
   const c2 = {
-    x: dest.x + turn2 * r * dest.vy,
-    y: dest.y - turn2 * r * dest.vx,
+    x: dest.x + turn2 * r * dest.vy / dest_velocity,
+    y: dest.y - turn2 * r * dest.vx / dest_velocity,
     radius: r
   }
   // Delta of dubin circles

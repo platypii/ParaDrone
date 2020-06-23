@@ -1,4 +1,4 @@
-import { GeoPointV, LatLng, LatLngAlt, Point, Point3V, PointV, Turn } from "../dtypes"
+import { GeoPointV, LatLng, LatLngAlt, Point, Point3V, Turn } from "../dtypes"
 import { Paramotor } from "../paramotor"
 import * as geo from "./geo"
 import { toDegrees, toRadians } from "./trig"
@@ -24,7 +24,7 @@ export class LandingZone {
     this.dest = {
       x: 0,
       y: 0,
-      alt: destination.alt,
+      alt: 0,
       vx: Math.sin(landingDirection),
       vy: Math.cos(landingDirection),
       climb: 0
@@ -41,7 +41,7 @@ export class LandingZone {
       alt: this.dest.alt + this.finalDistance / Paramotor.glide,
       vx: this.dest.vx,
       vy: this.dest.vy,
-      climb: Paramotor.descentRate
+      climb: Paramotor.climbRate
     }
   }
 
@@ -55,7 +55,7 @@ export class LandingZone {
       alt: this.dest.alt + 2 * this.finalDistance / Paramotor.glide, // TODO: Doesn't account for turns
       vx: -this.dest.vx,
       vy: -this.dest.vy,
-      climb: Paramotor.descentRate
+      climb: Paramotor.climbRate
     }
   }
 
@@ -69,7 +69,7 @@ export class LandingZone {
       alt: this.dest.alt + 3 * this.finalDistance / Paramotor.glide, // TODO: Doesn't account for turns
       vx: -this.dest.vx,
       vy: -this.dest.vy,
-      climb: Paramotor.descentRate
+      climb: Paramotor.climbRate
     }
   }
 
@@ -86,7 +86,7 @@ export class LandingZone {
   }
 
   /**
-   * Convert lat, lng to x, y meters centered at current location
+   * Convert lat, lng, alt msl to x, y meters, alt agl, centered at destination
    */
   public toPoint3V(ll: GeoPointV): Point3V {
     const bearing = toRadians(geo.bearing(this.destination.lat, this.destination.lng, ll.lat, ll.lng))
@@ -94,7 +94,7 @@ export class LandingZone {
     return {
       x: distance * Math.sin(bearing),
       y: distance * Math.cos(bearing),
-      alt: ll.alt,
+      alt: ll.alt - this.destination.alt,
       vx: ll.vE,
       vy: ll.vN,
       climb: ll.climb
@@ -108,6 +108,18 @@ export class LandingZone {
     const bear = toDegrees(Math.atan2(point.x, point.y))
     const dist = Math.sqrt(point.x * point.x + point.y * point.y)
     return geo.moveBearing(this.destination.lat, this.destination.lng, bear, dist)
+  }
+
+  /**
+   * Convert x, y, alt agl coordinates to lat, lng, alt msl
+   */
+  public toLatLngAlt(point: Point3V): LatLngAlt {
+    const bear = toDegrees(Math.atan2(point.x, point.y))
+    const dist = Math.sqrt(point.x * point.x + point.y * point.y)
+    return {
+      ...geo.moveBearing(this.destination.lat, this.destination.lng, bear, dist),
+      alt: point.alt + this.destination.alt
+    }
   }
 
 }

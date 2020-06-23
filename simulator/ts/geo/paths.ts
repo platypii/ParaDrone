@@ -1,5 +1,6 @@
-import { Point, PointV } from "../dtypes"
+import { Point, Point3V, PointV } from "../dtypes"
 import { ParaControls } from "../paracontrols"
+import { Paramotor } from "../paramotor"
 import { SegmentLine } from "./segment-line"
 import { SegmentTurn } from "./segment-turn"
 
@@ -33,11 +34,30 @@ export class Path {
     return ([] as Point[]).concat(...this.segments.map((s) => s.render()))
   }
 
+  public render3(startAlt: number): Point3V[] {
+    // Render and compute altitudes
+    const climb = Paramotor.climbRate
+    let alt = startAlt + climb
+    return this.render().map((p) => {
+      alt += climb
+      return {
+        ...p,
+        alt,
+        vx: 0,
+        vy: 0,
+        climb
+      }
+    })
+  }
+
   /**
    * Fly a given distance along the path.
    * If the end of the path is reached, extend a straight line out to infinity.
    */
   public fly(distance: number): Path {
+    if (distance <= 0) {
+      console.error("path flight distance must be positive", distance)
+    }
     const trimmed: Segment[] = []
     let flown = 0
     let i = 0

@@ -1,27 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>BASEline ParaDrone</title>
-    <link rel="shortcut icon" type="image/png" href="/img/favicon.png">
+    <title>ParaDrone Simulator</title>
+    <link rel="icon" type="image/png" href="https://paradr.one/favicon.png">
+    <meta property="og:title" content="ParaDrone: Autopilot for Parachutes">
+    <meta property="og:description" content="The ParaDrone project aims to create hardware and software for autonomous parachute flight at full human scale.">
+    <meta property="og:image" content="https://paradr.one/social.png">
+    <meta name="keywords" content="autopilot, paraglider, parachute, paramotor, ppg, flight, drone, arduino, gps, lora">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#6b00ff">
     <link rel="stylesheet" href="css/main.css">
   </head>
 
   <body>
-    <div class="map-fullscreen">
-      <div id="map"></div>
+    <div class="container">
+      <div class="sidebar">
+        <h1>ParaDrone</h1>
 
-      <div class="map-overlay">
-        <div class="ap-status">
-          <div id="ap-latlng"></div>
-          <div id="ap-landingzone"></div>
-          <div id="ap-alt"></div>
+        <h2>Status</h2>
+        <div class="sidebar-section">
+          <div class="paramotor-status">
+            <div id="pstatus-name"></div>
+            <div id="pstatus-error"></div>
+            <svg id="error-chart"></svg>
+          </div>
+        </div>
+
+        <h2>Testing</h2>
+        <div class="sidebar-section">
+          <button class="btn" id="test-button">Test</button>
+          <div id="test-score"></div>
+          <div id="test-distance"></div>
+          <div id="test-angle"></div>
+          <div id="test-n"></div>
+          <div id="test-time"></div>
         </div>
       </div>
 
-      <div class="map-overlay map-overlay-bottom">
-        <div class="paramotor-status">
-          <div id="pstatus-name"></div>
-          <div id="pstatus-error"></div>
+      <div class="map-container">
+        <div id="map"></div>
+
+        <div class="map-overlay">
+          <div class="ap-status">
+            <div id="ap-latlng"></div>
+            <div id="ap-landingzone"></div>
+            <div id="ap-alt"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -29,9 +53,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=visualization&key=AIzaSyDYk5vsLVQO1Fe2SKHzwMEAQHnsA3SzO1I"></script>
     <script>
-      // Load modules
-      require(["js/main"], function(exits) {
-        exits.init()
+      // Load javascript modules
+      require(["js/main"], function(main) {
+        main.init()
       })
     </script>
   </body>

@@ -6,6 +6,7 @@ import { DroneMap } from "./map/drone-map"
 import { Paramotor } from "./paramotor"
 import * as player from "./player"
 import { sim } from "./sim"
+import * as test from "./test"
 import { distance } from "./util"
 
 const lz = kpow
@@ -15,9 +16,10 @@ let loc: GeoPointV
 let map: DroneMap
 
 export function init() {
+  // Setup map
   map = new DroneMap()
   map.setState({lz})
-  map.googleMap.addListener("click", (e) => {
+  map.map.addListener("click", (e) => {
     player.stop()
     setStart({
       lat: e.latLng.lat(),
@@ -25,6 +27,7 @@ export function init() {
       alt: 800 // TODO: Get elevation
     })
   })
+  test.init()
   update()
 }
 
@@ -36,7 +39,7 @@ function setStart(latlng: LatLngAlt) {
     alt: latlng.alt,
     vN: 0,
     vE: Paramotor.groundSpeed,
-    climb: 0
+    climb: Paramotor.climbRate
   }
 
   // Update UI
@@ -56,10 +59,12 @@ function setStart(latlng: LatLngAlt) {
 function update() {
   if (loc) {
     // Compute full plan
+    const alt_agl = loc.alt - lz.destination.alt
     const plan = getPlan(loc, lz)
-    const rendered = plan.render()
-      .map((p) => lz.toLatLng(p))
-    const actual = sim(start, lz)
+    const rendered = plan.render3(alt_agl)
+      .map((p) => lz.toLatLngAlt(p))
+    const simsteps = sim(start, lz)
+    const actual = simsteps.map((s) => s.loc)
     // const actual: any[] = []
 
     // Update map

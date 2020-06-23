@@ -53,8 +53,8 @@ export class SegmentTurn {
    * If the end of the path is reached, extend a straight line out to infinity.
    */
   public fly(distance: number): Path {
-    if (distance < 0) {
-      console.error("flight distance cannot be negative", distance)
+    if (distance <= 0) {
+      console.error("turn flight distance must be positive", distance)
     }
     const len = this.length()
     if (distance < len) {
