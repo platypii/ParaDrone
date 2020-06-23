@@ -1,51 +1,60 @@
-import { LatLng } from "../dtypes"
+import { LatLngAlt } from "../dtypes"
 import { MapLayer } from "./basemap"
 
 export class MarkerLayer implements MapLayer {
   private readonly title: string
-  private icon: google.maps.Symbol
-  private marker?: google.maps.Marker
-  private loc?: LatLng
+  private icon: string
+  private rotation: number = 0
 
-  constructor(title: string, icon: google.maps.Symbol) {
+  private billboards?: Cesium.BillboardCollection
+  private billboard?: Cesium.Billboard
+
+  private loc?: LatLngAlt
+
+  constructor(title: string, icon: string) {
     this.title = title
     this.icon = icon
   }
 
-  public setIcon(icon: google.maps.Symbol) {
+  public setIcon(icon: string, rotation: number) {
     this.icon = icon
+    this.rotation = rotation
     this.update()
   }
 
-  public setLocation(loc?: LatLng) {
+  public setLocation(loc?: LatLngAlt) {
     this.loc = loc
     this.update()
   }
 
-  public onAdd(map: google.maps.Map) {
-    this.marker = new google.maps.Marker({
-      map,
-      title: this.title,
-      icon: this.icon
+  public onAdd(map: Cesium.Viewer) {
+    this.billboards = new Cesium.BillboardCollection()
+    map.scene.primitives.add(this.billboards)
+    this.billboard = this.billboards.add({
+      position: Cesium.Cartesian3.ZERO,
+      image: this.icon
+      // text: this.title
     })
     this.update()
   }
 
-  public onRemove() {
-    if (this.marker) {
-      this.marker.setMap(null)
-      this.marker = undefined
+  public onRemove(map: Cesium.Viewer) {
+    if (this.billboards) {
+      map.scene.primitives.remove(this.billboards)
+      this.billboards = undefined
+      this.billboard = undefined
     }
   }
 
   private update() {
-    if (this.marker) {
+    if (this.billboard) {
       if (this.loc) {
-        this.marker.setPosition(this.loc)
-        this.marker.setIcon(this.icon)
-        this.marker.setVisible(true)
+        this.billboard.position = Cesium.Cartesian3.fromDegrees(this.loc.lng, this.loc.lat, this.loc.alt)
+        this.billboard.rotation = this.rotation
+        this.billboard.image = this.icon
+        this.billboard.show = true
       } else {
-        this.marker.setVisible(false)
+        this.billboard.show = false
       }
     }
   }

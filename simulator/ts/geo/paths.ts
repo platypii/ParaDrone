@@ -36,16 +36,20 @@ export class Path {
 
   public render3(startAlt: number): Point3V[] {
     // Render and compute altitudes
-    const climb = Paramotor.climbRate
-    let alt = startAlt + climb
+    let alt = startAlt
+    let lastPoint: Point
     return this.render().map((p) => {
-      alt += climb
+      if (lastPoint) {
+        const lastDistance = Math.hypot(p.x - lastPoint.x, p.y - lastPoint.y)
+        alt -= lastDistance / Paramotor.glide
+      }
+      lastPoint = p
       return {
         ...p,
         alt,
         vx: 0,
         vy: 0,
-        climb
+        climb: Paramotor.climbRate
       }
     })
   }

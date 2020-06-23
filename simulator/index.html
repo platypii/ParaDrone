@@ -10,6 +10,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#6b00ff">
     <link rel="stylesheet" href="css/main.css">
+    <script src="https://cesium.com/downloads/cesiumjs/releases/1.71/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://cesium.com/downloads/cesiumjs/releases/1.71/Build/Cesium/Widgets/widgets.css">
   </head>
 
   <body>
@@ -53,6 +55,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=visualization&key=AIzaSyDYk5vsLVQO1Fe2SKHzwMEAQHnsA3SzO1I"></script>
     <script>
+      Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI0OTY0YWEzMi1iYTEzLTRkNTktOWU4Ni1kYTAzZTlhYzg1MDgiLCJpZCI6MTA1MCwiaWF0IjoxNTI2ODU0NTMwfQ.GPRBDfdeQZv-8jHMR4uZoccEuMcxuSTN88nCxrdqW1Y"
       // Load javascript modules
       require(["js/main"], function(main) {
         main.init()

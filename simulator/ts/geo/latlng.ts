@@ -15,3 +15,7 @@ export function formatLatLngAlt(point: LatLngAlt): string {
     return ""
   }
 }
+
+export function latLngToCart(ll: LatLngAlt): Cesium.Cartesian3 {
+  return Cesium.Cartesian3.fromDegrees(ll.lng, ll.lat, ll.alt)
+}
