@@ -21,13 +21,9 @@ export function naive(loc: PointV, dest: Point, r: number): Path | undefined {
     // console.log("Zero velocity no tangent")
     return undefined
   }
-  // bearing from loc to destination
-  const bearing = Math.atan2(dest.x - loc.x, dest.y - loc.y)
-  // velocity bearing
-  const yaw = Math.atan2(loc.vx, loc.vy)
-  // shorter to turn right or left?
-  const delta = bearing - yaw
-  const turn1 = delta < 0 ? Turn.Left : Turn.Right
+  // Is dest on our left or right?
+  const dot = (dest.y - loc.y) * loc.vx - (dest.x - loc.x) * loc.vy
+  const turn1 = dot > 0 ? Turn.Left : Turn.Right
   const c1 = {
     x: loc.x + turn1 * r * loc.vy / velocity,
     y: loc.y - turn1 * r * loc.vx / velocity,

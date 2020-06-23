@@ -8,9 +8,9 @@ export class Paramotor {
   // Constants
   public static readonly turnRadius = 50 // Turn radius in meters with 1 toggle buried
   // public static readonly yawRate = toDegrees(velocity / turnRadius) // Yaw degrees per second with 1 toggle buried
-  public static readonly descentRate = 3 // Meters of altitude lost per second
+  public static readonly climbRate = -3 // Meters of altitude lost per second
   public static readonly groundSpeed = 12 // Meters per second
-  public static readonly glide = Paramotor.groundSpeed / Paramotor.descentRate
+  public static readonly glide = -Paramotor.groundSpeed / Paramotor.climbRate
 
   // State
   public loc?: GeoPointV
@@ -57,17 +57,17 @@ export class Paramotor {
    */
   public tick(dt: number): void {
     if (this.loc) {
-      this.loc.alt += this.loc.climb
       const vel = Math.hypot(this.loc.vE, this.loc.vN)
       const distance = vel * dt
       const control = this.controls.right - this.controls.left // [-1, 1]
       const toggle_yaw = distance * control / Paramotor.turnRadius
       const bearing = toDegrees(Math.atan2(this.loc.vE, this.loc.vN) + toggle_yaw)
+      // TODO: Adjust climb toward Paramotor.climbRate based on gravity or WSE
       // Move lat,lng by distance and bearing
       const moved = geo.moveBearing(this.loc.lat, this.loc.lng, bearing, distance)
       this.loc.lat = moved.lat
       this.loc.lng = moved.lng
-      this.loc.alt -= Paramotor.descentRate
+      this.loc.alt += this.loc.climb
       // Adjust velocity
       this.loc.vN = vel * Math.cos(toRadians(bearing))
       this.loc.vE = vel * Math.sin(toRadians(bearing))
@@ -78,7 +78,7 @@ export class Paramotor {
    * Return the horizontal distance we could cover until landing
    */
   public static flightDistanceRemaining(alt: number): number {
-    const timeToGround = alt / Paramotor.descentRate
+    const timeToGround = -alt / Paramotor.climbRate
     return Paramotor.groundSpeed * timeToGround
   }
 

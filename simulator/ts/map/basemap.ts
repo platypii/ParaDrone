@@ -13,14 +13,14 @@ export interface MapLayer {
 }
 
 export class BaseMap {
-  public readonly googleMap: google.maps.Map
+  public readonly map: google.maps.Map
   private layers: MapLayer[] = []
 
   private readonly defaultCenter = new google.maps.LatLng(39, -100) // USA
   private readonly defaultZoom = 4 // USA
 
   constructor(options: MapOptions) {
-    this.googleMap = new google.maps.Map(options.element, {
+    this.map = new google.maps.Map(options.element, {
       center: options.center || this.defaultCenter,
       draggableCursor: options.draggableCursor,
       mapTypeId: google.maps.MapTypeId.HYBRID,
@@ -33,7 +33,7 @@ export class BaseMap {
   public addLayer(layer?: MapLayer): void {
     if (layer && this.layers.indexOf(layer) < 0) {
       this.layers.push(layer)
-      layer.onAdd(this.googleMap)
+      layer.onAdd(this.map)
     }
   }
 

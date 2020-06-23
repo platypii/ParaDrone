@@ -22,9 +22,9 @@ export class MarkerLayer implements MapLayer {
     this.update()
   }
 
-  public onAdd(googleMap: google.maps.Map) {
+  public onAdd(map: google.maps.Map) {
     this.marker = new google.maps.Marker({
-      map: googleMap,
+      map,
       title: this.title,
       icon: this.icon
     })

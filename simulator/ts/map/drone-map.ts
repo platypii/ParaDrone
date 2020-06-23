@@ -1,4 +1,4 @@
-import { GeoPointV, LatLng } from "../dtypes"
+import { GeoPointV, LatLngAlt } from "../dtypes"
 import { LandingZone } from "../geo/landingzone"
 import { BaseMap } from "./basemap"
 import { CanopyLayer } from "./canopy-layer"
@@ -8,11 +8,11 @@ import { MarkerLayer } from "./marker-layer"
 import { PathLayer } from "./path-layer"
 
 interface MapState {
-  start?: LatLng
+  start?: LatLngAlt
   current?: GeoPointV
   lz: LandingZone
-  plan?: LatLng[]
-  actual?: LatLng[]
+  plan?: LatLngAlt[]
+  actual?: LatLngAlt[]
 }
 
 export class DroneMap extends BaseMap {

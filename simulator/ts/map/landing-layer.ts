@@ -1,16 +1,14 @@
 import { LandingZone } from "../geo/landingzone"
-import { toDegrees } from "../geo/trig"
 import { MapLayer } from "./basemap"
-import * as icons from "./icons"
 
 export class LandingLayer implements MapLayer {
   private readonly arrowhead = {path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW}
   private arrow?: google.maps.Polyline
 
-  public onAdd(googleMap: google.maps.Map) {
+  public onAdd(map: google.maps.Map) {
     this.arrow = new google.maps.Polyline({
+      map,
       path: [],
-      map: googleMap,
       strokeColor: "#eee",
       icons: [{
         icon: this.arrowhead,
