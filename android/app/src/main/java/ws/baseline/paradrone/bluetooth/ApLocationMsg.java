@@ -19,9 +19,14 @@ public class ApLocationMsg implements APEvent {
         final double lat = buf.getInt(1) * 1e-6; // microdegrees
         final double lng = buf.getInt(5) * 1e-6; // microdegrees
         final double alt = buf.getShort(9) * 0.1; // decimeters
-        Timber.d("ap -> phone: location " + lat + " " + lng + " " + alt);
-        final ApLocationMsg lastLocation = new ApLocationMsg(lat, lng, alt);
-        EventBus.getDefault().post(lastLocation);
+
+        if (LocationCheck.validate(lat, lng) == 0) {
+            Timber.d("ap -> phone: location " + lat + " " + lng + " " + alt);
+            final ApLocationMsg lastLocation = new ApLocationMsg(lat, lng, alt);
+            EventBus.getDefault().post(lastLocation);
+        } else {
+            Timber.w("ap -> phone: invalid location %f, %f", lat, lng);
+        }
     }
 
     private ApLocationMsg(double lat, double lng, double alt) {
