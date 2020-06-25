@@ -10,7 +10,10 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.text.InputType;
 import android.view.View;
+import android.widget.EditText;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -52,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
                         final LandingZone lz = new LandingZone(ll.latitude, ll.longitude, elevation, landingDirection);
                         Timber.i("Setting landing zone %s", lz);
                         APLandingZone.setPending(lz);
-                        Services.bluetooth.setLandingZone(lz);
+                        Services.bluetooth.actions.setLandingZone(lz);
                     });
                 } else {
                     Timber.e("Failed to find map fragment");
@@ -61,6 +64,28 @@ public class MainActivity extends AppCompatActivity {
                 binding.setLandingZone.setText("↑ LZ");
             }
             settingLz = !settingLz;
+        });
+
+        binding.setFrequency.setOnClickListener((e) -> {
+            final EditText edit = new EditText(this);
+            edit.setInputType(InputType.TYPE_CLASS_NUMBER);
+            edit.setText("915000000");
+            new AlertDialog.Builder(this)
+                    .setTitle("Frequency")
+                    .setView(edit)
+                    .setPositiveButton(android.R.string.ok, (d, which) -> {
+                        final int freq = Integer.parseInt(edit.getText().toString());
+                        Services.bluetooth.actions.setFrequency(freq);
+                    })
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .show();
+        });
+
+        binding.buttonUp.setOnClickListener((e) -> {
+            Services.bluetooth.actions.setMotorControls(-127, -127);
+        });
+        binding.buttonDown.setOnClickListener((e) -> {
+            Services.bluetooth.actions.setMotorPosition(255, 255);
         });
     }
 

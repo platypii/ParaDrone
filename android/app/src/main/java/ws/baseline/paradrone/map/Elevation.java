@@ -14,7 +14,7 @@ public class Elevation {
 
     public static void get(Context context, LatLng ll, ElevationCallback cb) {
         final GeoApiContext ctx = new GeoApiContext.Builder()
-                .apiKey(context.getString(R.string.google_maps_key))
+                .apiKey(context.getString(R.string.google_elevation_key))
                 .build();
         ElevationApi.getByPoint(ctx, new com.google.maps.model.LatLng(ll.latitude, ll.longitude)).setCallback(new PendingResult.Callback<ElevationResult>() {
             @Override

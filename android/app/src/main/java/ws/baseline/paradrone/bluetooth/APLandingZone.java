@@ -36,11 +36,13 @@ public class APLandingZone implements APEvent {
             final double lng = buf.getInt(5) * 1e-6; // microdegrees
             final double alt = buf.getShort(9) * 0.1; // decimeters
             final double dir = buf.getShort(11) * 0.001; // milliradians
-            lz = new LandingZone(lat, lng, alt, dir);
-            Timber.i("ap -> phone: lz %s", lz);
-        } else if (value[0] == 'N') {
-            lz = null;
-            Timber.i("ap -> phone: no lz");
+            if (lat != 0 && lng != 0) {
+                lz = new LandingZone(lat, lng, alt, dir);
+                Timber.i("ap -> phone: lz %s", lz);
+            } else {
+                lz = null;
+                Timber.i("ap -> phone: no lz");
+            }
         } else {
             Timber.e("Unexpected landing zone message: %s", value[0]);
         }

@@ -37,7 +37,7 @@ public class Search {
         final Path straightPath = straight(loc).fly(Math.min(1, flight_distance_remaining));
         final Path naivePath = naive(loc, sof, r);
 
-        if (alt_agl < no_turns_below) {
+        if (alt_agl <= no_turns_below) {
             // No turns under 100ft
             return straightPath;
         } else if (distance > 1000 && naivePath != null) {

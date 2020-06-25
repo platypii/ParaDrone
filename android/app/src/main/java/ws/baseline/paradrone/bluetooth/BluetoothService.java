@@ -1,7 +1,5 @@
 package ws.baseline.paradrone.bluetooth;
 
-import ws.baseline.paradrone.geo.LandingZone;
-
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
@@ -12,7 +10,7 @@ import org.greenrobot.eventbus.EventBus;
 import timber.log.Timber;
 
 import static ws.baseline.paradrone.bluetooth.BluetoothPreferences.DeviceMode.AP;
-import static ws.baseline.paradrone.bluetooth.BluetoothPreferences.DeviceMode.RELAY;
+import static ws.baseline.paradrone.bluetooth.BluetoothPreferences.DeviceMode.RC;
 import static ws.baseline.paradrone.bluetooth.BluetoothState.BT_CONNECTING;
 import static ws.baseline.paradrone.bluetooth.BluetoothState.BT_STARTED;
 import static ws.baseline.paradrone.bluetooth.BluetoothState.BT_STATES;
@@ -33,7 +31,9 @@ public class BluetoothService {
     // Bluetooth state
     private int bluetoothState = BT_STOPPED;
     @Nullable
-    private BluetoothHandler bluetoothHandler;
+    BluetoothHandler bluetoothHandler;
+
+    public AutopilotActions actions = new AutopilotActions(this);
 
     public void start(@NonNull Context context) {
         deviceMode = prefs.load(context);
@@ -52,7 +52,7 @@ public class BluetoothService {
 
     public void switchDeviceMode() {
         if (deviceMode == AP) {
-            deviceMode = RELAY;
+            deviceMode = RC;
         } else {
             deviceMode = AP;
         }
@@ -60,24 +60,6 @@ public class BluetoothService {
             bluetoothHandler.disconnect();
         }
         prefs.save(deviceMode);
-    }
-
-    public void setControls(byte left, byte right) {
-        if (bluetoothHandler != null) {
-            bluetoothHandler.setControls(left, right);
-        }
-    }
-
-    public void setLandingZone(@NonNull LandingZone lz) {
-        if (bluetoothHandler != null) {
-            bluetoothHandler.setLandingZone(lz);
-        }
-    }
-
-    public void fetchLandingZone() {
-        if (bluetoothHandler != null) {
-            bluetoothHandler.fetchLandingZone();
-        }
     }
 
     /**

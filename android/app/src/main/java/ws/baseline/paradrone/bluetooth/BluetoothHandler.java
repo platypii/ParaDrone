@@ -4,7 +4,6 @@ import ws.baseline.paradrone.bluetooth.blessed.BluetoothCentral;
 import ws.baseline.paradrone.bluetooth.blessed.BluetoothCentralCallback;
 import ws.baseline.paradrone.bluetooth.blessed.BluetoothPeripheral;
 import ws.baseline.paradrone.bluetooth.blessed.BluetoothPeripheralCallback;
-import ws.baseline.paradrone.geo.LandingZone;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothGattCharacteristic;
@@ -13,8 +12,6 @@ import android.content.Context;
 import android.os.Handler;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.UUID;
 import timber.log.Timber;
 
@@ -22,7 +19,7 @@ import static android.bluetooth.BluetoothGatt.CONNECTION_PRIORITY_HIGH;
 import static android.bluetooth.BluetoothGatt.GATT_SUCCESS;
 import static android.bluetooth.BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT;
 import static ws.baseline.paradrone.bluetooth.BluetoothPreferences.DeviceMode.AP;
-import static ws.baseline.paradrone.bluetooth.BluetoothPreferences.DeviceMode.RELAY;
+import static ws.baseline.paradrone.bluetooth.BluetoothPreferences.DeviceMode.RC;
 import static ws.baseline.paradrone.bluetooth.BluetoothState.BT_CONNECTED;
 import static ws.baseline.paradrone.bluetooth.BluetoothState.BT_CONNECTING;
 import static ws.baseline.paradrone.bluetooth.BluetoothState.BT_SEARCHING;
@@ -37,13 +34,13 @@ import static ws.baseline.paradrone.bluetooth.Util.byteArrayToHex;
  */
 class BluetoothHandler {
 
-    // Autopilot IDs
+    // Autopilot service IDs
     private static final UUID apServiceId = UUID.fromString("ba5e0001-c55f-496f-a444-9855f5f14901");
     private static final UUID apCharacteristicId = UUID.fromString("ba5e0002-9235-47c8-b2f3-916cee33d802");
 
-    // Relay IDs
-    private static final UUID relayServiceId = UUID.fromString("ba5e0003-ed55-43fa-bb54-8e721e092603");
-    private static final UUID relayCharacteristicId = UUID.fromString("ba5e0004-be98-4de9-9e9a-080b5bb41404");
+    // Remote control service IDs
+    private static final UUID rcServiceId = UUID.fromString("ba5e0003-ed55-43fa-bb54-8e721e092603");
+    private static final UUID rcCharacteristicId = UUID.fromString("ba5e0004-be98-4de9-9e9a-080b5bb41404");
 
     private final Handler handler = new Handler();
     private final BluetoothService service;
@@ -51,7 +48,7 @@ class BluetoothHandler {
     private BluetoothPeripheral currentPeripheral;
 
     boolean connected_ap = false;
-    boolean connected_relay = false;
+    boolean connected_rc = false;
 
     BluetoothHandler(@NonNull BluetoothService service, @NonNull Context context) {
         this.service = service;
@@ -72,9 +69,9 @@ class BluetoothHandler {
         service.setState(BT_SEARCHING);
         // Scan for peripherals with a certain service UUIDs
         central.startPairingPopupHack();
-        if (service.deviceMode == RELAY) {
-            Timber.i("Scanning for relay");
-            central.scanForPeripheralsWithServices(new UUID[]{relayServiceId});
+        if (service.deviceMode == RC) {
+            Timber.i("Scanning for RC");
+            central.scanForPeripheralsWithServices(new UUID[]{rcServiceId});
         } else {
             Timber.i("Scanning for AP");
             central.scanForPeripheralsWithServices(new UUID[]{apServiceId});
@@ -94,13 +91,13 @@ class BluetoothHandler {
             if (service.deviceMode == AP && peripheral.getService(apServiceId) != null) {
                 Timber.d("Enabling notifications for autopilot service");
                 peripheral.setNotify(peripheral.getCharacteristic(apServiceId, apCharacteristicId), true);
-                fetchLandingZone();
+                service.actions.fetchLandingZone();
             }
-            // Turn on notifications for LoRa Relay Service
-            if (service.deviceMode == RELAY && peripheral.getService(relayServiceId) != null) {
-                Timber.d("Enabling notifications for relay service");
-                peripheral.setNotify(peripheral.getCharacteristic(relayServiceId, relayCharacteristicId), true);
-                fetchLandingZone();
+            // Turn on notifications for LoRa R/C service
+            if (service.deviceMode == RC && peripheral.getService(rcServiceId) != null) {
+                Timber.d("Enabling notifications for RC service");
+                peripheral.setNotify(peripheral.getCharacteristic(rcServiceId, rcCharacteristicId), true);
+                service.actions.fetchLandingZone();
             }
         }
 
@@ -135,7 +132,7 @@ class BluetoothHandler {
 //            Timber.d("onCharacteristicUpdate %s", characteristicUUID);
             if (characteristicUUID.equals(apCharacteristicId)) {
                 processBytes(value);
-            } else if (characteristicUUID.equals(relayCharacteristicId)) {
+            } else if (characteristicUUID.equals(rcCharacteristicId)) {
                 processBytes(value);
             }
         }
@@ -150,8 +147,8 @@ class BluetoothHandler {
             Timber.i("Connected to '%s'", connectedPeripheral.getName());
             if (connectedPeripheral.getService(apServiceId) != null) {
                 connected_ap = true;
-            } else if (connectedPeripheral.getService(relayServiceId) != null) {
-                connected_relay = true;
+            } else if (connectedPeripheral.getService(rcServiceId) != null) {
+                connected_rc = true;
             } else {
                 Timber.e("Connected to device with no service?");
             }
@@ -173,16 +170,16 @@ class BluetoothHandler {
                 if (BluetoothState.started(service.getState())) {
                     autoreconnect();
                 }
-            } else if (connected_relay && service.deviceMode == RELAY) {
-                Timber.d("Auto reconnecting to relay");
-                connected_relay = false;
+            } else if (connected_rc && service.deviceMode == RC) {
+                Timber.d("Auto reconnecting to RC");
+                connected_rc = false;
                 if (BluetoothState.started(service.getState())) {
                     autoreconnect();
                 }
             } else {
                 Timber.d("Back to searching");
                 connected_ap = false;
-                connected_relay = false;
+                connected_rc = false;
                 currentPeripheral = null;
                 // Go back to searching
                 if (BluetoothState.started(service.getState())) {
@@ -208,8 +205,8 @@ class BluetoothHandler {
                 service.setState(BT_CONNECTING);
                 central.stopScan();
                 central.connectPeripheral(peripheral, peripheralCallback);
-            } else if (service.deviceMode == RELAY && peripheral.getName().equals("ParaDroneRelay")) {
-                Timber.i("Relay device found, connecting to: %s %s", peripheral.getName(), peripheral.getAddress());
+            } else if (service.deviceMode == RC && peripheral.getName().equals("ParaDroneRC")) {
+                Timber.i("ParaDroneRC device found, connecting to: %s %s", peripheral.getName(), peripheral.getAddress());
                 service.setState(BT_CONNECTING);
                 central.stopScan();
                 central.connectPeripheral(peripheral, peripheralCallback);
@@ -238,60 +235,17 @@ class BluetoothHandler {
         } else if (value[0] == 'Z' && value.length == 13) {
             // Landing zone message
             APLandingZone.parse(value);
-        } else if (value[0] == 'N' && value.length == 1) {
-            // No landing zone message
-            APLandingZone.parse(value);
         } else {
-            Timber.e("ap -> phone: unknown %s", byteArrayToHex(value));
+            Timber.e("ap -> phone: unknown %c %s", (char) value[0], byteArrayToHex(value));
         }
     }
 
-    void setLandingZone(@NonNull LandingZone lz) {
-        Timber.i("phone -> ap: set lz %s", lz);
-        BluetoothGattCharacteristic ch = getCharacteristic();
+    void sendCommand(byte[] value) {
+        Timber.d("phone -> ap: cmd %c", (char) value[0]);
+        final BluetoothGattCharacteristic ch = getCharacteristic();
         if (ch != null) {
-            // Pack LZ into bytes
-            final byte[] value = new byte[13];
-            value[0] = 'Z';
-            final ByteBuffer buf = ByteBuffer.wrap(value).order(ByteOrder.LITTLE_ENDIAN);
-            buf.putInt(1, (int)(lz.destination.lat * 1e6)); // microdegrees
-            buf.putInt(5, (int)(lz.destination.lng * 1e6)); // microdegrees
-            buf.putShort(9, (short)(lz.destination.alt * 10)); // decimeters
-            buf.putShort(11, (short)(lz.landingDirection * 1000)); // milliradians
             if (!currentPeripheral.writeCharacteristic(ch, value, WRITE_TYPE_DEFAULT)) {
-                Timber.e("Failed to set lz");
-            }
-            fetchLandingZone();
-        } else {
-            Timber.e("Failed to get characteristic");
-        }
-    }
-
-    void setControls(byte left, byte right) {
-        Timber.i("phone -> ap: set controls %d %d", left & 0xff, right & 0xff);
-        BluetoothGattCharacteristic ch = getCharacteristic();
-        if (ch != null) {
-            // Pack controls into bytes
-            final byte[] value = new byte[3];
-            value[0] = 'C';
-            value[1] = left;
-            value[2] = right;
-            if (!currentPeripheral.writeCharacteristic(ch, value, WRITE_TYPE_DEFAULT)) {
-                Timber.e("Failed to set controls");
-            }
-        } else if (service.getState() == BT_CONNECTED) {
-            Timber.e("Failed to get characteristic");
-        }
-    }
-
-    void fetchLandingZone() {
-        Timber.i("phone -> ap: fetch lz");
-        BluetoothGattCharacteristic ch = getCharacteristic();
-        if (ch != null) {
-            // Request LZ from device
-            final byte[] value = {'Q'};
-            if (!currentPeripheral.writeCharacteristic(ch, value, WRITE_TYPE_DEFAULT)) {
-                Timber.e("Failed to request lz");
+                Timber.e("Failed to send cmd %c", (char) value[0]);
             }
         } else {
             Timber.e("Failed to get characteristic");
@@ -303,8 +257,8 @@ class BluetoothHandler {
         if (currentPeripheral != null) {
             if (connected_ap) {
                 return currentPeripheral.getCharacteristic(apServiceId, apCharacteristicId);
-            } else if (connected_relay) {
-                return currentPeripheral.getCharacteristic(relayServiceId, relayCharacteristicId);
+            } else if (connected_rc) {
+                return currentPeripheral.getCharacteristic(rcServiceId, rcCharacteristicId);
             }
         }
         return null;
@@ -333,6 +287,7 @@ class BluetoothHandler {
         if (currentPeripheral != null) {
             currentPeripheral.cancelConnection();
         }
+        // Don't close central because it won't come back if we re-start
 //        central.close();
         service.setState(BT_STOPPED);
     }

@@ -27,7 +27,7 @@ public class ControlView extends View {
 
     // Last time we sent a control message
     private long last_controls_sent;
-    private static final long control_rate = 200; // ms
+    private static final long control_rate = 300; // ms
 
     public ControlView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -143,11 +143,10 @@ public class ControlView extends View {
         left_toggle = normalize(left_toggle);
         right_toggle = normalize(right_toggle);
 
-        // Send control message at most every 100ms
-        // TODO: Except when let go?
-        if (System.currentTimeMillis() - last_controls_sent >= control_rate) {
+        // Send control message at most every 300ms, except always send zero
+        if (System.currentTimeMillis() - last_controls_sent >= control_rate || left_toggle + right_toggle == 0) {
             last_controls_sent = System.currentTimeMillis();
-            Services.bluetooth.setControls((byte) left_toggle, (byte) right_toggle);
+            Services.bluetooth.actions.setMotorPosition(left_toggle, right_toggle);
         }
 
         invalidate();

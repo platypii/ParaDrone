@@ -25,13 +25,9 @@ class PlannerNaive {
             // Log.w(TAG, "Naive planner on top of lz");
             return null;
         }
-        // bearing from loc to destination
-        final double bearing = Math.atan2(dest.x - loc.x, dest.y - loc.y);
-        // velocity bearing
-        final double yaw = Math.atan2(loc.vx, loc.vy);
-        // shorter to turn right or left?
-        final double delta = bearing - yaw;
-        final int turn1 = delta < 0 ? TURN_LEFT : TURN_RIGHT;
+        // Is dest on our left or right?
+        final double dot = (dest.y - loc.y) * loc.vx - (dest.x - loc.x) * loc.vy;
+        final int turn1 = dot > 0 ? TURN_LEFT : TURN_RIGHT;
         // Compute path for naive
         final double velocity = Math.hypot(loc.vx, loc.vy);
         final Circle c1 = new Circle(

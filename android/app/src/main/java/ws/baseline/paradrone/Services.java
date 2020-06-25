@@ -13,17 +13,28 @@ public class Services {
     public static final FlightComputer flightComputer = new FlightComputer();
     public static final LocationService location = new LocationService();
 
+    private static boolean started = false;
+
     public static void start(@NonNull Activity activity) {
-        Timber.i("Starting services...");
-        bluetooth.start(activity);
-        flightComputer.start();
-        location.start();
+        if (!started) {
+            started = true;
+            Timber.i("Starting services...");
+            bluetooth.start(activity);
+            flightComputer.start();
+            location.start();
+        } else {
+            Timber.e("Services started twice");
+        }
     }
 
     static void stop() {
+        if (!started) {
+            Timber.e("Stop called but services not started");
+        }
         Timber.i("Stopping services...");
         flightComputer.stop();
         bluetooth.stop();
         location.stop();
+        started = false;
     }
 }

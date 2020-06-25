@@ -35,7 +35,7 @@ public class ApScreenFragment extends Fragment {
         binding = ApScreenBinding.inflate(inflater, container, false);
         binding.statusLandingZone.setOnClickListener((event) -> {
             // Refresh LZ
-            Services.bluetooth.fetchLandingZone();
+            Services.bluetooth.actions.fetchLandingZone();
             if (APLandingZone.lastLz != null && APLandingZone.lastLz.lz != null) {
                 APLandingZone.setPending(APLandingZone.lastLz.lz);
             }
@@ -125,6 +125,8 @@ public class ApScreenFragment extends Fragment {
             final double distance = Geo.distance(ll.lat, ll.lng, lz.destination.lat, lz.destination.lng);
             final double bearing = Geo.bearing(ll.lat, ll.lng, lz.destination.lat, lz.destination.lng);
             binding.statusLandingZone.setText("LZ: " + Convert.distance(distance) + " " + Convert.bearing2(bearing));
+        } else if (lz != null) {
+            binding.statusLandingZone.setText("LZ: set");
         } else {
             binding.statusLandingZone.setText("LZ:");
         }
