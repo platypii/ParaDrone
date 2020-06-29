@@ -5,12 +5,13 @@
 // tags       : Motor,actuator,linear,drone,paraglider
 // file       : actuator.jscad
 
-const qty = 0.5
+const qty = 1
 
 const axleZ = 21 // center of axle
 const wallZ = 27 // slightly above axle
 const domeZ = 27 // a bit higher
 const topZ = 46 // top top
+const strutZ = axleZ - 2
 
 const leftX = 0
 const rightX = 31
@@ -45,14 +46,19 @@ function main() {
 // Top
 function topcase() {
   return union(
-    dome(0.3, 2.8),
+    dome(0.25, 2.75),
     switchmount(),
+    difference( // top walls
+      translate([4.25, -widthY / 2 + 2, strutZ], cube({size: [rightX - 8.5, widthY - 4, wallZ - strutZ]})),
+      translate([4.25, -widthY / 2 + 3.9, strutZ], cube({size: [rightX - 8.5, widthY - 7.8, wallZ - strutZ]})),
+      linchpin()
+    ),
     difference(
       union(
-        struttop(9, pulleyHole),
+        struttop(10, pulleyHole),
         struttop(11, pulleyHole),
         struttop(18, pulleyHole),
-        struttop(20, pulleyHole)
+        struttop(19, pulleyHole)
       ),
       tophalf(topZ),
       walls(),
@@ -87,7 +93,7 @@ function dome(domeToleranceX, domeThic) {
   return difference(
     shell(x1, x2, 0),
     shell(x1, x2, domeThic),
-    cylinder({r: 1.75, start: [15.5, holeY, 0], end: [15.5, holeY, 60], fn: 30 * qty}) // tophole
+    cylinder({r: 1.4, start: [15.5, holeY, 0], end: [15.5, holeY, 60], fn: 30 * qty}) // tophole
   )
 }
 
@@ -103,8 +109,8 @@ const domeThic = 2.8
     union(
       latch1,
       latch2,
-      cylinder({r: 1.0, start: [10.75, -4, topZ - 4], end: [10.75, -4, topZ - 3], fn: 60 * qty}),
-      cylinder({r: 1.0, start: [20.25, -4, topZ - 4], end: [20.25, -4, topZ - 3], fn: 60 * qty})
+      cylinder({r: 1.0, start: [10.75, -4, topZ - 4], end: [10.75, -4, topZ - 3], fn: 40 * qty}),
+      cylinder({r: 1.0, start: [20.25, -4, topZ - 4], end: [20.25, -4, topZ - 3], fn: 40 * qty})
     ),
     shell(0, rightX, 0)
   )
@@ -123,6 +129,7 @@ function bottomcase() {
       bracket(),
       endbracket()
     ),
+    linchpin(),
     boardholes(),
     wirechannel(),
     tophalf(topZ)
@@ -186,19 +193,29 @@ function boardholes() {
 }
 
 function wirechannel() {
-  const w = 5
-  const h = 2.5
+  const w = 6
+  const h = 3
   return union(
     translate([leftX, nearY + 2, 2], cube({size: [widthX - 4, w, h]})),
     translate([leftX, farY - w - 2, 2], cube({size: [widthX - 4, w, h]}))
   )
 }
 
+function linchpin() {
+  return union(
+    translate([8.4, nearY + 4, 23], rotate([90, 0, -90], screw(1.4))),
+    translate([8.4, farY - 4, 23], rotate([90, 0, 90], screw(1.4))),
+    translate([22.6, nearY + 4, 23], rotate([90, 0, -90], screw(1.4))),
+    translate([22.6, farY - 4, 23], rotate([90, 0, 90], screw(1.4)))
+  )
+}
+
 
 // Common
-function screw() {
+function screw(shaftRadius) {
+  const r = shaftRadius || 1.6
   return union(
-    cylinder({r: 1.6, start: [0, 0, 0], end: [4, 0, 0], fn: 30 * qty}),
+    cylinder({r: r, start: [0, 0, 0], end: [4, 0, 0], fn: 30 * qty}),
     cylinder({r1: 0, r2: 2.7, start: [1.5, 0, 0], end: [4, 0, 0], fn: 30 * qty})
   )
 }
@@ -215,14 +232,14 @@ function strut(x, r) {
 function strutbottom(x, r) {
   return intersection(
     strut(x, r),
-    bottomhalf(axleZ - 2)
+    bottomhalf(strutZ)
   )
 }
 function struttop(x, r) {
   return difference(
     strut(x, r),
-    translate([x, -pulleyHole, axleZ - 2], cube({size: [2, pulleyHole * 2, 2]})),
-    bottomhalf(axleZ - 2)
+    translate([x, -pulleyHole, strutZ], cube({size: [2, pulleyHole * 2, 2]})),
+    bottomhalf(strutZ)
   )
 }
 
