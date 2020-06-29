@@ -14,7 +14,7 @@ const sizeX = 55
 const sizeY = topY - bottomY
 
 const battThic = 6 // 6 for battery
-const sizeZ = 12 + battThic
+const sizeZ = 12.4 + battThic
 const splitZ = 4 + battThic
 
 const leftX = -sizeX / 2
@@ -34,8 +34,8 @@ const colors = {
 function main() {
   return union(
     // mechanism(),
-    // color(colors.topcase, topcase())
-    color(colors.bottomcase, bottomcase())
+    color(colors.topcase, topcase())
+    // color(colors.bottomcase, bottomcase())
   )
 }
 
@@ -45,7 +45,7 @@ function topcase() {
       shell(0, splitZ, sizeZ), // outer
       inner(),
       ahole(),
-      translate([leftX - .1, 12.25, sizeZ - 5.5], cube({size: [2.2, 8, 3], radius: [0, .6, .6], fn: 15 * qty})), // USB hole
+      translate([leftX - .1, 12.25, splitZ + 2.5], cube({size: [2.2, 8, 3], radius: [0, .6, .6], fn: 15 * qty})), // USB hole
       mechanism()
     ),
     difference(
@@ -140,8 +140,8 @@ function tophalf(z) {
 }
 
 function latches() {
-  const latch1 = translate([18, topY - 3, sizeZ - 2], latch(90))
-  const latch2 = translate([-18, bottomY + 3, sizeZ - 2], latch(-90))
+  const latch1 = translate([18, topY - 3, splitZ + 6], latch(90))
+  const latch2 = translate([-18, bottomY + 3, splitZ + 6], latch(-90))
   return union(
     latch1,
     latch2,
@@ -151,7 +151,7 @@ function latches() {
 }
 
 function latchholes() {
-  const z = sizeZ - 10.5
+  const z = splitZ - 3.5
   return union(
     translate([-19, topY - 2.5, z], cube({size: [10, 1, 1.4]})),
     translate([9, topY - 2.5, z], cube({size: [10, 1, 1.4]})),
@@ -163,7 +163,7 @@ function latchholes() {
 function latch(angle) {
   return rotate(
     [-90, 0, angle],
-    linear_extrude({height: 8}, polygon([[-.5, -1], [-.5, 8.5], [1, 8.2], [1.4, 7.3], [.8, 7], [.8, 6], [1,6], [1, -1]]))
+    linear_extrude({height: 8}, polygon([[-.5, -1], [-.5, 9.5], [1, 9.2], [1.4, 8.3], [.8, 8], [.8, 6], [1,6], [1, -1]]))
   )
 }
 
@@ -210,11 +210,11 @@ function esp32() {
   const circuitboard = linear_extrude({height: 2.5}, polygon([
     [0,8.2], [-1,7.2], [-1,1.8], [1,0], [48,0], [48,4], [52.3,8], [52.3,h-8], [48,h-4], [48,h], [1,h], [-1,h-1.8], [-1,h-7.2], [0,h-8.2]
   ]))
-  return translate([leftX + 1.1, 3.5, sizeZ - 16], union(
+  return translate([leftX + 1.2, 3.5, splitZ - 8], union(
     color(colors.esp32, translate([0, 0, 9], circuitboard)),
     color([0, 0, 0, 0.4], translate([13.9, 2.7, 12], cube({size: [35, 20.5, 3.8]}))),
     color([0, 0, 0, 0.4], translate([24.5, 1, 12], cube({size: [14, 2, 3.8]}))),
-    color("black", translate([19, 8, 12], cube({size: [25.8, 13, 4]}))),
+    color("black", translate([19, 8, 12], cube({size: [25.8, 13, 4.4]}))),
     color("brown", cylinder({r: 3.2, start: [11, 19.5, 10], end: [11, 19.5, 15.8], fn: 25 * qty}))
   ))
 }

@@ -13,12 +13,12 @@ const couplingRadius = 6
 
 const discThic = 2
 const axleThic = 5
-const threadRadius = 1.2
+const threadRadius = 1.1
 
 function main() {
   return union(
-    translate([0, 0, 0], half1()),
-    translate([32, 0, 0], half2())
+    translate([0, -16, 0], half1()),
+    translate([0, 16, 0], half2())
   )
 }
 
@@ -40,14 +40,14 @@ function half2() {
 
 function solid(axleRadius) {
   return union(
-    cylinder({r: pulleyRadius, start: [0, 0, 0], end: [0, 0, discThic], fn: qty * 120}), // disc
-    cylinder({r: axleRadius, start: [0, 0, discThic], end: [0, 0, discThic + axleThic], fn: qty * 120}) // axle
+    cylinder({r: pulleyRadius, start: [0, 0, 0], end: [0, 0, discThic], fn: qty * 100}), // disc
+    cylinder({r: axleRadius, start: [0, 0, discThic], end: [0, 0, discThic + axleThic], fn: qty * 100}) // axle
   )
 }
 
 function pin() {
   return difference(
-    cylinder({r: 3.2, start: [0, 0, 0], end: [0, 0, 18], fn: qty * 120}),
+    cylinder({r: 3.15, start: [0, 0, 0], end: [0, 0, 18], fn: qty * 80}),
     translate([-50, 2.65, 0], cube({size: [100, 100, 100]}))
   )
 }
@@ -58,9 +58,9 @@ function threadhole() {
 
 function gluechannel() {
   const top = discThic + axleThic
-  const bottom = discThic + axleThic - 0.7
+  const bottom = discThic + axleThic - 0.5
   return difference(
-    cylinder({r: 6.0, start: [0, 0, bottom], end: [0, 0, top], fn: qty * 120}),
-    cylinder({r: 5.2, start: [0, 0, bottom], end: [0, 0, top], fn: qty * 120})
+    cylinder({r: 6.0, start: [0, 0, bottom], end: [0, 0, top], fn: qty * 80}),
+    cylinder({r: 5.2, start: [0, 0, bottom], end: [0, 0, top], fn: qty * 80})
   )
 }
