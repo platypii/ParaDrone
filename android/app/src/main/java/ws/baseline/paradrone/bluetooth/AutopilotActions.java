@@ -11,6 +11,9 @@ public class AutopilotActions {
     @NonNull
     private final BluetoothService bt;
 
+    public static final int MODE_IDLE = 0;
+    public static final int MODE_AP = 1;
+
     public AutopilotActions(@NonNull BluetoothService bt) {
         this.bt = bt;
     }
@@ -39,19 +42,19 @@ public class AutopilotActions {
             Timber.e("Invalid motor controls %d %d", left, right);
         }
         Timber.i("phone -> ap: set motor position %d %d", left & 0xff, right & 0xff);
-        sendCommand(new byte[] {'C', (byte) left, (byte) right});
+        sendCommand(new byte[] {'T', (byte) left, (byte) right});
     }
 
-    public void setMotorControls(int left, int right) {
+    public void setMotorSpeed(int left, int right) {
         if (left < -127 || left > 127 || right < -127 || right > 127) {
-            Timber.e("Invalid motor controls %d %d", left, right);
+            Timber.e("Invalid motor speed %d %d", left, right);
         }
-        Timber.i("phone -> ap: set motor controls %d %d", left, right);
-        sendCommand(new byte[] {'M', (byte) left, (byte) right});
+        Timber.i("phone -> ap: set motor speed %d %d", left, right);
+        sendCommand(new byte[] {'S', (byte) left, (byte) right});
     }
 
     public void fetchLandingZone() {
-        Timber.i("phone -> ap: fetch lz");
+        Timber.i("phone -> ap: fetch status");
         sendCommand(new byte[] {'Q'});
     }
 
@@ -63,6 +66,11 @@ public class AutopilotActions {
         final ByteBuffer buf = ByteBuffer.wrap(value).order(ByteOrder.LITTLE_ENDIAN);
         buf.putInt(1, freq);
         sendCommand(value);
+    }
+
+    public void setMode(int mode) {
+        Timber.i("phone -> ap: set mode %d", mode);
+        sendCommand(new byte[] {'M', (byte) mode});
     }
 
     private void sendCommand(byte[] value) {

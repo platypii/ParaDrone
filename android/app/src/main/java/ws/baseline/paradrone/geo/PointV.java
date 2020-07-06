@@ -5,8 +5,8 @@ import java.util.Locale;
 import timber.log.Timber;
 
 public class PointV extends Point {
-    public final double vx;
-    public final double vy;
+    public final double vx; // m/s
+    public final double vy; // m/s
 
     public PointV(double x, double y, double vx, double vy) {
         super(x, y);

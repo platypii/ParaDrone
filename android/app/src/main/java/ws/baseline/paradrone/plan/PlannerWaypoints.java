@@ -25,8 +25,17 @@ class PlannerWaypoints {
      */
     @NonNull
     static List<Path> viaWaypoints(Point3V loc, LandingZone lz) {
-        final List<Point3V> rightPattern = Arrays.asList(loc, lz.startOfDownwind(TURN_RIGHT), lz.startOfBase(TURN_RIGHT), lz.startOfFinal());
-        final List<Point3V> leftPattern = Arrays.asList(loc, lz.startOfDownwind(TURN_LEFT), lz.startOfBase(TURN_LEFT), lz.startOfFinal());
+        // Fly straight for 10s
+        final Point3V straight = new Point3V(
+                loc.x + 10 * loc.vx,
+                loc.y + 10 * loc.vy,
+                loc.alt + 10 * loc.climb,
+                loc.vx,
+                loc.vy,
+                loc.climb
+        );
+        final List<Point3V> rightPattern = Arrays.asList(straight, lz.startOfDownwind(TURN_RIGHT), lz.startOfBase(TURN_RIGHT), lz.startOfFinal());
+        final List<Point3V> leftPattern = Arrays.asList(straight, lz.startOfDownwind(TURN_LEFT), lz.startOfBase(TURN_LEFT), lz.startOfFinal());
 
         final List<Path> plans = new ArrayList<>();
         plans.addAll(searchPattern(loc, leftPattern));
