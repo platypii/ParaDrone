@@ -69,6 +69,10 @@ public class ControlView extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        if (!isEnabled()) {
+            return super.onTouchEvent(event);
+        }
+
         final int index = event.getActionIndex();
         final float x = event.getX(index);
         final float y = event.getY(index);

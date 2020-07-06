@@ -29,9 +29,14 @@ class PlannerDubins {
                 turnRadius
         );
         // Second dubins circle
+        final double dest_velocity = Math.hypot(dest.vx, dest.vy);
+        if (dest_velocity == 0) {
+            Timber.w("Zero velocity no tangent");
+            return null;
+        }
         final Circle c2 = new Circle(
-                dest.x + turn2 * turnRadius * dest.vy,
-                dest.y - turn2 * turnRadius * dest.vx,
+                dest.x + turn2 * turnRadius * dest.vy / dest_velocity,
+                dest.y - turn2 * turnRadius * dest.vx / dest_velocity,
                 turnRadius
         );
         // Delta of dubin circles

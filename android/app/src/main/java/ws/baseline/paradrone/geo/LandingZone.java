@@ -24,7 +24,7 @@ public class LandingZone {
         this.dest = new Point3V(
                 0,
                 0,
-                destination.alt,
+                0,
                 Math.sin(landingDirection),
                 Math.cos(landingDirection),
                 0
@@ -82,7 +82,7 @@ public class LandingZone {
         return new Point3V(
                 distance * Math.sin(bearing),
                 distance * Math.cos(bearing),
-                point.alt,
+                point.alt - destination.alt,
                 point.vE,
                 point.vN,
                 point.climb

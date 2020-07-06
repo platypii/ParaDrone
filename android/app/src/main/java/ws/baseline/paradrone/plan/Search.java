@@ -20,9 +20,8 @@ public class Search {
 
     public static Path search(Point3V loc, LandingZone lz) {
         // How much farther can we fly with available altitude?
-        final double alt_agl = loc.alt - lz.destination.alt;
-        final double turn_distance_remaining = Paramotor.flightDistanceRemaining(alt_agl - no_turns_below);
-        final double flight_distance_remaining = Paramotor.flightDistanceRemaining(alt_agl);
+        final double turn_distance_remaining = Paramotor.flightDistanceRemaining(loc.alt - no_turns_below);
+        final double flight_distance_remaining = Paramotor.flightDistanceRemaining(loc.alt);
 
         final PointV sof = lz.startOfFinal();
         final double r = Paramotor.turnRadius;
@@ -37,7 +36,7 @@ public class Search {
         final Path straightPath = straight(loc).fly(Math.min(1, flight_distance_remaining));
         final Path naivePath = naive(loc, sof, r);
 
-        if (alt_agl <= no_turns_below) {
+        if (loc.alt <= no_turns_below) {
             // No turns under 100ft
             return straightPath;
         } else if (distance > 1000 && naivePath != null) {
