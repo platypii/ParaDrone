@@ -8,6 +8,7 @@ import ws.baseline.paradrone.geo.SegmentLine;
 import ws.baseline.paradrone.geo.SegmentTurn;
 
 import androidx.annotation.Nullable;
+import timber.log.Timber;
 
 import static ws.baseline.paradrone.geo.Turn.TURN_LEFT;
 import static ws.baseline.paradrone.geo.Turn.TURN_RIGHT;
@@ -21,15 +22,22 @@ class PlannerNaive {
      */
     @Nullable
     static Path naive(PointV loc, PointV dest, double turnRadius) {
-        if (Math.hypot(loc.x - dest.x, loc.y - dest.y) < 2 * turnRadius) {
-            // Log.w(TAG, "Naive planner on top of lz");
+        final double velocity = Math.hypot(loc.vx, loc.vy);
+        if (velocity == 0) {
+            Timber.i("Zero velocity no tangent");
+            return null;
+        }
+        final double delta_x = dest.x - loc.x;
+        final double delta_y = dest.y - loc.y;
+        final double delta = Math.hypot(delta_x, delta_y);
+        if (delta < 2 * turnRadius) {
+            // Timber.w("Naive planner on top of lz");
             return null;
         }
         // Is dest on our left or right?
-        final double dot = (dest.y - loc.y) * loc.vx - (dest.x - loc.x) * loc.vy;
+        final double dot = delta_y * loc.vx - delta_x * loc.vy;
         final int turn1 = dot > 0 ? TURN_LEFT : TURN_RIGHT;
         // Compute path for naive
-        final double velocity = Math.hypot(loc.vx, loc.vy);
         final Circle c1 = new Circle(
                 loc.x + turn1 * turnRadius * loc.vy / velocity,
                 loc.y - turn1 * turnRadius * loc.vx / velocity,

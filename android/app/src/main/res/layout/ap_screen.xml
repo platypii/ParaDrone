@@ -74,7 +74,7 @@
                     android:layout_height="24dp"
                     android:layout_weight="1"
                     android:background="@drawable/bt_button_bg"
-                    android:text="RL"/>
+                    android:text="RC"/>
 
         </LinearLayout>
 

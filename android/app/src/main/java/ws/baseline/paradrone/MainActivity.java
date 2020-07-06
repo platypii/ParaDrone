@@ -20,6 +20,9 @@ import androidx.core.content.ContextCompat;
 import com.google.android.gms.maps.model.LatLng;
 import timber.log.Timber;
 
+import static ws.baseline.paradrone.bluetooth.AutopilotActions.MODE_AP;
+import static ws.baseline.paradrone.bluetooth.AutopilotActions.MODE_IDLE;
+
 public class MainActivity extends AppCompatActivity {
 
     private static final int PERMISSION_REQUEST_LOCATION = 2010;
@@ -81,11 +84,12 @@ public class MainActivity extends AppCompatActivity {
                     .show();
         });
 
-        binding.buttonUp.setOnClickListener((e) -> {
-            Services.bluetooth.actions.setMotorControls(-127, -127);
+        binding.setModeIdle.setOnClickListener((e) -> {
+            Services.bluetooth.actions.setMode(MODE_IDLE);
         });
-        binding.buttonDown.setOnClickListener((e) -> {
-            Services.bluetooth.actions.setMotorPosition(255, 255);
+
+        binding.setModeAp.setOnClickListener((e) -> {
+            Services.bluetooth.actions.setMode(MODE_AP);
         });
     }
 

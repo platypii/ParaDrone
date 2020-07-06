@@ -11,6 +11,7 @@ import timber.log.Timber;
 
 import static ws.baseline.paradrone.bluetooth.BluetoothPreferences.DeviceMode.AP;
 import static ws.baseline.paradrone.bluetooth.BluetoothPreferences.DeviceMode.RC;
+import static ws.baseline.paradrone.bluetooth.BluetoothState.BT_CONNECTED;
 import static ws.baseline.paradrone.bluetooth.BluetoothState.BT_CONNECTING;
 import static ws.baseline.paradrone.bluetooth.BluetoothState.BT_STARTED;
 import static ws.baseline.paradrone.bluetooth.BluetoothState.BT_STATES;
@@ -85,6 +86,10 @@ public class BluetoothService {
         return bluetoothState;
     }
 
+    public boolean isConnected() {
+        return bluetoothState == BT_CONNECTED;
+    }
+
     void setState(int state) {
         if (bluetoothState == BT_STOPPING && state == BT_CONNECTING) {
             Timber.e("Invalid bluetooth state transition: " + BT_STATES[bluetoothState] + " -> " + BT_STATES[state]);
@@ -101,7 +106,7 @@ public class BluetoothService {
         if (deviceMode == AP) {
             return "AP";
         } else {
-            return "RL";
+            return "RC";
         }
     }
 
