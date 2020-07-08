@@ -39,6 +39,7 @@ static void screen_draw() {
   char buf[80];
   Heltec.display->clear();
   Heltec.display->setFont(ArialMT_Plain_10);
+  Heltec.display->setTextAlignment(TEXT_ALIGN_LEFT);
 
   if (last_lat != 0 && last_lng != 0) {
     // Show last lat,lng to help find lost drone
@@ -52,15 +53,6 @@ static void screen_draw() {
   if (!isnan(last_alt)) {
     sprintf(buf, "Alt: %.0f m MSL", last_alt);
     Heltec.display->drawString(0, 10, buf);
-  }
-
-  // GPS lastfix
-  if (last_fix_millis >= 0) {
-    long delta = millis() - last_fix_millis;
-    Heltec.display->setTextAlignment(TEXT_ALIGN_RIGHT);
-    sprintd(buf, delta);
-    Heltec.display->drawString(DISPLAY_WIDTH, 10, buf);
-    Heltec.display->setTextAlignment(TEXT_ALIGN_LEFT);
   }
 
   if (last_packet_millis > 0) {
@@ -77,10 +69,22 @@ static void screen_draw() {
     }
   }
 
+  // GPS lastfix
+  Heltec.display->setTextAlignment(TEXT_ALIGN_RIGHT);
+  if (last_fix_millis >= 0) {
+    const long delta = millis() - last_fix_millis;
+    sprintd(buf, delta);
+    Heltec.display->drawString(DISPLAY_WIDTH, 10, buf);
+  }
+
   // Phone connected?
   if (bt_connected) {
-    Heltec.display->drawString(115, 54, "BT");
+    Heltec.display->drawString(DISPLAY_WIDTH, 54, "BT");
   }
+
+  // Battery level
+  sprintf(buf, "%d V", get_battery_level());
+  Heltec.display->drawString(DISPLAY_WIDTH, 44, buf);
 
   Heltec.display->display();
 }

@@ -28,6 +28,8 @@ void lora_init();
 void lora_loop();
 void lora_send(uint8_t *data, size_t len);
 
+short get_battery_level();
+
 /**
  * Message with just location.
  * sizeof 11

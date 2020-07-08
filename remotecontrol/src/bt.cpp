@@ -42,7 +42,7 @@ class RelayCharacteristic : public BLECharacteristicCallbacks {
 
 void bt_init() {
   // Init BLE
-  BLEDevice::init("ParaDroneRelay"); // Device name
+  BLEDevice::init("ParaDroneRC"); // Device name
   BLEServer *pServer = BLEDevice::createServer();
   pServer->setCallbacks(new RelayServer());
   BLEService *pService = pServer->createService(RELAY_SERVICE);

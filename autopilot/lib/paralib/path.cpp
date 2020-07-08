@@ -9,6 +9,9 @@
 #define PRINTF Serial.printf
 #endif
 
+/**
+ * Construct a new path object.
+ */
 Path *new_path(const char *name, uint8_t segment_count, Segment *segments[]) {
   if (segment_count <= 0) {
     PRINTF("Error: new_path segment_count %d\n", segment_count);
@@ -23,6 +26,7 @@ Path *new_path(const char *name, uint8_t segment_count, Segment *segments[]) {
   path->name = name;
   path->start = segment_start(segments[0]);
   path->end = segment_end(segments[segment_count - 1]);
+  // Copy segments to struct
   path->segment_count = segment_count;
   for (int i = 0; i < segment_count; i++) {
     path->segments[i] = segments[i];

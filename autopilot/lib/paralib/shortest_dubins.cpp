@@ -19,9 +19,9 @@ Path *shortest_dubins(PointV loc, PointV dest, double r) {
   };
   Path *shortest = shortest_path(paths);
   // Free non-shortest paths
-  for (int i = 0; i < paths.size(); i++) {
-    if (paths[i] != shortest) {
-      free_path(paths[i]);
+  for (const auto path : paths) {
+    if (path != shortest) {
+      free_path(path);
     }
   }
   return shortest;
@@ -33,11 +33,13 @@ Path *shortest_dubins(PointV loc, PointV dest, double r) {
 static Path *shortest_path(vector<Path*> paths) {
   Path *best = NULL;
   double best_score = INFINITY;
-  for (int i = 0; i < paths.size(); i++) {
-    const double score = path_length(paths[i]);
-    if (score < best_score) {
-      best = paths[i];
-      best_score = score;
+  for (const auto path : paths) {
+    if (path) {
+      const double score = path_length(path);
+      if (score < best_score) {
+        best = path;
+        best_score = score;
+      }
     }
   }
   return best;

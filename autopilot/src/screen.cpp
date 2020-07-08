@@ -91,13 +91,18 @@ static void screen_draw() {
   int prewidth = Heltec.display->getStringWidth(buf);
   sprintf(buf, "%d | %d", (short) motor_position_left, (short) motor_position_right);
   Heltec.display->drawString(DISPLAY_WIDTH / 2 - prewidth, 54, buf);
-  // Target position
-  if (motor_position_left != motor_target_left || motor_position_right != motor_target_right) {
-    sprintf(buf, "%d ", motor_target_left);
-    prewidth = Heltec.display->getStringWidth(buf);
-    sprintf(buf, "%d | %d", motor_target_left, motor_target_right);
-    Heltec.display->drawString(DISPLAY_WIDTH / 2 - prewidth, 44, buf);
-  }
+  // // Target position
+  // if (motor_position_left != motor_target_left || motor_position_right != motor_target_right) {
+  //   sprintf(buf, "%d ", motor_target_left);
+  //   prewidth = Heltec.display->getStringWidth(buf);
+  //   sprintf(buf, "%d | %d", motor_target_left, motor_target_right);
+  //   Heltec.display->drawString(DISPLAY_WIDTH / 2 - prewidth, 44, buf);
+  // }
+  // Motor current
+  sprintf(buf, "%.2fA ", motor_current_left);
+  prewidth = Heltec.display->getStringWidth(buf);
+  sprintf(buf, "%.2fA | %.2fA", motor_current_left, motor_current_right);
+  Heltec.display->drawString(DISPLAY_WIDTH / 2 - prewidth, 44, buf);
 
   // LoRa enabled?
   if (lora_enabled) {

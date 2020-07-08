@@ -5,6 +5,11 @@
 #include <stdlib.h>
 #include "gtypes.h"
 
+#define PARAMOTOR_GROUNDSPEED 11
+#define PARAMOTOR_DESCENTRATE 4
+#define PARAMOTOR_TURNRADIUS 100
+#define PARAMOTOR_GLIDE (PARAMOTOR_GROUNDSPEED / PARAMOTOR_DESCENTRATE)
+
 // Math
 double mod360(double degrees);
 double to_degrees(double radians);

@@ -56,9 +56,10 @@ Path *turn_fly(Turn *turn, const double distance) {
       turn->end.y - turn->turn * remaining * dx / turn->circle.radius
     };
     Line *line = new Line {'L', turn->end, extension};
-    Segment **segments = new Segment*[2];
-    segments[0] = segment_copy((Segment*) turn);
-    segments[1] = (Segment*) line;
+    Segment *segments[] = {
+      segment_copy((Segment*) turn),
+      (Segment*) line
+    };
     return new_path("turn-fly2", 2, segments);
   }
 }

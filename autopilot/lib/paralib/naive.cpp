@@ -40,8 +40,9 @@ Path *naive(PointV loc, PointV dest, double r) {
   // Construct path
   Turn *arc1 = new Turn {'T', {loc.x, loc.y}, comm1, c1, turn1};
   Line *line = new Line {'L', comm1, {dest.x, dest.y}};
-  Segment **segments = new Segment*[2];
-  segments[0] = (Segment *) arc1;
-  segments[1] = (Segment *) line;
+  Segment *segments[] = {
+    (Segment *) arc1,
+    (Segment *) line
+  };
   return new_path("naive", 2, segments);
 }

@@ -17,6 +17,8 @@ Path *naive(PointV loc, PointV dest, const double r);
 
 Path *dubins(PointV loc, PointV dest, double r, int turn1, int turn2);
 
-std::vector<Path*> via_waypoints(Point3V loc, LandingZone *lz);
+Path *shortest_dubins(PointV loc, PointV dest, double radius);
+
+std::vector<Path*> via_waypoints(Point3V loc, LandingZone *lz, double radius);
 
 #endif

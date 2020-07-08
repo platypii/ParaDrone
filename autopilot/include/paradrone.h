@@ -5,11 +5,6 @@
 #include "geo.h"
 #include "landingzone.h"
 
-#define PARAMOTOR_GROUNDSPEED 11
-#define PARAMOTOR_DESCENTRATE 4
-#define PARAMOTOR_TURNRADIUS 100
-#define PARAMOTOR_GLIDE (PARAMOTOR_GROUNDSPEED / PARAMOTOR_DESCENTRATE)
-
 // LoRa North America
 #define LORA_BAND 915E6
 
@@ -26,6 +21,9 @@ extern float motor_position_right;
 // Target motor position
 extern short motor_target_left;
 extern short motor_target_right;
+// Motor current
+extern float motor_current_left;
+extern float motor_current_right;
 
 // Screen
 void screen_init();

@@ -1,7 +1,7 @@
 #include <math.h>
 #include <stdio.h>
-#include "messages.h"
-#include "paradrone.h"
+#include "geo.h"
+#include "landingzone.h"
 
 LandingZone::LandingZone(double lat, double lng, double alt, double landingDir) {
   destination = {

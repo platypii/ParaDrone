@@ -5,28 +5,35 @@
 
 #define RC_SPEED_OVERRIDE_DURATION 3000
 
-void set_motor_speed_raw(const short left, const short right);
 static void update_position_estimate();
 static short speed(const float delta);
 static float normalize_position(float position);
 
+void set_motor_speed_raw(const short left, const short right);
+float get_motor_current_left();
+float get_motor_current_right();
+
 // Use shorts to avoid signed/unsigned overflow
 
-// Current best guess of position
+// Best guess of position
 // 0 = no deflection, 255 = full deflection
 float motor_position_left = 0;
-float motor_position_right = 0;
+float motor_position_right = 10;
 // TODO: Gaussian estimate
 
 // Target motor position
 // 0 = no deflection, 255 = full deflection
 short motor_target_left = 0;
-short motor_target_right = 0;
+short motor_target_right = 10;
 
 // Current motor speed
 // -255 = full speed up, 255 = full speed down
 float motor_speed_left = 0;
 float motor_speed_right = 0;
+
+// Motor current
+float motor_current_left = 0;
+float motor_current_right = 0;
 
 long last_update = -1;
 long last_speed_override = -1;
@@ -36,6 +43,10 @@ bool motor_running = false;
 // If the current position is not the target position, engage the motors
 void motor_loop() {
   update_position_estimate();
+
+  // Check motor feedback
+  motor_current_left = get_motor_current_left();
+  motor_current_right = get_motor_current_right();
 
   // Only update speed if it hasn't been overridden
   if (last_speed_override < 0 || millis() - last_speed_override > RC_SPEED_OVERRIDE_DURATION) {
@@ -97,8 +108,12 @@ static void update_position_estimate() {
  * @return motor speed in range -255..255
  */
 static short speed(const float delta) {
-  // Start slowing down when delta < 32
-  short speed = delta * 8;
+  // Start slowing down when delta < 23
+  short speed = delta * 10;
+  // Minimum speed 32
+  if (speed < 0) speed -= 32;
+  if (speed > 0) speed += 32;
+  // Max speed 255
   if (speed < -255) return -255;
   else if (speed > 255) return 255;
   else return speed;

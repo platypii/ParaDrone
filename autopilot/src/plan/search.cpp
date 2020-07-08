@@ -53,7 +53,7 @@ Path *search(Point3V loc3, LandingZone *lz, const double r) {
       naive_path,
       straight_path
     };
-    vector<Path*> ways = via_waypoints(loc3, lz);
+    vector<Path*> ways = via_waypoints(loc3, lz, PARAMOTOR_TURNRADIUS);
     plans.insert(plans.end(), ways.begin(), ways.end());
     // Fly path to ground
     for (int i = 0; i < plans.size(); i ++) {

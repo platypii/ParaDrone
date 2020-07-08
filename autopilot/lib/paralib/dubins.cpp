@@ -18,9 +18,14 @@ Path *dubins(PointV loc, PointV dest, double r, int turn1, int turn2) {
     .radius = r
   };
   // Second dubins circle
+  const double dest_velocity = hypot(dest.vx, dest.vy);
+  if (dest_velocity == 0) {
+    // printf("Zero dest velocity no tangent\n");
+    return NULL;
+  }
   Circle c2 = {
-    .x = dest.x + turn2 * r * dest.vy,
-    .y = dest.y - turn2 * r * dest.vx,
+    .x = dest.x + turn2 * r * dest.vy / dest_velocity,
+    .y = dest.y - turn2 * r * dest.vx / dest_velocity,
     .radius = r
   };
   // Delta of dubin circles
@@ -61,9 +66,10 @@ Path *dubins(PointV loc, PointV dest, double r, int turn1, int turn2) {
   Turn *arc1 = new Turn {'T', {loc.x, loc.y}, comm1, c1, turn1};
   Line *line = new Line {'L', comm1, comm2};
   Turn *arc2 = new Turn {'T', comm2, {dest.x, dest.y}, c2, turn2};
-  Segment **segments = new Segment*[3];
-  segments[0] = (Segment *) arc1;
-  segments[1] = (Segment *) line;
-  segments[2] = (Segment *) arc2;
+  Segment *segments[] = {
+    (Segment *) arc1,
+    (Segment *) line,
+    (Segment *) arc2
+  };
   return new_path("dubins", 3, segments);
 }

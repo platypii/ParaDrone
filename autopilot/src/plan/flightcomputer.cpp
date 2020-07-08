@@ -8,6 +8,8 @@
 // After 60 seconds of no GPS, revert to slow spiral
 #define GPS_EXPIRATION 60000
 
+static boolean autopilot_enabled = true;
+
 // last_fix_millis
 static long last_rc_millis = -10000; // Don't wait on reboot when millis = 0
 static Path *current_plan;
@@ -19,7 +21,7 @@ static bool rc_override() {
 }
 
 static bool gps_expired() {
-  return millis() - last_fix_millis < GPS_EXPIRATION;
+  return millis() - last_fix_millis > GPS_EXPIRATION;
 }
 
 static bool valid_point(GeoPointV * p) {
@@ -48,7 +50,7 @@ void rc_set_position(uint8_t new_left, uint8_t new_right) {
  * Called when autopilot updates the plan
  */
 void ap_set_position(uint8_t new_left, uint8_t new_right) {
-  if (!rc_override()) {
+  if (autopilot_enabled && !rc_override()) {
     set_motor_position(new_left, new_right);
   }
 }
@@ -77,7 +79,7 @@ void planner_update_location(GeoPointV *point) {
       ParaControls ctrl = path_controls(current_plan);
       ap_set_position(ctrl.left, ctrl.right);
       const double landing_error = hypot(current_plan->end.x, current_plan->end.y);
-      Serial.printf("Got plan length %f landing error %f\n", path_length(current_plan), landing_error);
+      Serial.printf("Plan length %.1fm error %.2f\n", path_length(current_plan), landing_error);
     } else {
       // Do nothing
     }
@@ -89,7 +91,7 @@ void planner_update_location(GeoPointV *point) {
  */
 void planner_loop() {
   // If its been X seconds since GPS, then put glider into slight right turn
-  if (gps_expired()) {
+  if (gps_expired() && !rc_override()) {
     ap_set_position(0, 10);
   }
 }
