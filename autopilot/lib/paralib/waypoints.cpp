@@ -14,8 +14,17 @@ static Path *cat_paths(Path *first, vector<Path*> paths);
  * In between each waypoint, follow the shortest dubins path.
  */
 vector<Path*> via_waypoints(Point3V loc, LandingZone *lz, double radius) {
-  vector<Point3V> right_pattern = {loc, lz->start_of_downwind(TURN_RIGHT), lz->start_of_base(TURN_RIGHT), lz->start_of_final()};
-  vector<Point3V> left_pattern = {loc, lz->start_of_downwind(TURN_LEFT), lz->start_of_base(TURN_LEFT), lz->start_of_final()};
+  // Fly straight for 10s
+  Point3V straight = {
+    loc.x + 10 * loc.vx,
+    loc.y + 10 * loc.vy,
+    loc.alt + 10 * loc.climb,
+    loc.vx,
+    loc.vy,
+    loc.climb
+  };
+  vector<Point3V> right_pattern = {straight, lz->start_of_downwind(TURN_RIGHT), lz->start_of_base(TURN_RIGHT), lz->start_of_final()};
+  vector<Point3V> left_pattern = {straight, lz->start_of_downwind(TURN_LEFT), lz->start_of_base(TURN_LEFT), lz->start_of_final()};
 
   vector<Path*> right_plans = search_pattern(loc, right_pattern, radius);
   vector<Path*> left_plans = search_pattern(loc, left_pattern, radius);

@@ -1,6 +1,5 @@
-#include <Arduino.h>
 #include <EEPROM.h>
-#include "heltec.h"
+#include <heltec.h>
 #include "paradrone.h"
 
 #define TIME_START long start_time = millis()

@@ -8,17 +8,20 @@
  * You will probably not arrive at your destination in the DIRECTION you want though.
  */
 Path *naive(PointV loc, PointV dest, double r) {
-  if (hypot(loc.x - dest.x, loc.y - dest.y) < 2 * r) {
-    // printf("Naive planner on top of lz");
-    return NULL;
-  }
   const double velocity = hypot(loc.vx, loc.vy);
   if (velocity == 0) {
     // printf("Zero velocity no tangent");
     return NULL;
   }
+  const double delta_x = dest.x - loc.x;
+  const double delta_y = dest.y - loc.y;
+  const double delta = hypot(delta_x, delta_y);
+  if (delta < 2 * r) {
+    // printf("Naive planner on top of lz");
+    return NULL;
+  }
   // Is dest on our left or right?
-  const double dot = (dest.y - loc.y) * loc.vx - (dest.x - loc.x) * loc.vy;
+  const double dot = delta_y * loc.vx - delta_x * loc.vy;
   const int turn1 = dot > 0 ? TURN_LEFT : TURN_RIGHT;
   Circle c1 = {
     .x = loc.x + turn1 * r * loc.vy / velocity,

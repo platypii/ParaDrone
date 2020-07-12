@@ -19,9 +19,8 @@ Path *search(Point3V loc3, LandingZone *lz, const double r) {
     .vx = loc3.vx,
     .vy = loc3.vy
   };
-  const double alt_agl = loc3.alt - lz->destination.alt;
-  const double turn_distance_remaining = flight_distance_remaining(alt_agl - ALT_NO_TURNS_BELOW);
-  const double fdr = flight_distance_remaining(alt_agl);
+  const double turn_distance_remaining = flight_distance_remaining(loc3.alt - ALT_NO_TURNS_BELOW);
+  const double fdr = flight_distance_remaining(loc3.alt);
 
   PointV dest = lz->start_of_final();
   const double distance = hypot(loc.x, loc.y);
@@ -39,7 +38,7 @@ Path *search(Point3V loc3, LandingZone *lz, const double r) {
   naive_path = path_fly_free(naive_path, turn_distance_remaining);
   naive_path = path_fly_free(naive_path, fdr);
 
-  if (alt_agl <= ALT_NO_TURNS_BELOW) {
+  if (loc3.alt <= ALT_NO_TURNS_BELOW) {
     // No turns under 100ft
     return straight_path;
   } else if (distance > 1000 && naive_path) {

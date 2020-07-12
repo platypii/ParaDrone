@@ -1,5 +1,5 @@
-#include "heltec.h"
-#include "relay.h"
+#include <heltec.h>
+#include "rc.h"
 
 #define MAX_PACKET_SIZE 20 // Same as BT
 #define PING_INTERVAL 30000
@@ -8,7 +8,7 @@ long last_packet_millis;
 int last_packet_rssi;
 float last_packet_snr;
 
-// How long since last ping sent by relay
+// How long since we last sent ping
 long last_ping_millis = 5000 - PING_INTERVAL; // Initial ping 5 seconds after startup
 
 double last_lat = 0;

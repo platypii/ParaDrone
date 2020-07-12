@@ -2,7 +2,7 @@
 #include <BLEDevice.h>
 #include <BLEUtils.h>
 #include <BLEServer.h>
-#include "relay.h"
+#include "rc.h"
 
 #define RELAY_SERVICE        "ba5e0003-ed55-43fa-bb54-8e721e092603"
 #define RELAY_CHARACTERISTIC "ba5e0004-be98-4de9-9e9a-080b5bb41404"

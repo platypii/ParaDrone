@@ -1,6 +1,6 @@
+#include <heltec.h>
 #include "messages.h"
 #include "paradrone.h"
-#include "heltec.h"
 
 static void lora_send_raw(uint8_t *msg, size_t size) {
   // long start_time = millis();

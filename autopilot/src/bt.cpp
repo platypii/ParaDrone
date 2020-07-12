@@ -32,22 +32,26 @@ class AutopilotCharacteristic : public BLECharacteristicCallbacks {
     };
     void onWrite(BLECharacteristic *pCharacteristic) {
       std::string value = pCharacteristic->getValue();
-      if (value[0] == 'C' && value.length() == 3) {
-        // Serial.printf("BT ctrl %d %d\n", value[1], value[2]);
-        rc_set_position(value[1], value[2]);
-      } else if (value[0] == 'M' && value.length() == 3) {
-        // Message is -127..127, speeds are -255..255
-        const short left = ((short)(int8_t) value[1]) * 2;
-        const short right = ((short)(int8_t) value[2]) * 2;
-        Serial.printf("BT %.1fs motor %d %d\n", millis() * 1e-3, left, right);
-        rc_set_speed(left, right);
-      } else if (value[0] == 'F' && value.length() == 5) {
+      if (value[0] == 'F' && value.length() == 5) {
         const int freq = *(int*)(value.c_str() + 1);
         Serial.printf("BT %.1fs set lora freq %f\n", millis() * 1e-3, freq * 1e-6);
         LoRa.setFrequency(freq);
+      } else if (value[0] == 'M' && value.length() == 2) {
+        const uint8_t mode = value[1];
+        Serial.printf("BT %.1fs mode %d\n", millis() * 1e-3, mode);
+        set_flight_mode(mode);
       } else if (value[0] == 'Q' && value.length() == 1) {
         // Send LZ in response
         bt_send_lz();
+      } else if (value[0] == 'S' && value.length() == 3) {
+        // Message is -127..127, speeds are -255..255
+        const short left = ((short)(int8_t) value[1]) * 2;
+        const short right = ((short)(int8_t) value[2]) * 2;
+        Serial.printf("BT %.1fs motor speed %d %d\n", millis() * 1e-3, left, right);
+        rc_set_speed(left, right);
+      } else if (value[0] == 'T' && value.length() == 3) {
+        // Serial.printf("BT toggle %d %d\n", value[1], value[2]);
+        rc_set_position(value[1], value[2]);
       } else if (value[0] == 'Z' && value.length() == 13) {
         set_landing_zone(value.c_str());
         screen_update();

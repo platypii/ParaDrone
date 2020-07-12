@@ -1,5 +1,5 @@
-#ifndef _RELAY_H
-#define _RELAY_H
+#ifndef _RC_H
+#define _RC_H
 
 // LoRa North America
 #define LORA_BAND 915E6
@@ -28,7 +28,7 @@ void lora_init();
 void lora_loop();
 void lora_send(uint8_t *data, size_t len);
 
-short get_battery_level();
+float get_battery_level();
 
 /**
  * Message with just location.

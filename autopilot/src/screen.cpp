@@ -1,4 +1,4 @@
-#include "heltec.h"
+#include <heltec.h>
 #include "paradrone.h"
 
 static bool should_redraw = false;
@@ -80,11 +80,18 @@ static void screen_draw() {
     const double bearing = geo_bearing(last_location->lat, last_location->lng, current_landing_zone->destination.lat, current_landing_zone->destination.lng);
     bearing2(buf + strnlen(buf, 20), to_degrees(bearing));
   } else if (current_landing_zone != NULL) {
-    sprintf(buf, "LZ: set");
+    sprintf(buf, "LZ: %.2f, %.2f, %.0fm", current_landing_zone->destination.lat, current_landing_zone->destination.lng, current_landing_zone->destination.alt);
   } else {
     sprintf(buf, "LZ:");
   }
   Heltec.display->drawString(0, 20, buf);
+
+  // Flight mode
+  if (flight_mode == MODE_IDLE) {
+    Heltec.display->drawString(0, 30, "Idle");
+  } else if (flight_mode == MODE_AP) {
+    Heltec.display->drawString(0, 30, "Auto");
+  }
 
   // Current motor position
   sprintf(buf, "%d ", (short) motor_position_left);

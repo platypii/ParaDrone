@@ -8,12 +8,17 @@
 // LoRa North America
 #define LORA_BAND 915E6
 
+// Flight modes
+#define MODE_IDLE 0
+#define MODE_AP 1
+
 // Global vars
 extern LandingZone *current_landing_zone;
 extern GeoPointV *last_location;
 extern long last_fix_millis;
 extern bool bt_connected;
 extern bool lora_enabled;
+extern uint8_t flight_mode;
 
 // Current motor position
 extern float motor_position_left;
@@ -68,6 +73,7 @@ void planner_update_location(GeoPointV *point);
 double plan_score(LandingZone *lz, Path *plan);
 
 // Flight computer
+void set_flight_mode(uint8_t mode);
 void rc_set_speed(const short new_left, const short new_right);
 void rc_set_position(uint8_t new_left, uint8_t new_right);
 

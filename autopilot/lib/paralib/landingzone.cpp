@@ -13,7 +13,7 @@ LandingZone::LandingZone(double lat, double lng, double alt, double landingDir) 
   dest = {
     .x = 0,
     .y = 0,
-    .alt = alt,
+    .alt = 0,
     .vx = sin(landingDirection),
     .vy = cos(landingDirection),
     .climb = 0
@@ -42,7 +42,7 @@ Point3V LandingZone::to_point3V(GeoPointV *loc) {
   Point3V point = {
     .x = distance * sin(bearing),
     .y = distance * cos(bearing),
-    .alt = loc->alt,
+    .alt = loc->alt - destination.alt,
     .vx = loc->vE,
     .vy = loc->vN,
     .climb = loc->climb

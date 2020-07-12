@@ -1,6 +1,6 @@
+#include <heltec.h>
 #include "messages.h"
 #include "paradrone.h"
-#include "heltec.h"
 
 #define MAX_PACKET_SIZE 20 // Same as BT
 
@@ -51,24 +51,27 @@ static void lora_read(int parse_len) {
     Serial.printf("LoRa %.1fs len %d %d\n", millis() * 1e-3, parse_len, buffer_len);
   }
 
-  if (buffer[0] == 'C' && buffer_len == 3) {
-    // Parse controls
-    uint8_t left = buffer[1];
-    uint8_t right = buffer[2];
-    rc_set_position(left, right);
-    Serial.printf("LoRa %.1fs ctrl %d %d\n", millis() * 1e-3, left, right);
-  } else if (buffer[0] == 'M' && buffer_len == 3) {
-    // Message is -127..127, speeds are -255..255
-    const short left = ((short)(int8_t) buffer[1]) * 2;
-    const short right = ((short)(int8_t) buffer[2]) * 2;
-    rc_set_speed(left, right);
-    Serial.printf("LoRa %.1fs motor %d %d\n", millis() * 1e-3, left, right);
+  if (buffer[0] == 'M' && buffer_len == 2) {
+    Serial.printf("LoRa %.1fs mode %d\n", millis() * 1e-3, buffer[1]);
+    set_flight_mode(buffer[1]);
   } else if (buffer[0] == 'P' && buffer_len == 1) {
     Serial.printf("LoRa %.1fs ping\n", millis() * 1e-3);
   } else if (buffer[0] == 'Q' && buffer_len == 1) {
     // Send LZ in response
     lora_send_lz();
     Serial.printf("LoRa %.1fs Q\n", millis() * 1e-3);
+  } else if (buffer[0] == 'S' && buffer_len == 3) {
+    // Message is -127..127, speeds are -255..255
+    const short left = ((short)(int8_t) buffer[1]) * 2;
+    const short right = ((short)(int8_t) buffer[2]) * 2;
+    rc_set_speed(left, right);
+    Serial.printf("LoRa %.1fs motor speed %d %d\n", millis() * 1e-3, left, right);
+  } else if (buffer[0] == 'T' && buffer_len == 3) {
+    // Parse controls
+    uint8_t left = buffer[1];
+    uint8_t right = buffer[2];
+    rc_set_position(left, right);
+    Serial.printf("LoRa %.1fs toggle %d %d\n", millis() * 1e-3, left, right);
   } else if (buffer[0] == 'Z' && buffer_len == 13) {
     set_landing_zone((char*) buffer);
     Serial.printf("LoRa %.1fs set lz\n", millis() * 1e-3);

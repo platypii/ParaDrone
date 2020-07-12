@@ -12,11 +12,11 @@ double flight_distance_remaining(const double alt) {
 /**
  * Return the angle between two velocity vectors (radians)
  */
-static double direction_error(PointV *a, PointV *b) {
+static double direction_error(PointV a, PointV b) {
   // Dot product
-  const double magA = hypot(a->vx, a->vy);
-  const double magB = hypot(b->vx, b->vy);
-  const double dot = (a->vx * b->vx + a->vy * b->vy) / (magA * magB);
+  const double magA = hypot(a.vx, a.vy);
+  const double magB = hypot(b.vx, b.vy);
+  const double dot = (a.vx * b.vx + a.vy * b.vy) / (magA * magB);
   if (dot >= 1) {
     return 0;
   } else if (dot <= -1) {
@@ -32,9 +32,9 @@ static double direction_error(PointV *a, PointV *b) {
 double plan_score(LandingZone *lz, Path *plan) {
   if (plan) {
     // LZ is at origin
-    const double distance = hypot(plan->end.x, plan->end.y);
-    // const double angle_error = 100 * direction_error(lz->dest, plan->end);
-    return distance;
+    const double distance_error = hypot(plan->end.x, plan->end.y);
+    const double angle_error = 15 * direction_error(lz->dest, plan->end);
+    return distance_error + angle_error;
   } else {
     return 100000;
   }

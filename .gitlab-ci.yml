@@ -10,7 +10,7 @@ autopilot:
     paths:
       - .pio/libdeps
 
-relay:
+rc:
   stage: build
   image: baselinews/paradrone:platformio
   script:

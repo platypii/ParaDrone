@@ -1,8 +1,8 @@
 #include <Arduino.h>
 #include "paradrone.h"
 
-#define GPS_TX 12 // white GPS output
-#define GPS_RX 36 // green GPS input
+#define GPS_TX 13 // white GPS output
+#define GPS_RX 32 // green GPS input
 
 GeoPointV *last_location;
 long last_fix_millis = -1;

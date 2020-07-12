@@ -1,6 +1,5 @@
-#include <Arduino.h>
-#include "heltec.h"
-#include "relay.h"
+#include <heltec.h>
+#include "rc.h"
 
 void setup() {
   Heltec.begin(

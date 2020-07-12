@@ -1,5 +1,5 @@
-#include "heltec.h"
-#include "relay.h"
+#include <heltec.h>
+#include "rc.h"
 
 static boolean should_redraw = false;
 static long last_redraw_millis = -1;
@@ -83,7 +83,7 @@ static void screen_draw() {
   }
 
   // Battery level
-  sprintf(buf, "%d V", get_battery_level());
+  sprintf(buf, "%.0f%%", 100 * get_battery_level());
   Heltec.display->drawString(DISPLAY_WIDTH, 44, buf);
 
   Heltec.display->display();

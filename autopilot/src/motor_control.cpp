@@ -1,16 +1,19 @@
-#include <Arduino.h>
-#include "heltec.h"
+#include <heltec.h>
 
 // Right motor
-#define PIN_M1_IN1 2
-#define PIN_M1_IN2 17
+#define PIN_M1_IN1 23
+#define PIN_M1_IN2 22
 // Left motor
-#define PIN_M2_IN1 22
-#define PIN_M2_IN2 23
+#define PIN_M2_IN1 17
+#define PIN_M2_IN2 2
 
 // Current sense
-#define PIN_M1_FB 33
-#define PIN_M2_FB 32
+#define PIN_M1_FB 39
+#define PIN_M2_FB 35
+
+// Status flag
+#define PIN_M1_SF 38
+#define PIN_M2_SF 34
 
 // ESP32 PWM channels
 #define CHANNEL_M1_IN1 0
