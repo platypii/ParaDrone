@@ -35,6 +35,9 @@ export function distance(lat1: number, lng1: number, lat2: number, lng2: number)
 
   return R * c
 }
+export function distancePoint(ll1: LatLng, ll2: LatLng): number {
+  return distance(ll1.lat, ll1.lng, ll2.lat, ll2.lng)
+}
 
 /**
  * Moves the location along a bearing (degrees) by a given distance (meters)

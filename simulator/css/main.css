@@ -16,16 +16,41 @@ body {
 }
 
 h1 {
-  margin-bottom: 0;
   margin-top: 0;
+  margin-bottom: 10px;
+  text-align: center;
+  color: #6b39a7;
+  font-weight: normal;
+}
+h2, h3 {
+  margin-bottom: 0;
+  margin-top: 10px;
+}
+input {
+  border: 1px solid #ccc;
+  border-radius: 2px;
+  padding: 3px;
+}
+input:focus {
+  outline: none;
+  border: 1px solid #888;
+}
+input[type=checkbox] {
+  cursor: pointer;
+}
+
+label {
+  font-weight: bold;
+  display: block;
+  color: #333;
 }
 
 .btn,
 .btn:active {
-  border: 1px solid #111;
+  border: 1px solid #aaa;
   border-radius: 4px;
-  background-color: #ddd;
-  color: #111;
+  background-color: #e6e6e6;
+  color: #333;
   font-weight: bold;
   padding-top: 8px;
   padding-bottom: 8px;
@@ -46,6 +71,22 @@ h1 {
 
 .sidebar-section {
   margin-bottom: 20px;
+}
+
+.sidebar-header {
+  background-color: #eee;
+  color: #222;
+  font-weight: bold;
+  position: relative;
+  padding: 4px;
+  margin-left: -10px;
+  margin-right: -10px;
+  margin-bottom: 4px;
+}
+.sidebar-header input[type=checkbox] {
+  display: inline-block;
+  position: absolute;
+  right: 4px;
 }
 
 .map-container {
@@ -75,4 +116,22 @@ h1 {
 .ap-status {
   color: #1ce;
   min-width: 170px;
+}
+
+.param {
+  display: inline-block;
+  width: 49%;
+}
+.param input {
+  width: 50%;
+}
+
+#plan-error, #sim-error {
+  float: right;
+}
+.plan-header {
+  border-right: 4px solid #3c3;
+}
+.sim-header {
+  border-right: 4px solid #c33;
 }

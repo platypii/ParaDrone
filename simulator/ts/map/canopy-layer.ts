@@ -35,7 +35,7 @@ export class CanopyLayer implements MapLayer {
           orientation: this.orientation(),
           model: {
             uri: "img/paraglider.glb",
-            scale: 0.03
+            scale: 0.02
           }
         })
       } else if (this.entity) {
@@ -59,7 +59,7 @@ export class CanopyLayer implements MapLayer {
       const heading = Math.atan2(this.loc.vE, this.loc.vN) - Math.PI / 2
       const pitch = 0
       const roll = 0
-      return Cesium.Transforms.headingPitchRollQuaternion(this.position(), new Cesium.HeadingPitchRoll(heading, pitch, roll));
+      return Cesium.Transforms.headingPitchRollQuaternion(this.position(), new Cesium.HeadingPitchRoll(heading, pitch, roll))
     } else {
       return Cesium.Cartesian3.ZERO
     }

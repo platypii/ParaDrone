@@ -6,14 +6,14 @@ import { ParaControls } from "./paracontrols"
 
 export class Paramotor {
   // Constants
-  public static readonly turnRadius = 50 // Turn radius in meters with 1 toggle buried
-  // public static readonly yawRate = toDegrees(velocity / turnRadius) // Yaw degrees per second with 1 toggle buried
-  public static readonly climbRate = -3 // Meters of altitude lost per second
-  public static readonly groundSpeed = 12 // Meters per second
-  public static readonly glide = -Paramotor.groundSpeed / Paramotor.climbRate
+  public readonly turnRadius = 50 // Turn radius in meters with 1 toggle buried
+  // public readonly yawRate = toDegrees(velocity / turnRadius) // Yaw degrees per second with 1 toggle buried
+  public readonly climbRate = -3 // Meters of altitude lost per second
+  public readonly groundSpeed = 12 // Meters per second
+  public readonly glide = -this.groundSpeed / this.climbRate
 
   // State
-  public loc?: GeoPointV
+  public loc: GeoPointV = {} as GeoPointV
   public pitch: number = 0
   public roll: number = 0
 
@@ -60,9 +60,9 @@ export class Paramotor {
       const vel = Math.hypot(this.loc.vE, this.loc.vN)
       const distance = vel * dt
       const control = this.controls.right - this.controls.left // [-1, 1]
-      const toggle_yaw = distance * control / Paramotor.turnRadius
+      const toggle_yaw = distance * control / this.turnRadius
       const bearing = toDegrees(Math.atan2(this.loc.vE, this.loc.vN) + toggle_yaw)
-      // TODO: Adjust climb toward Paramotor.climbRate based on gravity or WSE
+      // TODO: Adjust climb toward climbRate based on gravity or WSE
       // Move lat,lng by distance and bearing
       const moved = geo.moveBearing(this.loc.lat, this.loc.lng, bearing, distance)
       this.loc.lat = moved.lat
@@ -77,9 +77,9 @@ export class Paramotor {
   /**
    * Return the horizontal distance we could cover until landing
    */
-  public static flightDistanceRemaining(alt: number): number {
-    const timeToGround = -alt / Paramotor.climbRate
-    return Paramotor.groundSpeed * timeToGround
+  public flightDistanceRemaining(alt: number): number {
+    const timeToGround = -alt / this.climbRate
+    return this.groundSpeed * timeToGround
   }
 
 }

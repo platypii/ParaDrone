@@ -1,4 +1,4 @@
-import { LatLng } from "../dtypes"
+import { LatLng, LatLngAlt } from "../dtypes"
 import { toDegrees } from "../geo/trig"
 
 interface MapOptions {
@@ -34,6 +34,8 @@ export class BaseMap {
 
   constructor(options: MapOptions) {
     this.map = new Cesium.Viewer(options.element, cesiumOptions)
+    this.map.terrainProvider = Cesium.createWorldTerrain()
+    this.map.scene.globe.depthTestAgainstTerrain = true
     if (options.center) {
       this.map.camera.setView({
         destination: Cesium.Cartesian3.fromDegrees(options.center.lng, options.center.lat, 4000)
@@ -41,10 +43,31 @@ export class BaseMap {
     }
   }
 
-  public onClick(cb: (e: LatLng) => void) {
-    this.map.canvas.addEventListener("click", (e) => {
+  public onClick(cb: (e: LatLngAlt) => void) {
+    this.map.canvas.addEventListener("click", (e: any) => {
       if (!e.ctrlKey && !e.shiftKey) {
-        const carte = this.map.camera.pickEllipsoid(e)
+        const xy = new Cesium.Cartesian2(e.layerX, e.layerY)
+        const carte = this.map.camera.pickEllipsoid(xy)
+        if (carte) {
+          const ellipsoid = this.map.scene.globe.ellipsoid
+          const carto = ellipsoid.cartesianToCartographic(carte)
+          const ll = {
+            lat: toDegrees(carto.latitude),
+            lng: toDegrees(carto.longitude),
+            alt: carto.height
+          }
+          cb(ll)
+        }
+      }
+    })
+  }
+
+  public onMouseMove(cb: (e: LatLngAlt) => void) {
+    this.map.canvas.addEventListener("mousemove", (e: any) => {
+      if (!e.ctrlKey && !e.shiftKey) {
+        const xy = new Cesium.Cartesian2(e.layerX, e.layerY)
+        // const carte = this.map.camera.pickEllipsoid(xy)
+        const carte = this.map.scene.pickPosition(xy)
         if (carte) {
           const ellipsoid = this.map.scene.globe.ellipsoid
           const carto = ellipsoid.cartesianToCartographic(carte)

@@ -14,6 +14,7 @@ declare module Cesium {
     constructor(r: number, g: number, b: number, a: number)
   }
   export class Cartesian2 {
+    constructor(x: number, y: number)
   }
   export class Cartesian3 {
     static ZERO: Cartesian3
@@ -60,6 +61,7 @@ declare module Cesium {
   export class Scene {
     globe: Globe
     primitives: any
+    pickPosition(windowPosition: Cartesian2): Cartesian3
   }
   export class BillboardCollection {
     add(primitive: any, index?: number): any

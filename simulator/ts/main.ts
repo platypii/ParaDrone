@@ -1,23 +1,31 @@
 import { GeoPointV, LatLngAlt } from "./dtypes"
-import { getPlan } from "./flightcomputer"
 import * as geo from "./geo/geo"
-import { kpow } from "./geo/landingzone"
+import { defaultLz } from "./geo/landingzone"
 import { DroneMap } from "./map/drone-map"
+import { MarkerLayer } from "./map/marker-layer"
 import { Paramotor } from "./paramotor"
+import { search } from "./plan/search"
 import * as player from "./player"
 import { sim } from "./sim"
 import * as test from "./test"
 import { distance } from "./util"
 
-const lz = kpow
+const lz = defaultLz
+const para = new Paramotor()
 
 let start: GeoPointV
 let loc: GeoPointV
 let map: DroneMap
 
+const planEnabled = document.getElementById("plan-enabled") as HTMLInputElement
+const planName = document.getElementById("plan-name") as HTMLElement
+const planError = document.getElementById("plan-error") as HTMLElement
+const simEnabled = document.getElementById("sim-enabled") as HTMLInputElement
+const simError = document.getElementById("sim-error") as HTMLElement
+
 export function init() {
   // Setup map
-  map = new DroneMap()
+  map = new DroneMap(lz)
   map.setState({lz})
   map.onClick((e) => {
     player.stop()
@@ -27,6 +35,15 @@ export function init() {
       alt: 800 // TODO: Get elevation
     })
   })
+  const hoverLayer = new MarkerLayer("hover", "img/pin.svg")
+  map.addLayer(hoverLayer)
+  map.onMouseMove((e) => {
+    // console.log("WTF", e)
+    // TODO: Show billboard
+    hoverLayer.setLocation(e)
+  })
+  planEnabled.onclick = update
+  simEnabled.onclick = update
   test.init()
   update()
 }
@@ -38,8 +55,8 @@ function setStart(latlng: LatLngAlt) {
     lng: latlng.lng,
     alt: latlng.alt,
     vN: 0,
-    vE: Paramotor.groundSpeed,
-    climb: Paramotor.climbRate
+    vE: para.groundSpeed, // TODO: handle init 0
+    climb: para.climbRate // TODO: handle init 0
   }
 
   // Update UI
@@ -58,26 +75,34 @@ function setStart(latlng: LatLngAlt) {
  */
 function update() {
   if (loc) {
+    para.setLocation(loc)
     // Compute full plan
     const alt_agl = loc.alt - lz.destination.alt
-    const plan = getPlan(loc, lz)
-    const rendered = plan.render3(alt_agl)
+    const plan = search(lz, para)
+    const rendered = plan.render3(para, alt_agl)
       .map((p) => lz.toLatLngAlt(p))
-    const simsteps = sim(start, lz)
-    const actual = simsteps.map((s) => s.loc)
-    // const actual: any[] = []
+    const plan_error = distance(plan.end, lz.dest)
+    planName.innerText = plan.name
+    planError.innerText = `${plan_error.toFixed(1)}m`
+
+    // Simulate forward
+    let actual: GeoPointV[] = []
+    if (simEnabled.checked) {
+      const simsteps = sim(start, lz)
+      actual = simsteps.map((s) => s.loc)
+      const sim_error = geo.distancePoint(actual[actual.length - 1], lz.destination)
+      simError.innerText = `${sim_error.toFixed(1)}m`
+    } else {
+      simError.innerHTML = "&nbsp;"
+    }
 
     // Update map
     map.setState({
       current: loc,
-      plan: rendered,
+      plan: planEnabled.checked ? rendered : [],
       lz,
       actual
     })
-
-    const error = distance(plan.end, lz.dest)
-    document.getElementById("pstatus-name")!.innerText = "Plan: " + plan.name
-    document.getElementById("pstatus-error")!.innerText = `Error: ${error.toFixed(1)} m`
   }
   updateApScreen()
 }

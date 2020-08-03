@@ -1,7 +1,7 @@
 import { GeoPointV } from "./dtypes"
-import { getPlan } from "./flightcomputer"
 import { LandingZone } from "./geo/landingzone"
 import { Paramotor } from "./paramotor"
+import { search } from "./plan/search"
 
 const interval = 80
 
@@ -11,7 +11,7 @@ export function start(loc: GeoPointV, lz: LandingZone, listener: (loc: GeoPointV
   const paramotor = new Paramotor()
   paramotor.setLocation(loc)
   player = setInterval(() => {
-    const ctrl = getPlan(paramotor.loc!, lz).controls()
+    const ctrl = search(lz, paramotor).controls()
     paramotor.setControls(ctrl)
     paramotor.tick(1)
     if (paramotor.landed(lz)) {
