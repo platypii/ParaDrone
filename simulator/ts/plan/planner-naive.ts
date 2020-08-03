@@ -2,6 +2,7 @@ import { Point, PointV, Turn } from "../dtypes"
 import { Path } from "../geo/paths"
 import { SegmentLine } from "../geo/segment-line"
 import { SegmentTurn } from "../geo/segment-turn"
+import { toRadians } from "../geo/trig"
 import { Paramotor } from "../paramotor"
 import { distance } from "../util"
 
@@ -11,23 +12,31 @@ import { distance } from "../util"
  * You will probably not arrive at your destination in the DIRECTION you want though.
  */
 export function naive(loc: PointV, dest: Point, r: number): Path | undefined {
-  if (Math.hypot(loc.x - dest.x, loc.y - dest.y) < 2 * r) {
-    // On top of LZ, no naive path to destination
-    return undefined
-  }
-  // Compute path for naive
   const velocity = Math.hypot(loc.vx, loc.vy)
   if (velocity === 0) {
     // console.log("Zero velocity no tangent")
     return undefined
   }
+  const delta_x = dest.x - loc.x
+  const delta_y = dest.y - loc.y
+  const delta = Math.hypot(delta_x, delta_y)
+  if (delta < 2 * r) {
+    // On top of LZ, let planner fallback to straight plan
+    // There is an unreachable area which is a subset of delta < 2r.
+    return undefined
+  }
+  // If we are within epislon of on-target, return straight line
+  if (approximatelyParallel(loc.vx / velocity, loc.vy / velocity, delta_x / delta, delta_y / delta)) {
+    // console.log("approximately parallel")
+    return undefined
+  }
   // Is dest on our left or right?
-  const dot = (dest.y - loc.y) * loc.vx - (dest.x - loc.x) * loc.vy
+  const dot = delta_y * loc.vx - delta_x * loc.vy
   const turn1 = dot > 0 ? Turn.Left : Turn.Right
   const c1 = {
     x: loc.x + turn1 * r * loc.vy / velocity,
     y: loc.y - turn1 * r * loc.vx / velocity,
-    radius: Paramotor.turnRadius
+    radius: r
   }
   // Angle from circle center to target
   const center_angle = Math.atan2(dest.x - c1.x, dest.y - c1.y)
@@ -44,4 +53,17 @@ export function naive(loc: PointV, dest: Point, r: number): Path | undefined {
   const turn = new SegmentTurn(c1, loc, comm1, turn1)
   const line = new SegmentLine(comm1, dest)
   return new Path("naive", turn, line)
+}
+
+// If we are within angleError of on-target, return straight line
+const angleError = toRadians(2) // radians
+const angleErrorUnitDistance = 2 * Math.sin(angleError)
+/**
+ * A fast function to tell you if two vectors are within angleError radians of each other.
+ * Vectors must be unit!
+ */
+function approximatelyParallel(x1: number, y1: number, x2: number, y2: number): boolean {
+  const dx = x1 - x2
+  const dy = y1 - y2
+  return dx * dx + dy * dy < angleErrorUnitDistance * angleErrorUnitDistance
 }

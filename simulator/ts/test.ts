@@ -1,5 +1,6 @@
 import { GeoPoint } from "./dtypes"
 import { kpow, LandingZone } from "./geo/landingzone"
+import { Paramotor } from "./paramotor"
 import { LandingScore, landing_score } from "./plan/planner"
 import { sim } from "./sim"
 

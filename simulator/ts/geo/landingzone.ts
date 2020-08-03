@@ -34,42 +34,42 @@ export class LandingZone {
   /**
    * Landing pattern: start of final approach
    */
-  public startOfFinal(): Point3V {
+  public startOfFinal(para: Paramotor): Point3V {
     return {
       x: -this.finalDistance * this.dest.vx,
       y: -this.finalDistance * this.dest.vy,
-      alt: this.dest.alt + this.finalDistance / Paramotor.glide,
+      alt: this.dest.alt + this.finalDistance / para.glide,
       vx: this.dest.vx,
       vy: this.dest.vy,
-      climb: Paramotor.climbRate
+      climb: para.climbRate
     }
   }
 
   /**
    * Landing pattern: start of base leg
    */
-  public startOfBase(turn: Turn): Point3V {
+  public startOfBase(para: Paramotor, turn: Turn): Point3V {
     return {
       x: this.finalDistance * (-this.dest.vx + turn * this.dest.vy),
       y: this.finalDistance * (-turn * this.dest.vx - this.dest.vy),
-      alt: this.dest.alt + 2 * this.finalDistance / Paramotor.glide, // TODO: Doesn't account for turns
+      alt: this.dest.alt + 2 * this.finalDistance / para.glide, // TODO: Doesn't account for turns
       vx: -this.dest.vx,
       vy: -this.dest.vy,
-      climb: Paramotor.climbRate
+      climb: para.climbRate
     }
   }
 
   /**
    * Landing pattern: start of downwind leg
    */
-  public startOfDownwind(turn: Turn): Point3V {
+  public startOfDownwind(para: Paramotor, turn: Turn): Point3V {
     return {
       x: this.finalDistance * turn * this.dest.vy,
       y: -this.finalDistance * turn * this.dest.vx,
-      alt: this.dest.alt + 3 * this.finalDistance / Paramotor.glide, // TODO: Doesn't account for turns
+      alt: this.dest.alt + 3 * this.finalDistance / para.glide, // TODO: Doesn't account for turns
       vx: -this.dest.vx,
       vy: -this.dest.vy,
-      climb: Paramotor.climbRate
+      climb: para.climbRate
     }
   }
 
@@ -125,3 +125,7 @@ export class LandingZone {
 }
 
 export const kpow = new LandingZone({lat: 47.239, lng: -123.143, alt: 84}, toRadians(32))
+// export const chelan = new LandingZone({lat: 47.864, lng: -119.944, alt: 378}, 0) // chelan
+// export const milehi = new LandingZone({lat: 40.162, lng: -105.164, alt: 1535}, 0) // mile hi
+
+export const defaultLz = new LandingZone({lat: 47.864, lng: -119.944, alt: 378}, 0) // chelan

@@ -15,12 +15,16 @@ const no_turns_below = 30 // meters
 /**
  * Search across a set of path plans
  */
-export function search(loc: Point3V, lz: LandingZone): Path {
+export function search(lz: LandingZone, para: Paramotor): Path {
+  const loc = lz.toPoint3V(para.loc)
+  if (isNaN(loc.x)) {
+    throw new Error("invalid location")
+  }
   // How much farther can we fly with available altitude?
-  const flight_distance_remaining = Paramotor.flightDistanceRemaining(loc.alt)
+  const flight_distance_remaining = para.flightDistanceRemaining(loc.alt)
 
-  const dest = lz.startOfFinal()
-  const r = Paramotor.turnRadius
+  const dest = lz.startOfFinal(para)
+  const r = para.turnRadius
   const dist = Math.hypot(loc.x, loc.y)
 
   if (loc.vx === 0 && loc.vy === 0) {
@@ -37,33 +41,36 @@ export function search(loc: Point3V, lz: LandingZone): Path {
     return straightPath
   } else if (dist > 1000) {
     const naivePath = naive(loc, dest, r) || straightPath
-    return apply_turn_distance(naivePath, loc.alt)
+    return apply_turn_distance(para, naivePath, loc.alt)
   } else {
     const paths = [
-      ...viaWaypoints(loc, lz),
+      ...viaWaypoints(loc, lz, para),
       // dubins(loc, dest, r, Turn.Right, Turn.Right), // rsr
       // dubins(loc, dest, r, Turn.Right, Turn.Left), // rsl
       // dubins(loc, dest, r, Turn.Left, Turn.Right), // lsr
       // dubins(loc, dest, r, Turn.Left, Turn.Left), // lsl
-      // shortestDubins(loc, dest, Paramotor.turnRadius),
+      // shortestDubins(loc, dest, para.turnRadius),
       // naive(loc, dest, r),
       straightPath
     ]
     .filter((path): path is Path => !!path)
-    .map((p) => apply_turn_distance(p, loc.alt))
+    .map((p) => apply_turn_distance(para, p, loc.alt))
     return best_plan(lz, paths) || straightPath
   }
 }
 
-function apply_turn_distance(path: Path, alt_agl: number): Path {
+/**
+ * Fly until we are at no_turns_below altitude, and then fly straight
+ */
+function apply_turn_distance(para: Paramotor, path: Path, alt_agl: number): Path {
   if (alt_agl <= 0) {
     console.error("Grounded")
   }
   if (alt_agl <= no_turns_below) {
     console.error("No turns", alt_agl)
   }
-  const turn_distance_remaining = Paramotor.flightDistanceRemaining(alt_agl - no_turns_below)
-  const flight_distance_remaining = Paramotor.flightDistanceRemaining(alt_agl)
+  const turn_distance_remaining = para.flightDistanceRemaining(alt_agl - no_turns_below)
+  const flight_distance_remaining = para.flightDistanceRemaining(alt_agl)
   return path.fly(turn_distance_remaining).fly(flight_distance_remaining)
 }
 

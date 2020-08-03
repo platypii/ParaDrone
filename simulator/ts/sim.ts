@@ -1,8 +1,8 @@
 import { GeoPoint, GeoPointV } from "./dtypes"
-import { getPlan } from "./flightcomputer"
 import { LandingZone } from "./geo/landingzone"
 import { Paramotor } from "./paramotor"
 import { LandingScore, landing_score } from "./plan/planner"
+import { search } from "./plan/search"
 
 interface SimStep {
   loc: GeoPointV
@@ -13,23 +13,24 @@ interface SimStep {
  * Run a simulation and return the list of points
  */
 export function sim(start: GeoPoint, lz: LandingZone): SimStep[] {
+  const para = new Paramotor()
   const startV = {
     ...start,
     vN: 0,
-    vE: Paramotor.groundSpeed,
-    climb: Paramotor.climbRate
+    vE: para.groundSpeed,
+    climb: para.climbRate
   }
-  const paramotor = new Paramotor()
-  paramotor.setLocation(startV)
+  para.setLocation(startV)
 
   const actual: SimStep[] = []
-  while (!paramotor.landed(lz)) {
-    const plan = getPlan(paramotor.loc!, lz)
-    paramotor.setControls(plan.controls())
-    paramotor.tick(1)
-    if (paramotor.loc) {
+  while (!para.landed(lz)) {
+    const plan = search(lz, para)
+    // TODO: Simulate motor input
+    para.setControls(plan.controls())
+    para.tick(1)
+    if (para.loc) {
       const error = 0
-      actual.push({loc: {...paramotor.loc}, score: landing_score(lz, plan.end)})
+      actual.push({loc: {...para.loc}, score: landing_score(lz, plan.end)})
     }
   }
   return actual

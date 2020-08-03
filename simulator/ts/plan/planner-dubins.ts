@@ -7,6 +7,9 @@ import { SegmentTurn } from "../geo/segment-turn"
  * Find dubins path
  */
 export function dubins(loc: PointV, dest: PointV, r: number, turn1: Turn, turn2: Turn): Path | undefined {
+  if (isNaN(loc.x)) {
+    throw new Error("invalid location")
+  }
   // First dubins circle, perpendicular to velocity
   const velocity = Math.hypot(loc.vx, loc.vy)
   if (velocity === 0) {

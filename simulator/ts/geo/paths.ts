@@ -34,14 +34,14 @@ export class Path {
     return ([] as Point[]).concat(...this.segments.map((s) => s.render()))
   }
 
-  public render3(startAlt: number): Point3V[] {
+  public render3(para: Paramotor, startAlt: number): Point3V[] {
     // Render and compute altitudes
     let alt = startAlt
     let lastPoint: Point
     return this.render().map((p) => {
       if (lastPoint) {
         const lastDistance = Math.hypot(p.x - lastPoint.x, p.y - lastPoint.y)
-        alt -= lastDistance / Paramotor.glide
+        alt -= lastDistance / para.glide
       }
       lastPoint = p
       return {
@@ -49,7 +49,7 @@ export class Path {
         alt,
         vx: 0,
         vy: 0,
-        climb: Paramotor.climbRate
+        climb: para.climbRate
       }
     })
   }
@@ -70,7 +70,7 @@ export class Path {
       const segmentLength = segment.length()
       if (distance < flown + segmentLength) {
         // End point is within segment
-        break;
+        break
       } else {
         trimmed.push(segment)
         flown += segmentLength

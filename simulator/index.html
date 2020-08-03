@@ -10,8 +10,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#6b00ff">
     <link rel="stylesheet" href="css/main.css">
-    <script src="https://cesium.com/downloads/cesiumjs/releases/1.71/Build/Cesium/Cesium.js"></script>
-    <link rel="stylesheet" href="https://cesium.com/downloads/cesiumjs/releases/1.71/Build/Cesium/Widgets/widgets.css">
+    <script src="https://cesium.com/downloads/cesiumjs/releases/1.74/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://cesium.com/downloads/cesiumjs/releases/1.74/Build/Cesium/Widgets/widgets.css">
   </head>
 
   <body>
@@ -19,17 +19,54 @@
       <div class="sidebar">
         <h1>ParaDrone</h1>
 
-        <h2>Status</h2>
         <div class="sidebar-section">
-          <div class="paramotor-status">
-            <div id="pstatus-name"></div>
-            <div id="pstatus-error"></div>
-            <svg id="error-chart"></svg>
+          <div class="sidebar-header">
+            Params
+          </div>
+          <label title="Values used by the path planner">Expected</label>
+          <div class="param">
+            Vx <input type="number" step="0.1" id="expected-vx" value="4"> m/s
+          </div>
+          <div class="param">
+            Vy <input type="number" step="0.1" id="expected-vy" value="1"> m/s
+          </div>
+          <label title="Values used by the simulator">Actual</label>
+          <div class="param">
+            Vx <input type="number" step="0.1" id="actual-vx" value="4"> m/s
+          </div>
+          <div class="param">
+            Vy <input type="number" step="0.1" id="actual-vy" value="1"> m/s
+          </div>
+          <label>Wind</label>
+          <div class="param">
+            W <input type="number" step="0.1" id="actual-vy" value="0"> m/s
+          </div>
+          <div class="param">
+            Dir <input type="number" step="0.1" id="actual-vy" value="0"> °
           </div>
         </div>
 
-        <h2>Testing</h2>
         <div class="sidebar-section">
+          <div class="sidebar-header plan-header">
+            Plan
+            <input type="checkbox" id="plan-enabled" title="Show short term plan" checked>
+          </div>
+          <div id="plan-name">&nbsp;</div>
+          <div id="plan-error">&nbsp;</div>
+        </div>
+        <div class="sidebar-section">
+          <div class="sidebar-header sim-header">
+            Sim
+            <input type="checkbox" id="sim-enabled" title="Show simulated path" checked>
+          </div>
+          <div id="sim-error">&nbsp;</div>
+          <svg id="sim-error-chart"></svg> <!-- TODO -->
+        </div>
+
+        <div class="sidebar-section">
+          <div class="sidebar-header">
+            Testing
+          </div>
           <button class="btn" id="test-button">Test</button>
           <div id="test-score"></div>
           <div id="test-distance"></div>

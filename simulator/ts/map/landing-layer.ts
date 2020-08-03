@@ -1,10 +1,12 @@
 import { LandingZone } from "../geo/landingzone"
 import { latLngToCart } from "../geo/latlng"
+import { Paramotor } from "../paramotor"
 import { MapLayer } from "./basemap"
 
 export class LandingLayer implements MapLayer {
   private entity?: Cesium.Entity
   private lz?: LandingZone
+  private readonly para = new Paramotor()
 
   public onAdd(map: Cesium.Viewer) {
     this.entity = map.entities.add({
@@ -41,7 +43,7 @@ export class LandingLayer implements MapLayer {
 
   private positions(): Cesium.Cartesian3[] {
     if (this.lz) {
-      const final = this.lz.toLatLngAlt(this.lz.startOfFinal())
+      const final = this.lz.toLatLngAlt(this.lz.startOfFinal(this.para))
       const lz = this.lz.destination
       return [final, lz].map((p) => latLngToCart(p))
     } else {
