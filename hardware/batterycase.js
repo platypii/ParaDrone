@@ -7,7 +7,7 @@
 
 const qty = 1
 
-const battery = {len: 140, width: 37, height: 23}
+const battery = {len: 115, width: 31.5, height: 17.4}
 
 const thic = 2 // wall thickness
 const h = battery.len / 2 + thic // height (1/2 battery length)
@@ -24,6 +24,7 @@ function main() {
     ),
     translate([-half_len, -10, thic], cuber(len, width + 10, h, r)), // inner
     translate([-100, -400, -1], cube(400)), // bottom half
+    translate([-1.5, -1, -1], cuber(3, 5, 10, 1)), // wire hole
     translate([-half_len - 6, -2, h / 4], screw()),
     translate([half_len + 6, -2, h / 4], screw()),
     translate([-half_len - 6, -2, h * 3 / 4], screw()),
@@ -44,6 +45,6 @@ function cuber(x, y, z, r) {
     return cube({size: [x, y, z], radius: [r, r, 0], fn: 30 * qty})
     // return linear_extrude({height: z}, square({size: [x, y], radius: r, segments: 15 * qty}))
   } else {
-    return cube({size: [x, y, z], center: [x / 2, y / 2, z / 2]})
+    return cube({size: [x, y, z]}) //, center: [x / 2, y / 2, z / 2]})
   }
 }
