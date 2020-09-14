@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:ignore="HardcodedText">
+
+    <Button
+        android:id="@+id/get_elevation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Get Elevation"/>
+
+    <Button
+        android:id="@+id/set_landing_zone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Set LZ"/>
+
+    <Button
+        android:id="@+id/lz_cancel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@android:string/cancel"/>
+
+    <TextView
+        android:id="@+id/lz_elevation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:textSize="20pt"/>
+
+</LinearLayout>

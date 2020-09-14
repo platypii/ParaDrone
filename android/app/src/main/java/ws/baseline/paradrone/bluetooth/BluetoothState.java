@@ -2,7 +2,7 @@ package ws.baseline.paradrone.bluetooth;
 
 public class BluetoothState {
 
-    private final int state;
+    public final int state;
 
     // Bluetooth finite state machine
     static final int BT_STOPPED = 0;

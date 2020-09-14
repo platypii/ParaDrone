@@ -1,7 +1,7 @@
 package ws.baseline.paradrone.map;
 
 import ws.baseline.paradrone.R;
-import ws.baseline.paradrone.bluetooth.APLandingZone;
+import ws.baseline.paradrone.bluetooth.ApLandingZone;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -29,7 +29,7 @@ public class LandingLayer extends MapLayer {
     @Override
     public void update() {
         if (arrow != null) {
-            final APLandingZone lz = APLandingZone.lastLz;
+            final ApLandingZone lz = ApLandingZone.lastLz;
             if (lz != null && lz.lz != null) {
                 arrow.setPosition(lz.lz.destination.toLatLng());
                 arrow.setDimensions((float) lz.lz.finalDistance * 0.2f);

@@ -1,12 +1,12 @@
 package ws.baseline.paradrone.plan;
 
 import ws.baseline.paradrone.GeoPoint;
-import ws.baseline.paradrone.bluetooth.APLandingZone;
+import ws.baseline.paradrone.Paramotor;
+import ws.baseline.paradrone.bluetooth.ApLandingZone;
 import ws.baseline.paradrone.bluetooth.ApLocationMsg;
 import ws.baseline.paradrone.bluetooth.ApSpeedMsg;
 import ws.baseline.paradrone.geo.LandingZone;
 import ws.baseline.paradrone.geo.Path;
-import ws.baseline.paradrone.geo.Point3V;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,9 +15,8 @@ import org.greenrobot.eventbus.Subscribe;
 
 public class FlightComputer {
 
-    // Combined location and speed data
-    @Nullable
-    private GeoPoint lastPoint;
+    private Paramotor para = new Paramotor();
+
     @Nullable
     private LandingZone lastLz;
 
@@ -29,7 +28,7 @@ public class FlightComputer {
     }
 
     @Subscribe
-    public void onApLandingZone(@NonNull APLandingZone event) {
+    public void onApLandingZone(@NonNull ApLandingZone event) {
         lastLz = event.lz;
         replan();
     }
@@ -37,12 +36,13 @@ public class FlightComputer {
     @Subscribe
     public void onApLocation(@NonNull ApLocationMsg event) {
         // TODO: Use kalman filter to estimate velocities
-        lastPoint = new GeoPoint(event.lat, event.lng, event.alt, Double.NaN, Double.NaN, Double.NaN);
+        para.loc = new GeoPoint(event.lat, event.lng, event.alt, Double.NaN, Double.NaN, Double.NaN);
+        replan();
     }
 
     @Subscribe
     public void onApSpeed(@NonNull ApSpeedMsg event) {
-        lastPoint = new GeoPoint(event.lat, event.lng, event.alt, event.vN, event.vE, event.climb);
+        para.loc = new GeoPoint(event.lat, event.lng, event.alt, event.vN, event.vE, event.climb);
         replan();
     }
 
@@ -51,10 +51,9 @@ public class FlightComputer {
     }
 
     private void replan() {
-        if (lastPoint != null && lastLz != null) {
-            final Point3V point = lastLz.toPoint3V(lastPoint);
+        if (para.loc != null && lastLz != null) {
             // Recompute plan
-            plan = Search.search(point, lastLz);
+            plan = Search.search(para, lastLz);
             EventBus.getDefault().post(new PlanEvent());
         }
     }

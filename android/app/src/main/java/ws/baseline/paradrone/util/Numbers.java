@@ -13,4 +13,11 @@ public class Numbers {
         return start + alpha * (end - start);
     }
 
+    public static double parseDistance(String str) {
+        if (str.endsWith(" m")) {
+            return Double.parseDouble(str.substring(0, str.length() - 2));
+        } else {
+            return Double.NaN;
+        }
+    }
 }

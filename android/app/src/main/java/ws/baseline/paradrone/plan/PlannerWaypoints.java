@@ -24,7 +24,8 @@ class PlannerWaypoints {
      * In between each waypoint, follow the shortest dubins path.
      */
     @NonNull
-    static List<Path> viaWaypoints(Point3V loc, LandingZone lz) {
+    static List<Path> viaWaypoints(Point3V loc, LandingZone lz, Paramotor para) {
+        final double r = para.turnRadius;
         // Fly straight for 10s
         final Point3V straight = new Point3V(
                 loc.x + 10 * loc.vx,
@@ -38,8 +39,8 @@ class PlannerWaypoints {
         final List<Point3V> leftPattern = Arrays.asList(straight, lz.startOfDownwind(TURN_LEFT), lz.startOfBase(TURN_LEFT), lz.startOfFinal());
 
         final List<Path> plans = new ArrayList<>();
-        plans.addAll(searchPattern(loc, leftPattern));
-        plans.addAll(searchPattern(loc, rightPattern));
+        plans.addAll(searchPattern(loc, leftPattern, r));
+        plans.addAll(searchPattern(loc, rightPattern, r));
         return plans;
     }
 
@@ -47,17 +48,17 @@ class PlannerWaypoints {
      * Search all suffixes of a flight pattern.
      * In between each waypoint, follow the shorest dubins path.
      */
-    private static List<Path> searchPattern(Point3V loc, List<Point3V> pattern) {
+    private static List<Path> searchPattern(Point3V loc, List<Point3V> pattern, double r) {
         // Pre-compute shortest dubins path from pattern[i] to pattern[i+1]
         final List<Path> steps = new ArrayList<>();
         for (int i = 0; i < pattern.size() - 1; i++) {
-            steps.add(shortestDubins(pattern.get(i), pattern.get(i + 1), Paramotor.turnRadius));
+            steps.add(shortestDubins(pattern.get(i), pattern.get(i + 1), r));
         }
         // Construct path for all suffixes
         final List<Path> paths = new ArrayList<>();
         for (int i = 0; i < pattern.size(); i++) {
             // Construct path for [loc, pattern[i], ..., pattern[n]]
-            final Path first = shortestDubins(loc, pattern.get(i), Paramotor.turnRadius);
+            final Path first = shortestDubins(loc, pattern.get(i), r);
             final Path path = catPaths(first, steps.subList(i, steps.size()));
             if (path != null) paths.add(path);
         }

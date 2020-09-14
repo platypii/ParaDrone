@@ -18,13 +18,14 @@ import static ws.baseline.paradrone.plan.PlannerWaypoints.viaWaypoints;
 public class Search {
     private static final double no_turns_below = 30; // meters
 
-    public static Path search(Point3V loc, LandingZone lz) {
+    public static Path search(Paramotor para, LandingZone lz) {
+        final Point3V loc = lz.toPoint3V(para.loc);
         // How much farther can we fly with available altitude?
         final double turn_distance_remaining = Paramotor.flightDistanceRemaining(loc.alt - no_turns_below);
         final double flight_distance_remaining = Paramotor.flightDistanceRemaining(loc.alt);
 
         final PointV sof = lz.startOfFinal();
-        final double r = Paramotor.turnRadius;
+        final double r = para.turnRadius;
         final double distance = Math.hypot(loc.x, loc.y);
 
         if (loc.vx == 0 && loc.vy == 0) {
@@ -34,16 +35,20 @@ public class Search {
 
         // Construct flight paths
         final Path straightPath = straight(loc).fly(Math.min(1, flight_distance_remaining));
-        final Path naivePath = naive(loc, sof, r);
 
         if (loc.alt <= no_turns_below) {
             // No turns under 100ft
             return straightPath;
-        } else if (distance > 1000 && naivePath != null) {
-            return naivePath.fly(turn_distance_remaining).fly(flight_distance_remaining);
+        } else if (distance > 1000) {
+            final Path naivePath = naive(loc, sof, r);
+            if (naivePath != null) {
+                return naivePath.fly(turn_distance_remaining).fly(flight_distance_remaining);
+            } else {
+                return straightPath;
+            }
         } else {
             final List<Path> paths = new ArrayList<>();
-            paths.addAll(viaWaypoints(loc, lz));
+            paths.addAll(viaWaypoints(loc, lz, para));
 //            paths.add(dubins(loc, sof, r, TURN_RIGHT, TURN_RIGHT)); // rsr
 //            paths.add(dubins(loc, sof, r, TURN_RIGHT, TURN_LEFT)); // rsl
 //            paths.add(dubins(loc, sof, r, TURN_LEFT, TURN_RIGHT)); // lsr

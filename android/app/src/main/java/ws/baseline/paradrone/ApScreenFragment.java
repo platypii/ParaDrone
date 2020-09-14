@@ -1,6 +1,6 @@
 package ws.baseline.paradrone;
 
-import ws.baseline.paradrone.bluetooth.APLandingZone;
+import ws.baseline.paradrone.bluetooth.ApLandingZone;
 import ws.baseline.paradrone.bluetooth.BluetoothPreferences;
 import ws.baseline.paradrone.bluetooth.BluetoothState;
 import ws.baseline.paradrone.databinding.ApScreenBinding;
@@ -36,8 +36,8 @@ public class ApScreenFragment extends Fragment {
         binding.statusLandingZone.setOnClickListener((event) -> {
             // Refresh LZ
             Services.bluetooth.actions.fetchLandingZone();
-            if (APLandingZone.lastLz != null && APLandingZone.lastLz.lz != null) {
-                APLandingZone.setPending(APLandingZone.lastLz.lz);
+            if (ApLandingZone.lastLz != null && ApLandingZone.lastLz.lz != null) {
+                ApLandingZone.setPending(ApLandingZone.lastLz.lz);
             }
         });
         binding.buttonAp.setOnClickListener((event) -> {
@@ -75,7 +75,7 @@ public class ApScreenFragment extends Fragment {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onApLandingZone(@NonNull APLandingZone event) {
+    public void onApLandingZone(@NonNull ApLandingZone event) {
         update();
     }
 
@@ -90,7 +90,7 @@ public class ApScreenFragment extends Fragment {
     @SuppressLint("SetTextI18n")
     private void update() {
         final GeoPoint ll = Services.location.lastLoc;
-        final LandingZone lz = APLandingZone.lastLz != null ? APLandingZone.lastLz.lz : null;
+        final LandingZone lz = ApLandingZone.lastLz != null ? ApLandingZone.lastLz.lz : null;
 
         // LL
         if (ll != null) {

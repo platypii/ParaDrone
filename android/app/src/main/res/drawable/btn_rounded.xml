@@ -1,13 +1,15 @@
 <selector
     xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:state_enabled="true">
-        <shape android:shape="oval">
+        <shape android:shape="rectangle">
             <solid android:color="#2211ccff"/>
+            <corners android:radius="4dp"/>
         </shape>
     </item>
     <item android:state_enabled="false">
-        <shape android:shape="oval">
+        <shape android:shape="rectangle">
             <solid android:color="#aa11ccff"/>
+            <corners android:radius="4dp"/>
         </shape>
     </item>
 </selector>
