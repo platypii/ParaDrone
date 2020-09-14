@@ -7,7 +7,7 @@ import java.util.Locale;
 import org.greenrobot.eventbus.EventBus;
 import timber.log.Timber;
 
-public class ApSpeedMsg implements APEvent {
+public class ApSpeedMsg implements ApEvent {
     public final double lat;
     public final double lng;
     public final double alt;

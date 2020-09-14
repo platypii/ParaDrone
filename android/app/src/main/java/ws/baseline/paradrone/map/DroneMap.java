@@ -1,7 +1,7 @@
 package ws.baseline.paradrone.map;
 
 import ws.baseline.paradrone.Services;
-import ws.baseline.paradrone.bluetooth.APEvent;
+import ws.baseline.paradrone.bluetooth.ApEvent;
 import ws.baseline.paradrone.plan.PlanEvent;
 
 import androidx.annotation.NonNull;
@@ -35,7 +35,7 @@ public class DroneMap extends MapFragment {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onUpdate(@NonNull APEvent event) {
+    public void onUpdate(@NonNull ApEvent event) {
         updateLayers();
         // Center on drone, if map hasn't been touched recently
         if (map != null && Services.location.lastLoc != null && !draging && System.currentTimeMillis() - lastDrag > SNAPBACK_TIME) {

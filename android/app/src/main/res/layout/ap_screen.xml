@@ -64,7 +64,7 @@
                     android:layout_width="0dp"
                     android:layout_height="24dp"
                     android:layout_weight="1"
-                    android:background="@drawable/bt_button_bg"
+                    android:background="@drawable/btn_rounded"
                     android:text="AP"/>
 
                 <Button
@@ -73,7 +73,7 @@
                     android:layout_width="0dp"
                     android:layout_height="24dp"
                     android:layout_weight="1"
-                    android:background="@drawable/bt_button_bg"
+                    android:background="@drawable/btn_rounded"
                     android:text="RC"/>
 
         </LinearLayout>
