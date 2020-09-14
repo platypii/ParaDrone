@@ -54,8 +54,13 @@ public class AutopilotActions {
     }
 
     public void fetchLandingZone() {
-        Timber.i("phone -> ap: fetch status");
-        sendCommand(new byte[] {'Q'});
+        Timber.i("phone -> ap: fetch lz");
+        sendCommand(new byte[] {'Q', 'Z'});
+    }
+
+    public void fetchMotorConfig() {
+        Timber.i("phone -> ap: fetch motor config");
+        sendCommand(new byte[] {'Q', 'C'});
     }
 
     public void setFrequency(int freq) {

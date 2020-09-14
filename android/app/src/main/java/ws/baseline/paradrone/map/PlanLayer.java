@@ -1,14 +1,14 @@
 package ws.baseline.paradrone.map;
 
 import ws.baseline.paradrone.Services;
-import ws.baseline.paradrone.bluetooth.APLandingZone;
+import ws.baseline.paradrone.bluetooth.ApLandingZone;
 
 class PlanLayer extends PathLayer {
 
     @Override
     public void update() {
-        if (APLandingZone.lastLz != null) {
-            setPath(Services.flightComputer.plan, APLandingZone.lastLz.lz);
+        if (ApLandingZone.lastLz != null) {
+            setPath(Services.flightComputer.plan, ApLandingZone.lastLz.lz);
         }
         super.update();
     }

@@ -234,7 +234,7 @@ class BluetoothHandler {
             ApSpeedMsg.parse(value);
         } else if (value[0] == 'Z' && value.length == 13) {
             // Landing zone message
-            APLandingZone.parse(value);
+            ApLandingZone.parse(value);
         } else {
             Timber.e("ap -> phone: unknown %c %s", (char) value[0], byteArrayToHex(value));
         }

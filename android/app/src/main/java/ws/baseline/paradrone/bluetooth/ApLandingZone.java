@@ -9,21 +9,21 @@ import java.nio.ByteOrder;
 import org.greenrobot.eventbus.EventBus;
 import timber.log.Timber;
 
-public class APLandingZone implements APEvent {
+public class ApLandingZone implements ApEvent {
     @Nullable
     public final LandingZone lz;
     public boolean pending;
 
     @Nullable
-    public static APLandingZone lastLz;
+    public static ApLandingZone lastLz;
 
-    private APLandingZone(@Nullable LandingZone lz, boolean pending) {
+    private ApLandingZone(@Nullable LandingZone lz, boolean pending) {
         this.lz = lz;
         this.pending = pending;
     }
 
     public static void setPending(@NonNull LandingZone lz) {
-        lastLz = new APLandingZone(lz, true);
+        lastLz = new ApLandingZone(lz, true);
         EventBus.getDefault().post(lastLz);
     }
 
@@ -46,7 +46,7 @@ public class APLandingZone implements APEvent {
         } else {
             Timber.e("Unexpected landing zone message: %s", value[0]);
         }
-        lastLz = new APLandingZone(lz, false);
+        lastLz = new ApLandingZone(lz, false);
         EventBus.getDefault().post(lastLz);
     }
 }

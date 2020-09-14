@@ -13,13 +13,14 @@ import androidx.fragment.app.Fragment;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
-public class ControlFragment extends Fragment {
+import static ws.baseline.paradrone.bluetooth.AutopilotActions.MODE_AP;
+import static ws.baseline.paradrone.bluetooth.AutopilotActions.MODE_IDLE;
 
-    private ControlFragmentBinding binding;
+public class ControlFragment extends Fragment {
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        binding = ControlFragmentBinding.inflate(inflater, container, false);
+        final ControlFragmentBinding binding = ControlFragmentBinding.inflate(inflater, container, false);
 
         binding.buttonUp.setOnClickListener((e) -> {
             Services.bluetooth.actions.setMotorSpeed(-127, -127);
@@ -33,34 +34,43 @@ public class ControlFragment extends Fragment {
         binding.buttonDown.setOnClickListener((e) -> {
             Services.bluetooth.actions.setMotorPosition(255, 255);
         });
-        update();
+        binding.setModeIdle.setOnClickListener((e) -> {
+            Services.bluetooth.actions.setMode(MODE_IDLE);
+        });
+        binding.setModeAp.setOnClickListener((e) -> {
+            Services.bluetooth.actions.setMode(MODE_AP);
+        });
         return binding.getRoot();
-    }
-
-    private void update() {
-        final boolean connected = Services.bluetooth.isConnected();
-        binding.buttonUp.setEnabled(connected);
-        binding.buttonUpRight.setEnabled(connected);
-        binding.buttonUpLeft.setEnabled(connected);
-        binding.buttonDown.setEnabled(connected);
-        binding.controlView.setEnabled(connected);
-        binding.controlFragment.setAlpha(connected ? 1 : 0.5f);
     }
 
     @Override
     public void onStart() {
         super.onStart();
+        ViewState.setMode(ViewState.ViewMode.CTRL);
         EventBus.getDefault().register(this);
-    }
-
-    @Subscribe
-    public void onBluetoothState(BluetoothState event) {
-        update();
+        checkConnected();
     }
 
     @Override
     public void onStop() {
         super.onStop();
         EventBus.getDefault().unregister(this);
+    }
+
+    @Subscribe
+    public void onBluetoothState(BluetoothState event) {
+        checkConnected();
+    }
+
+    /**
+     * If not connected, return to home fragment
+     */
+    private void checkConnected() {
+        if (!Services.bluetooth.isConnected()) {
+            getParentFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.control_plane, new HomeFragment())
+                    .commit();
+        }
     }
 }

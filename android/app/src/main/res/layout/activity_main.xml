@@ -12,13 +12,13 @@
         android:layout_width="match_parent"
         android:layout_height="380dp">
 
-        <fragment
+        <androidx.fragment.app.FragmentContainerView
             android:id="@+id/map"
             android:name="ws.baseline.paradrone.map.DroneMap"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
-        <fragment
+        <androidx.fragment.app.FragmentContainerView
             android:id="@+id/ap_screen"
             android:name="ws.baseline.paradrone.ApScreenFragment"
             android:layout_margin="8dp"
@@ -26,42 +26,13 @@
             android:layout_height="wrap_content" />
 
         <Button
-            android:id="@+id/set_landing_zone"
+            android:id="@+id/set_config"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:minWidth="64dp"
-            android:text="↑ LZ"
+            android:text="CFG"
             android:background="#88000000"
             android:layout_gravity="bottom|end"/>
-
-        <Button
-            android:id="@+id/set_frequency"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minHeight="26dp"
-            android:minWidth="44dp"
-            android:textColor="#aabbbbbb"
-            android:text="Frq"
-            android:background="#bb000000"
-            android:layout_gravity="bottom"/>
-
-        <Button
-            android:id="@+id/set_mode_idle"
-            android:layout_width="80dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="-45dp"
-            android:text="Idle"
-            android:background="#88000000"
-            android:layout_gravity="center_horizontal|bottom"/>
-
-        <Button
-            android:id="@+id/set_mode_ap"
-            android:layout_width="80dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="45dp"
-            android:text="AP"
-            android:background="#88000000"
-            android:layout_gravity="center_horizontal|bottom"/>
 
         <ImageView
             android:id="@+id/landing_arrow"
@@ -75,9 +46,9 @@
 
     </FrameLayout>
 
-    <fragment
+    <androidx.fragment.app.FragmentContainerView
         android:id="@+id/control_plane"
-        android:name="ws.baseline.paradrone.ControlFragment"
+        android:name="ws.baseline.paradrone.HomeFragment"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"/>
