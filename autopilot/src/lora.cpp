@@ -11,7 +11,7 @@ bool lora_enabled = false;
 static long last_received_millis = -1;
 
 void lora_init() {
-  if (!LoRa.begin(LORA_BAND, true)) { // TODO: while?
+  if (!LoRa.begin(motor_config.frequency, true)) { // TODO: while?
     Serial.println("LoRa init failed");
   }
   // LoRa.setPreambleLength();
@@ -56,10 +56,14 @@ static void lora_read(int parse_len) {
     set_flight_mode(buffer[1]);
   } else if (buffer[0] == 'P' && buffer_len == 1) {
     Serial.printf("LoRa %.1fs ping\n", millis() * 1e-3);
-  } else if (buffer[0] == 'Q' && buffer_len == 1) {
-    // Send LZ in response
-    lora_send_lz();
-    Serial.printf("LoRa %.1fs Q\n", millis() * 1e-3);
+  } else if (buffer[0] == 'Q' && buffer_len == 2) {
+    Serial.printf("LoRa %.1fs Q %c\n", millis() * 1e-3, buffer[1]);
+    if (buffer[1] == 'Z') {
+      // Send LZ in response
+      lora_send_lz();
+    } else {
+      // TODO: send motor config
+    }
   } else if (buffer[0] == 'S' && buffer_len == 3) {
     // Message is -127..127, speeds are -255..255
     const short left = ((short)(int8_t) buffer[1]) * 2;
@@ -73,7 +77,7 @@ static void lora_read(int parse_len) {
     rc_set_position(left, right);
     Serial.printf("LoRa %.1fs toggle %d %d\n", millis() * 1e-3, left, right);
   } else if (buffer[0] == 'Z' && buffer_len == 13) {
-    set_landing_zone((char*) buffer);
+    set_landing_zone((LandingZoneMessage*) buffer);
     Serial.printf("LoRa %.1fs set lz\n", millis() * 1e-3);
   } else {
     Serial.printf("LoRa %.1fs unknown %c size %d: ", millis() * 1e-3, buffer[0], buffer_len);

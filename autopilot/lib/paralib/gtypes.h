@@ -85,4 +85,14 @@ struct Path {
   Segment *segments[];
 };
 
+/**
+ * Paramotor input controls (left and right toggle)
+ * 0 = no deflection
+ * 255 = full deflection
+ */
+struct ParaControls {
+  uint8_t left;
+  uint8_t right;
+};
+
 #endif

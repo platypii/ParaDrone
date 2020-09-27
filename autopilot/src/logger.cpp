@@ -2,7 +2,7 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <time.h>
-#include "dtypes.h"
+#include "gtypes.h"
 
 static FILE *fp = NULL;
 

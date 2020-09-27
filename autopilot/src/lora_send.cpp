@@ -30,20 +30,8 @@ void lora_send_location(GeoPointV *point) {
 }
 
 void lora_send_lz() {
-  if (current_landing_zone != NULL) {
-    LandingZoneMessage msg = {
-      'Z',
-      (int)(current_landing_zone->destination.lat * 1e6), // microdegrees
-      (int)(current_landing_zone->destination.lng * 1e6), // microdegrees
-      (short)(current_landing_zone->destination.alt * 10), // decimeters
-      (short)(current_landing_zone->landingDirection * 1000) // milliradians
-    };
-    uint8_t *data = (uint8_t*) &msg;
-    size_t len = sizeof(msg);
-    lora_send_raw(data, len);
-  } else {
-    // No LZ
-    uint8_t data = 'N';
-    lora_send_raw(&data, 1);
-  }
+  LandingZoneMessage msg = pack_lz(config_landing_zone);
+  uint8_t *data = (uint8_t*) &msg;
+  size_t len = sizeof(msg);
+  lora_send_raw(data, len);
 }

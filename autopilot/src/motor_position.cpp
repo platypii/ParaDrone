@@ -35,10 +35,11 @@ float motor_speed_right = 0;
 float motor_current_left = 0;
 float motor_current_right = 0;
 
+int motor_switch_left = 0;
+int motor_switch_right = 0;
+
 long last_update = -1;
 long last_speed_override = -1;
-
-bool motor_running = false;
 
 /**
  * If the current position is not the target position, engage the motors
@@ -50,11 +51,21 @@ void motor_loop() {
   motor_current_left = get_motor_current_left();
   motor_current_right = get_motor_current_right();
 
+  // Limit switch engaged = toggles up
+  motor_switch_left = get_motor_switch_left();
+  motor_switch_right = get_motor_switch_right();
+  if (motor_switch_left < 64) {
+    motor_position_left = 0;
+  }
+  if (motor_switch_right < 64) {
+    motor_position_right = 0;
+  }
+
   // Only update speed if it hasn't been overridden
   if (last_speed_override < 0 || millis() - last_speed_override > RC_SPEED_OVERRIDE_DURATION) {
     // Calculate target delta and speed to get there
-    short new_speed_left = speed(motor_target_left - motor_position_left);
-    short new_speed_right = speed(motor_target_right - motor_position_right);
+    const short new_speed_left = speed(motor_target_left - motor_position_left);
+    const short new_speed_right = speed(motor_target_right - motor_position_right);
     if (new_speed_left != motor_speed_left || new_speed_right != motor_speed_right) {
       motor_speed_left = new_speed_left;
       motor_speed_right = new_speed_right;

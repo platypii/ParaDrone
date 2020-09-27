@@ -1,10 +1,15 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "geo.h"
 #include "path.h"
 
 static double angle1(Turn *turn);
 static double angle2(Turn *turn);
+static double arcs(Turn *turn);
+
+// If turn is less than minimum_turn, then don't bury a toggle
+const float minimum_turn = to_radians(10);
 
 PointV turn_start(Turn *turn) {
   const double dx = turn->start.x - turn->circle.x;
@@ -80,6 +85,31 @@ Point *turn_render(Turn *turn) {
   }
   points[n - 1] = turn->end;
   return points;
+}
+
+
+/**
+ * Return target toggle position for a given turn.
+ * If the turn is short, don't crank a hard toggle turn.
+ */
+ParaControls turn_controls(Turn *turn) {
+  const uint8_t deflect = fmin(arcs(turn) / minimum_turn, 1) * 255;
+  ParaControls ctrl = {};
+  if (turn->turn == TURN_RIGHT) {
+    ctrl.right = deflect;
+  } else {
+    ctrl.left = deflect;
+  }
+  return ctrl;
+}
+
+/**
+ * The arc angle in radians
+ */
+static double arcs(Turn *turn) {
+    double arcs = turn->turn * (angle2(turn) - angle1(turn));
+    if (arcs < 0) arcs += 2 * M_PI;
+    return arcs;
 }
 
 /**

@@ -43,6 +43,21 @@ struct LandingZoneMessage {
   short landing_direction; // milliradians
 };
 
+/**
+ * Message with motor configuration.
+ * Length of toggle stroke, motor direction, frequency.
+ * sizeof 10
+ */
+#pragma pack(1)
+struct MotorConfigMessage {
+  char msg_type; // C
+  int frequency; // Hz
+  uint16_t top; // millimeters
+  uint16_t stall; // millimeters
+  uint8_t dir; // left, right direction
+};
+
+// Packers
 LandingZoneMessage pack_lz(LandingZone *lz);
 LandingZone *unpack_lz(LandingZoneMessage *lz);
 

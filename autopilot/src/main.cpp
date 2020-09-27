@@ -17,7 +17,7 @@ void setup() {
   ); // 50ms
   // WiFi.mode(WIFI_OFF);
 
-  load_landing_zone();
+  config_init();
   motor_init();
   gps_init();
   screen_init(); // 200ms
@@ -34,7 +34,8 @@ void loop() {
   screen_loop();
   lora_loop();
   TIME_END;
-  delay(50);
+  // TODO: Sleep exactly enough to be ready for next gps
+  delay(60);
 }
 
 /**

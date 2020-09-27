@@ -53,8 +53,8 @@ static void screen_draw() {
 
   // Alt
   if (last_location != NULL && !isnan(last_location->alt)) {
-    if (current_landing_zone != NULL) {
-      const double alt = last_location->alt - current_landing_zone->destination.alt;
+    if (config_landing_zone != NULL) {
+      const double alt = last_location->alt - config_landing_zone->destination.alt;
       sprintf(buf, "Alt: %.0f m AGL", alt);
     } else {
       sprintf(buf, "%.0f m MSL", last_location->alt);
@@ -81,22 +81,22 @@ static void screen_draw() {
   }
 
   // LZ
-  if (current_landing_zone != NULL && last_location != NULL) {
-    const double distance = geo_distance(last_location->lat, last_location->lng, current_landing_zone->destination.lat, current_landing_zone->destination.lng);
+  if (config_landing_zone != NULL && last_location != NULL) {
+    const double distance = geo_distance(last_location->lat, last_location->lng, config_landing_zone->destination.lat, config_landing_zone->destination.lng);
     sprintf(buf, "LZ: %.0f m  ", distance);
-    const double bearing = geo_bearing(last_location->lat, last_location->lng, current_landing_zone->destination.lat, current_landing_zone->destination.lng);
+    const double bearing = geo_bearing(last_location->lat, last_location->lng, config_landing_zone->destination.lat, config_landing_zone->destination.lng);
     bearing2(buf + strnlen(buf, 20), to_degrees(bearing));
-  } else if (current_landing_zone != NULL) {
-    sprintf(buf, "LZ: %.2f, %.2f, %.0fm", current_landing_zone->destination.lat, current_landing_zone->destination.lng, current_landing_zone->destination.alt);
+  } else if (config_landing_zone != NULL) {
+    sprintf(buf, "LZ: %.2f, %.2f, %.0fm", config_landing_zone->destination.lat, config_landing_zone->destination.lng, config_landing_zone->destination.alt);
   } else {
     sprintf(buf, "LZ:");
   }
   Heltec.display->drawString(0, 20, buf);
 
   // Flight mode
-  if (flight_mode == MODE_IDLE) {
+  if (config_flight_mode == MODE_IDLE) {
     Heltec.display->drawString(0, 30, "Idle");
-  } else if (flight_mode == MODE_AP) {
+  } else if (config_flight_mode == MODE_AP) {
     Heltec.display->drawString(0, 30, "Auto");
   }
 

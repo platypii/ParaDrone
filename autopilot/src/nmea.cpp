@@ -6,6 +6,7 @@
 #include "paradrone.h"
 
 #define parseInt2(a, b) ((a - '0') * 10 + (b - '0'))
+#define KNOT 0.514444
 
 static void parse_gga(const char *line);
 static void parse_rmc(char *line);
@@ -69,7 +70,7 @@ static void parse_rmc(char *line) {
   const double lat = parse_degrees_minutes(latDM, latNS);
   const double lng = parse_degrees_minutes(lngDM, lngEW);
   const double climb = NAN; // TODO: Kalman
-  const double hspeed = parse_double(hspeedStr);
+  const double hspeed = parse_double(hspeedStr) * KNOT;
   double bearing = parse_double(bearingStr);
   if (isnan(bearing)) {
     // At low speeds, bearing is often NaN

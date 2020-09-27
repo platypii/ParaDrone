@@ -13,6 +13,7 @@ bool bt_connected = false;
 static BLECharacteristic *ap_ch;
 
 static void bt_send_lz();
+static void bt_send_motor_config();
 
 class AutopilotServer : public BLEServerCallbacks {
     void onConnect(BLEServer* pServer) {
@@ -32,17 +33,21 @@ class AutopilotCharacteristic : public BLECharacteristicCallbacks {
     };
     void onWrite(BLECharacteristic *pCharacteristic) {
       std::string value = pCharacteristic->getValue();
-      if (value[0] == 'F' && value.length() == 5) {
-        const int freq = *(int*)(value.c_str() + 1);
-        Serial.printf("BT %.1fs set lora freq %f\n", millis() * 1e-3, freq * 1e-6);
-        LoRa.setFrequency(freq);
+      if (value[0] == 'C' && value.length() == 10) {
+        set_motor_config((MotorConfigMessage*) value.c_str());
       } else if (value[0] == 'M' && value.length() == 2) {
         const uint8_t mode = value[1];
         Serial.printf("BT %.1fs mode %d\n", millis() * 1e-3, mode);
         set_flight_mode(mode);
-      } else if (value[0] == 'Q' && value.length() == 1) {
-        // Send LZ in response
-        bt_send_lz();
+      } else if (value[0] == 'Q' && value.length() == 2) {
+        Serial.printf("BT %.1fs Q %c\n", millis() * 1e-3, value[1]);
+        if (value[1] == 'Z') {
+          // Send LZ in response
+          bt_send_lz();
+        } else if (value[1] == 'C') {
+          // Send motor config in response
+          bt_send_motor_config();
+        }
       } else if (value[0] == 'S' && value.length() == 3) {
         // Message is -127..127, speeds are -255..255
         const short left = ((short)(int8_t) value[1]) * 2;
@@ -53,7 +58,7 @@ class AutopilotCharacteristic : public BLECharacteristicCallbacks {
         // Serial.printf("BT toggle %d %d\n", value[1], value[2]);
         rc_set_position(value[1], value[2]);
       } else if (value[0] == 'Z' && value.length() == 13) {
-        set_landing_zone(value.c_str());
+        set_landing_zone((LandingZoneMessage*) value.c_str());
         screen_update();
       } else {
         Serial.printf("Unexpected BT msg %02x %d\n", value[0], value.length());
@@ -106,9 +111,16 @@ void bt_send_location(GeoPointV *point) {
 }
 
 static void bt_send_lz() {
-  LandingZoneMessage msg = pack_lz(current_landing_zone);
+  LandingZoneMessage msg = pack_lz(config_landing_zone);
   uint8_t *data = (uint8_t*) &msg;
   size_t len = sizeof(msg);
+  ap_ch->setValue(data, len);
+  ap_ch->notify();
+}
+
+static void bt_send_motor_config() {
+  uint8_t *data = (uint8_t*) &motor_config;
+  size_t len = sizeof(motor_config);
   ap_ch->setValue(data, len);
   ap_ch->notify();
 }

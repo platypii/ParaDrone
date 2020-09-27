@@ -1,9 +1,9 @@
 #ifndef _PARADRONE_H
 #define _PARADRONE_H
 
-#include "dtypes.h"
 #include "geo.h"
 #include "landingzone.h"
+#include "messages.h"
 
 // LoRa North America
 #define LORA_BAND 915E6
@@ -12,13 +12,20 @@
 #define MODE_IDLE 0
 #define MODE_AP 1
 
-// Global vars
-extern LandingZone *current_landing_zone;
+// Persisted config
+extern uint8_t config_flight_mode;
+extern LandingZone *config_landing_zone;
+extern MotorConfigMessage motor_config;
+
+extern short config_left_invert;
+extern short config_right_invert;
+
+// AP state
 extern GeoPointV *last_location;
 extern long last_fix_millis;
 extern bool bt_connected;
 extern bool lora_enabled;
-extern uint8_t flight_mode;
+extern uint8_t flight_mode; // TODO: Persist
 
 // Current motor position
 extern float motor_position_left;
@@ -54,17 +61,18 @@ void lora_loop();
 void lora_send_location(GeoPointV *point);
 void lora_send_lz();
 
-// Landing zone
-void load_landing_zone();
-void set_landing_zone(const char *packed);
-
-ParaControls path_controls(Path *path);
+// Config
+void config_init();
+void set_landing_zone(LandingZoneMessage *packed);
+void set_motor_config(MotorConfigMessage *msg);
 
 // Motors
 void motor_init();
 void motor_loop();
 void set_motor_speed(const short left, const short right);
 void set_motor_position(uint8_t new_left, uint8_t new_right);
+int get_motor_switch_left();
+int get_motor_switch_right();
 
 // Planner
 void planner_loop();

@@ -9,33 +9,38 @@
 // After 60 seconds of no GPS, revert to slow spiral
 #define GPS_EXPIRATION 60000
 
-uint8_t flight_mode = MODE_IDLE;
-
 // last_fix_millis
 static long last_rc_millis = -10000; // Don't wait on reboot when millis = 0
 static Path *current_plan;
 
 String current_plan_name = "";
 
-static bool autopilot_enabled() {
-  return flight_mode == MODE_AP;
-}
-
+/**
+ * Return true if R/C input was made in the last few seconds
+ */
 static bool rc_override() {
   return millis() - last_rc_millis <= RC_OVERRIDE_MILLIS;
 }
 
+/**
+ * Return true autopilot should be flying
+ */
+static bool autopilot_enabled() {
+  return config_flight_mode == MODE_AP && !rc_override();
+}
+
+/**
+ * Return true if GPS fix is stale
+ */
 static bool gps_expired() {
   return millis() - last_fix_millis > GPS_EXPIRATION;
 }
 
+/**
+ * Return true GPS point is reasonable
+ */
 static bool valid_point(GeoPointV * p) {
   return !isnan(p->alt) && !isnan(p->vN) && !isnan(p->vE);
-}
-
-void set_flight_mode(uint8_t mode) {
-  flight_mode = mode;
-  screen_update();
 }
 
 /**
@@ -44,7 +49,7 @@ void set_flight_mode(uint8_t mode) {
 void rc_set_speed(const short new_left, const short new_right) {
   last_rc_millis = millis();
   set_motor_speed(new_left, new_right);
-  // Special case for full up
+  // Special case for full up // TODO: Why? What about 1 toggle up?
   if (new_left <= -254 && new_right <= -254) set_motor_position(0, 0);
 }
 
@@ -60,7 +65,7 @@ void rc_set_position(uint8_t new_left, uint8_t new_right) {
  * Called when autopilot updates the plan
  */
 static void ap_set_position(uint8_t new_left, uint8_t new_right) {
-  if (autopilot_enabled() && !rc_override()) {
+  if (autopilot_enabled()) {
     set_motor_position(new_left, new_right);
   }
 }
@@ -69,8 +74,8 @@ static void ap_set_position(uint8_t new_left, uint8_t new_right) {
  * Called when a new location arrives to begin planning
  */
 void planner_update_location(GeoPointV *point) {
-  if (current_landing_zone && autopilot_enabled() && !rc_override()) {
-    const double alt_agl = point->alt - current_landing_zone->destination.alt;
+  if (config_landing_zone && autopilot_enabled()) {
+    const double alt_agl = point->alt - config_landing_zone->destination.alt;
 
     if (isnan(alt_agl)) {
       // No alt, do nothing
@@ -83,8 +88,8 @@ void planner_update_location(GeoPointV *point) {
       // set_motor_speed(-255, -255); // TODO: Full speed up?
     } else if (valid_point(point)) {
       // Compute plan
-      Point3V loc3 = current_landing_zone->to_point3V(point);
-      Path *new_plan = search(loc3, current_landing_zone, PARAMOTOR_TURNRADIUS);
+      Point3V loc3 = config_landing_zone->to_point3V(point);
+      Path *new_plan = search(loc3, config_landing_zone, PARAMOTOR_TURNRADIUS);
       if (current_plan) free_path(current_plan);
       current_plan = new_plan;
       ParaControls ctrl = path_controls(current_plan);
