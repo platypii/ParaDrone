@@ -8,6 +8,7 @@ import ws.baseline.paradrone.map.Elevation;
 import ws.baseline.paradrone.util.Convert;
 import ws.baseline.paradrone.util.Numbers;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
@@ -18,37 +19,29 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.maps.PendingResult;
+import com.google.maps.model.ElevationResult;
 import timber.log.Timber;
 
+@SuppressLint("SetTextI18n")
 public class LandingFragment extends Fragment {
 
     private LandingFragmentBinding binding;
     private Handler handler = new Handler();
+    private boolean savePending = false;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = LandingFragmentBinding.inflate(inflater, container, false);
 
-        binding.getElevation.setOnClickListener((e) -> {
-            final LatLng ll = getMapCenter();
-            final Context ctx = getContext();
-            if (ll != null && ctx != null) {
-                Timber.i("Getting elevation %s", ll);
-                Elevation.get(ctx, ll, (elevation) -> {
-                    Timber.i("Got elevation %f", elevation);
-                    handler.post(() -> binding.lzElevation.setText(Convert.distance(elevation)));
-                });
-            } else {
-                Timber.e("Failed to get map center");
-            }
-        });
+        binding.getElevation.setOnClickListener(this::fetchElevation);
         binding.setLandingZone.setOnClickListener((e) -> {
-            final LandingZone lz = getLandingZone();
-            Timber.i("Setting landing zone %s", lz);
-            ApLandingZone.setPending(lz);
-            Services.bluetooth.actions.setLandingZone(lz);
-            // TODO: Wait for confirmation
-            ViewState.setMode(ViewState.ViewMode.HOME);
+            if (binding.lzElevation.getText().toString().isEmpty()) {
+                savePending = true;
+                fetchElevation(null);
+            } else {
+                save();
+            }
         });
         binding.lzCancel.setOnClickListener((e) -> {
             getParentFragmentManager().popBackStack();
@@ -65,6 +58,53 @@ public class LandingFragment extends Fragment {
         } else {
             Timber.e("Failed to find map fragment");
             return null;
+        }
+    }
+
+    private void fetchElevation(View view) {
+        final LatLng ll = getMapCenter();
+        final Context ctx = getContext();
+        if (ll != null && ctx != null) {
+            Timber.i("Getting elevation %.6f, %.6f", ll.latitude, ll.longitude);
+            binding.landingStatus.setText(R.string.fetching_elevation);
+            Elevation.get(ctx, ll, new PendingResult.Callback<ElevationResult>() {
+                @Override
+                public void onResult(ElevationResult result) {
+                    Timber.i("Got elevation %f", result.elevation);
+                    handler.post(() -> {
+                        binding.landingStatus.setText("");
+                        binding.lzElevation.setText(Convert.distance(result.elevation, 0, false));
+                        if (savePending) {
+                            savePending = false;
+                            save();
+                        }
+                    });
+                }
+                @Override
+                public void onFailure(Throwable e) {
+                    savePending = false;
+                    Timber.e("Failed to fetch elevation");
+                    handler.post(() -> binding.landingStatus.setText("Fetch elevation failed"));
+                }
+            });
+        } else {
+            Timber.e("Failed to get map center");
+        }
+    }
+
+    private void save() {
+        final LandingZone lz = getLandingZone();
+        if (!Services.bluetooth.isConnected()) {
+            binding.landingStatus.setText(Services.bluetooth.getBtString() + " not connected");
+        } else if (lz != null) {
+            Timber.i("Setting landing zone %s", lz);
+            ApLandingZone.setPending(lz);
+            Services.bluetooth.actions.setLandingZone(lz);
+            // TODO: Show pending, and wait for confirmation
+            binding.landingStatus.setText("");
+            getParentFragmentManager().popBackStack();
+        } else {
+            Timber.w("Invalid landing zone");
         }
     }
 

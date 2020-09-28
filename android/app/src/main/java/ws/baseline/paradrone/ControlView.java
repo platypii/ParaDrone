@@ -41,8 +41,9 @@ public class ControlView extends View {
         final int w = getWidth();
 
         // Axes
-        paint.setColor(0xffeeeeee);
-        canvas.drawLine(0, 2, w, 2, paint); // TODO: Draw at high point margin
+        paint.setColor(0xff888888);
+        canvas.drawLine(0, 1, w, 1, paint);
+        //noinspection IntegerDivisionInFloatingPointContext
         canvas.drawLine(w / 2, 0, w / 2, h, paint);
 
         paint.setTextAlign(Paint.Align.LEFT);
@@ -62,8 +63,9 @@ public class ControlView extends View {
         // Draw toggles
         final float l = (float) (left_toggle * h / 255);
         final float r = (float) (right_toggle * h / 255);
-        paint.setColor(0x88eeeeee);
+        paint.setColor(0xcc992222);
         canvas.drawRect(0, l - 30 * density, 15 * density, l + 30 * density, paint);
+        paint.setColor(0xcc229922);
         canvas.drawRect(w - 15 * density, r - 30 * density, w, r + 30 * density, paint);
     }
 

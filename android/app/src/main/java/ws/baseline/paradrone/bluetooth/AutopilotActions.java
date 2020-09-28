@@ -3,6 +3,7 @@ package ws.baseline.paradrone.bluetooth;
 import ws.baseline.paradrone.geo.LandingZone;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import timber.log.Timber;
@@ -18,20 +19,22 @@ public class AutopilotActions {
         this.bt = bt;
     }
 
-    public void setLandingZone(@NonNull LandingZone lz) {
+    public void setLandingZone(@Nullable LandingZone lz) {
         Timber.i("phone -> ap: set lz %s", lz);
         // Pack LZ into bytes
         final byte[] value = new byte[13];
         value[0] = 'Z';
-        final ByteBuffer buf = ByteBuffer.wrap(value).order(ByteOrder.LITTLE_ENDIAN);
-        buf.putInt(1, (int)(lz.destination.lat * 1e6)); // microdegrees
-        buf.putInt(5, (int)(lz.destination.lng * 1e6)); // microdegrees
-        buf.putShort(9, (short)(lz.destination.alt * 10)); // decimeters
-        buf.putShort(11, (short)(lz.landingDirection * 1000)); // milliradians
+        if (lz != null) {
+            final ByteBuffer buf = ByteBuffer.wrap(value).order(ByteOrder.LITTLE_ENDIAN);
+            buf.putInt(1, (int)(lz.destination.lat * 1e6)); // microdegrees
+            buf.putInt(5, (int)(lz.destination.lng * 1e6)); // microdegrees
+            buf.putShort(9, (short)(lz.destination.alt * 10)); // decimeters
+            buf.putShort(11, (short)(lz.landingDirection * 1000)); // milliradians
+        }
         sendCommand(value);
         // Fetch after send
         try {
-            Thread.sleep(1000); // TODO: Async
+            Thread.sleep(1000); // TODO: Wait for async callback
         } catch (InterruptedException ignored) {
         }
         fetchLandingZone();

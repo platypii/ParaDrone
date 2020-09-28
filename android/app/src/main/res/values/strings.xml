@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">BASEline ParaDrone</string>
+    <string name="fetching_elevation">Fetching elevation</string>
 </resources>

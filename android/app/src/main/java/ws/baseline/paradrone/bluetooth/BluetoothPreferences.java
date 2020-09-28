@@ -9,7 +9,7 @@ import static ws.baseline.paradrone.bluetooth.BluetoothPreferences.DeviceMode.AP
 import static ws.baseline.paradrone.bluetooth.BluetoothPreferences.DeviceMode.RC;
 
 public class BluetoothPreferences {
-    private static final String PREF_RC_MODE = "bt_relay_mode";
+    private static final String PREF_RC_MODE = "device_mode_rc";
 
     public enum DeviceMode {AP, RC}
 

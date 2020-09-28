@@ -2,6 +2,7 @@ package ws.baseline.paradrone.map;
 
 import ws.baseline.paradrone.Services;
 import ws.baseline.paradrone.bluetooth.ApEvent;
+import ws.baseline.paradrone.bluetooth.ApLandingZone;
 import ws.baseline.paradrone.plan.PlanEvent;
 
 import androidx.annotation.NonNull;
@@ -30,8 +31,16 @@ public class DroneMap extends MapFragment {
         addLayer(new LandingLayer());
         addLayer(new PlanLayer());
 
-        // TODO: Zoom to current phone location if available
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(47.6, -122.34), 14));
+        if (Services.location.lastLoc != null) {
+            // TODO: Zoom based on alt, distance
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(Services.location.lastLoc.toLatLng(), 14));
+        } else if (ApLandingZone.lastLz != null && ApLandingZone.lastLz.lz != null) {
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(ApLandingZone.lastLz.lz.destination.toLatLng(), 14));
+        } else {
+            // TODO: Zoom to current phone location if available
+            // Default fallback
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(47.6, -122.34), 14));
+        }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

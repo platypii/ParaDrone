@@ -1,5 +1,7 @@
 package ws.baseline.paradrone.util;
 
+import androidx.annotation.NonNull;
+
 public class Numbers {
 
     public static boolean isReal(double value) {
@@ -13,11 +15,15 @@ public class Numbers {
         return start + alpha * (end - start);
     }
 
-    public static double parseDistance(String str) {
-        if (str.endsWith(" m")) {
-            return Double.parseDouble(str.substring(0, str.length() - 2));
-        } else {
+    public static double parseDistance(@NonNull String str) {
+        if (str.isEmpty()) {
             return Double.NaN;
+        } else {
+            try {
+                return Double.parseDouble(str);
+            } catch (NumberFormatException e) {
+                return Double.NaN;
+            }
         }
     }
 }
