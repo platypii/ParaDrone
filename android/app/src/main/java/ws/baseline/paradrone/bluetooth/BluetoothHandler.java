@@ -46,6 +46,7 @@ class BluetoothHandler {
     private final BluetoothService service;
     private final BluetoothCentral central;
     private BluetoothPeripheral currentPeripheral;
+    private BluetoothGattCharacteristic currentCharacteristic;
 
     boolean connected_ap = false;
     boolean connected_rc = false;
@@ -254,20 +255,21 @@ class BluetoothHandler {
 
     @Nullable
     private BluetoothGattCharacteristic getCharacteristic() {
-        if (currentPeripheral != null) {
+        if (currentCharacteristic == null && currentPeripheral != null) {
             if (connected_ap) {
-                return currentPeripheral.getCharacteristic(apServiceId, apCharacteristicId);
+                currentCharacteristic = currentPeripheral.getCharacteristic(apServiceId, apCharacteristicId);
             } else if (connected_rc) {
-                return currentPeripheral.getCharacteristic(rcServiceId, rcCharacteristicId);
+                currentCharacteristic =  currentPeripheral.getCharacteristic(rcServiceId, rcCharacteristicId);
             }
         }
-        return null;
+        return currentCharacteristic;
     }
 
     /**
      * Terminate an existing connection (because we're switching devices)
      */
     void disconnect() {
+        currentCharacteristic = null;
         if (currentPeripheral != null) {
             // will receive callback in onDisconnectedPeripheral
             currentPeripheral.cancelConnection();
@@ -281,6 +283,7 @@ class BluetoothHandler {
     }
 
     void stop() {
+        currentCharacteristic = null;
         service.setState(BT_STOPPING);
         // Stop scanning
         central.stopScan();
