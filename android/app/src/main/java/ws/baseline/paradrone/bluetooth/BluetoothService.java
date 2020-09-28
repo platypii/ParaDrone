@@ -10,7 +10,6 @@ import org.greenrobot.eventbus.EventBus;
 import timber.log.Timber;
 
 import static ws.baseline.paradrone.bluetooth.BluetoothPreferences.DeviceMode.AP;
-import static ws.baseline.paradrone.bluetooth.BluetoothPreferences.DeviceMode.RC;
 import static ws.baseline.paradrone.bluetooth.BluetoothState.BT_CONNECTED;
 import static ws.baseline.paradrone.bluetooth.BluetoothState.BT_CONNECTING;
 import static ws.baseline.paradrone.bluetooth.BluetoothState.BT_STARTED;
@@ -51,16 +50,14 @@ public class BluetoothService {
         }
     }
 
-    public void switchDeviceMode() {
-        if (deviceMode == AP) {
-            deviceMode = RC;
-        } else {
-            deviceMode = AP;
+    public void setDeviceMode(BluetoothPreferences.DeviceMode mode) {
+        if (deviceMode != mode) {
+            deviceMode = mode;
+            EventBus.getDefault().post(mode);
+            if (bluetoothHandler != null) {
+                bluetoothHandler.disconnect();
+            }
         }
-        if (bluetoothHandler != null) {
-            bluetoothHandler.disconnect();
-        }
-        prefs.save(deviceMode);
     }
 
     /**
@@ -102,6 +99,9 @@ public class BluetoothService {
         EventBus.getDefault().post(new BluetoothState(state));
     }
 
+    /**
+     * Return AP or RC device mode
+     */
     public String getBtString() {
         if (deviceMode == AP) {
             return "AP";

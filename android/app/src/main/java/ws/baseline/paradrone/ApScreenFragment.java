@@ -40,14 +40,6 @@ public class ApScreenFragment extends Fragment {
                 ApLandingZone.setPending(ApLandingZone.lastLz.lz);
             }
         });
-        binding.buttonAp.setOnClickListener((event) -> {
-            Services.bluetooth.switchDeviceMode();
-            update();
-        });
-        binding.buttonRl.setOnClickListener((event) -> {
-            Services.bluetooth.switchDeviceMode();
-            update();
-        });
         return binding.getRoot();
     }
 
@@ -81,6 +73,11 @@ public class ApScreenFragment extends Fragment {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onApEvent(@NonNull GeoPoint event) {
+        update();
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onDeviceMode(@NonNull BluetoothPreferences.DeviceMode event) {
         update();
     }
 
@@ -124,22 +121,15 @@ public class ApScreenFragment extends Fragment {
         if (ll != null && lz != null) {
             final double distance = Geo.distance(ll.lat, ll.lng, lz.destination.lat, lz.destination.lng);
             final double bearing = Geo.bearing(ll.lat, ll.lng, lz.destination.lat, lz.destination.lng);
-            binding.statusLandingZone.setText("LZ: " + Convert.distance(distance) + " " + Convert.bearing2(bearing));
+            binding.statusLandingZone.setText("LZ: " + Convert.distance3(distance) + " " + Convert.bearing2(bearing));
         } else if (lz != null) {
-            binding.statusLandingZone.setText("LZ: set");
+            binding.statusLandingZone.setText(String.format(Locale.getDefault(), "LZ: %.2f, %.2f %.0fm", lz.destination.lat, lz.destination.lng, lz.destination.alt));
         } else {
             binding.statusLandingZone.setText("LZ:");
         }
 
         // BT
         binding.statusBt.setText(Services.bluetooth.getBtString());
-        if (Services.bluetooth.deviceMode == BluetoothPreferences.DeviceMode.AP) {
-            binding.buttonAp.setEnabled(false);
-            binding.buttonRl.setEnabled(true);
-        } else {
-            binding.buttonAp.setEnabled(true);
-            binding.buttonRl.setEnabled(false);
-        }
         if (Services.bluetooth.getState() == BluetoothState.BT_CONNECTED) {
             binding.statusBt.setTextColor(0xff11ccff);
         } else {
