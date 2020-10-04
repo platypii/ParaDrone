@@ -4,14 +4,14 @@
 void setup() {
   Heltec.begin(
     false, // Display
-    true, // LoRa
+    false, // LoRa
     true, // Serial
     true, // PABOOST
     LORA_BAND
-  );
-  screen_init();
-  bt_init();
-  lora_init();
+  ); // 50ms
+  screen_init(); // 200ms
+  bt_init(); // 680ms
+  lora_init(); // 70ms
 }
 
 void loop() {

@@ -10,24 +10,20 @@ void blink(int count);
 void setup() {
   Heltec.begin(
     false, // Display
-    true, // LoRa
+    false, // LoRa
     true, // Serial
     true, // PABOOST
     LORA_BAND
-  );
-  EEPROM.begin(512);
+  ); // 50ms
   // WiFi.mode(WIFI_OFF);
-  // Serial.println("ParaDrone");
 
   load_landing_zone();
-  screen_init();
   motor_init();
   gps_init();
-  bt_init();
-  lora_init();
-
-  // Welcome
-  blink(4);
+  screen_init(); // 200ms
+  bt_init(); // 680ms
+  lora_init(); // 70ms
+  // blink(4); // 350ms
 }
 
 void loop() {

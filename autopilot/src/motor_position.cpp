@@ -40,7 +40,9 @@ long last_speed_override = -1;
 
 bool motor_running = false;
 
-// If the current position is not the target position, engage the motors
+/**
+ * If the current position is not the target position, engage the motors
+ */
 void motor_loop() {
   update_position_estimate();
 

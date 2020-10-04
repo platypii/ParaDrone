@@ -2,7 +2,7 @@
 #include "rc.h"
 
 static boolean should_redraw = false;
-static long last_redraw_millis = -1;
+static unsigned long last_redraw_millis = 2000; // splash screen ms
 static void screen_draw();
 static void sprintd(char *buf, long delta);
 
@@ -21,7 +21,7 @@ void screen_init() {
 
 void screen_loop() {
   // Refresh at least once per second
-  if (last_redraw_millis >= 0 && millis() - last_redraw_millis >= 1000) {
+  if (millis() >= last_redraw_millis + 1000) {
     should_redraw = true;
   }
   if (should_redraw) {
@@ -51,10 +51,11 @@ static void screen_draw() {
 
   // Alt
   if (!isnan(last_alt)) {
-    sprintf(buf, "Alt: %.0f m MSL", last_alt);
+    sprintf(buf, "%.0f m MSL", last_alt);
     Heltec.display->drawString(0, 10, buf);
   }
 
+  // LoRa lastfix
   if (last_packet_millis > 0) {
     long delta = millis() - last_packet_millis;
 

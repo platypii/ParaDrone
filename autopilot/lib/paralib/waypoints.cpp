@@ -1,7 +1,6 @@
 #include <math.h>
-#include <stdlib.h>
 #include <vector>
-#include "geo.h"
+#include "path.h"
 #include "plan.h"
 using namespace std;
 
@@ -23,15 +22,15 @@ vector<Path*> via_waypoints(Point3V loc, LandingZone *lz, double radius) {
     loc.vy,
     loc.climb
   };
-  vector<Point3V> right_pattern = {straight, lz->start_of_downwind(TURN_RIGHT), lz->start_of_base(TURN_RIGHT), lz->start_of_final()};
   vector<Point3V> left_pattern = {straight, lz->start_of_downwind(TURN_LEFT), lz->start_of_base(TURN_LEFT), lz->start_of_final()};
+  vector<Point3V> right_pattern = {straight, lz->start_of_downwind(TURN_RIGHT), lz->start_of_base(TURN_RIGHT), lz->start_of_final()};
 
-  vector<Path*> right_plans = search_pattern(loc, right_pattern, radius);
   vector<Path*> left_plans = search_pattern(loc, left_pattern, radius);
+  vector<Path*> right_plans = search_pattern(loc, right_pattern, radius);
 
   vector<Path*> plans;
-  plans.insert(plans.end(), right_plans.begin(), right_plans.end());
   plans.insert(plans.end(), left_plans.begin(), left_plans.end());
+  plans.insert(plans.end(), right_plans.begin(), right_plans.end());
   return plans;
 }
 

@@ -1,6 +1,7 @@
 #include <math.h>
 #include <stdio.h>
-#include "geo.h"
+#include <stdlib.h>
+#include "path.h"
 
 #ifdef UNIT_TEST
 #define PRINTF printf

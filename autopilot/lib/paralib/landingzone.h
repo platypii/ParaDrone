@@ -9,7 +9,7 @@ public:
   double landingDirection; // radians
 
   /** Ground length of final approach */
-  const double finalDistance = 100; // meters
+  const double finalDistance = 150; // meters
 
   /** Destination, as origin of coordinate system */
   Point3V dest;

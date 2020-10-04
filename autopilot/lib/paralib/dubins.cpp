@@ -1,13 +1,12 @@
 #include <math.h>
-#include <stdlib.h>
-#include "geo.h"
+#include "path.h"
 
 /**
  * Find dubins path
  */
 Path *dubins(PointV loc, PointV dest, double r, int turn1, int turn2) {
   // First dubins circle, perpendicular to velocity
-  const double velocity = hypot(loc.vx, loc.vy);
+  const double velocity = sqrt(loc.vx * loc.vx + loc.vy * loc.vy);
   if (velocity == 0) {
     // printf("Zero velocity no tangent\n");
     return NULL;
@@ -18,7 +17,7 @@ Path *dubins(PointV loc, PointV dest, double r, int turn1, int turn2) {
     .radius = r
   };
   // Second dubins circle
-  const double dest_velocity = hypot(dest.vx, dest.vy);
+  const double dest_velocity = sqrt(dest.vx * dest.vx + dest.vy * dest.vy);
   if (dest_velocity == 0) {
     // printf("Zero dest velocity no tangent\n");
     return NULL;
@@ -31,7 +30,7 @@ Path *dubins(PointV loc, PointV dest, double r, int turn1, int turn2) {
   // Delta of dubin circles
   const double cx_delta = c2.x - c1.x;
   const double cy_delta = c2.y - c1.y;
-  const double c_dist = hypot(cx_delta, cy_delta);
+  const double c_dist = sqrt(cx_delta * cx_delta + cy_delta * cy_delta);
   if (turn1 != turn2 && c_dist < 2 * r) {
     // printf("Intersecting dubins circles\n", c2, dest);
     return NULL;

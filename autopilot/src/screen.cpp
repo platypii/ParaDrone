@@ -57,18 +57,25 @@ static void screen_draw() {
       const double alt = last_location->alt - current_landing_zone->destination.alt;
       sprintf(buf, "Alt: %.0f m AGL", alt);
     } else {
-      sprintf(buf, "Alt: %.0f m MSL", last_location->alt);
+      sprintf(buf, "%.0f m MSL", last_location->alt);
     }
-  } else {
-    sprintf(buf, "Alt:");
   }
   Heltec.display->drawString(0, 10, buf);
+
+  // Speed
+  if (last_location != NULL) {
+    const double vel = sqrt(last_location->vN * last_location->vN + last_location->vE * last_location->vE);
+    if (!isnan(vel)) {
+      sprintf(buf, "%.0f mph", vel * 2.23694);
+      Heltec.display->drawString(64, 10, buf);
+   }
+  }
 
   // GPS lastfix
   if (last_fix_millis >= 0) {
     long delta = millis() - last_fix_millis;
-    Heltec.display->setTextAlignment(TEXT_ALIGN_RIGHT);
     sprintd(buf, delta);
+    Heltec.display->setTextAlignment(TEXT_ALIGN_RIGHT);
     Heltec.display->drawString(DISPLAY_WIDTH, 10, buf);
     Heltec.display->setTextAlignment(TEXT_ALIGN_LEFT);
   }

@@ -1,6 +1,6 @@
 #include <math.h>
 #include <stdlib.h>
-#include "geo.h"
+#include "path.h"
 
 /**
  * Fly naively to a waypoint.
@@ -8,14 +8,14 @@
  * You will probably not arrive at your destination in the DIRECTION you want though.
  */
 Path *naive(PointV loc, PointV dest, double r) {
-  const double velocity = hypot(loc.vx, loc.vy);
+  const double velocity = sqrt(loc.vx * loc.vx + loc.vy * loc.vy);
   if (velocity == 0) {
     // printf("Zero velocity no tangent");
     return NULL;
   }
   const double delta_x = dest.x - loc.x;
   const double delta_y = dest.y - loc.y;
-  const double delta = hypot(delta_x, delta_y);
+  const double delta = sqrt(delta_x * delta_x + delta_y * delta_y);
   if (delta < 2 * r) {
     // printf("Naive planner on top of lz");
     return NULL;

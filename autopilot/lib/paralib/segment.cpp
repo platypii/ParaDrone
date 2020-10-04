@@ -1,6 +1,6 @@
 #include <math.h>
 #include <stdio.h>
-#include "geo.h"
+#include "path.h"
 
 PointV segment_start(Segment *segment) {
   if (segment->segment_type == 'L') {

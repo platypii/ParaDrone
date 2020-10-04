@@ -1,27 +1,27 @@
 #include <math.h>
 #include <stdio.h>
-#include "geo.h"
+#include "path.h"
 
 static double interpolate(double start, double end, double alpha);
 
 PointV line_start(Line *line) {
   const double dx = line->end.x - line->start.x;
   const double dy = line->end.y - line->start.y;
-  const double len = hypot(dx, dy);
+  const double len = sqrt(dx * dx + dy * dy);
   return PointV {line->start.x, line->start.y, dx / len, dy / len};
 }
 
 PointV line_end(Line *line) {
   const double dx = line->end.x - line->start.x;
   const double dy = line->end.y - line->start.y;
-  const double len = hypot(dx, dy);
+  const double len = sqrt(dx * dx + dy * dy);
   return PointV {line->end.x, line->end.y, dx / len, dy / len};
 }
 
 double line_length(Line *line) {
   const double dx = line->start.x - line->end.x;
   const double dy = line->start.y - line->end.y;
-  return hypot(dx, dy);
+  return sqrt(dx * dx + dy * dy);
 }
 
 /**

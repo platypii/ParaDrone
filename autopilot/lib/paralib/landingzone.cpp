@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include "geo.h"
 #include "landingzone.h"
+#include "plan.h"
 
 LandingZone::LandingZone(double lat, double lng, double alt, double landingDir) {
   destination = {
@@ -85,7 +86,7 @@ Point3V LandingZone::start_of_base(int turn) {
  */
 Point3V LandingZone::start_of_downwind(int turn) {
   Point3V point = {
-    .x = -finalDistance * turn * dest.vy,
+    .x = finalDistance * turn * dest.vy,
     .y = -finalDistance * turn * dest.vx,
     .alt = dest.alt + 3 * finalDistance / PARAMOTOR_GLIDE,
     .vx = -dest.vx,

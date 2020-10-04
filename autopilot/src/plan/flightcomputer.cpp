@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include "paradrone.h"
+#include "path.h"
 #include "plan.h"
 
 // Revert manual control to autopilot after 10 seconds of no RC
