@@ -11,7 +11,7 @@ export function dubins(loc: PointV, dest: PointV, r: number, turn1: Turn, turn2:
     throw new Error("invalid location")
   }
   // First dubins circle, perpendicular to velocity
-  const velocity = Math.hypot(loc.vx, loc.vy)
+  const velocity = Math.sqrt(loc.vx * loc.vx + loc.vy * loc.vy)
   if (velocity === 0) {
     console.error("Zero velocity no tangent")
     return undefined
@@ -22,7 +22,7 @@ export function dubins(loc: PointV, dest: PointV, r: number, turn1: Turn, turn2:
     radius: r
   }
   // Second dubins circle
-  const dest_velocity = Math.hypot(dest.vx, dest.vy)
+  const dest_velocity = Math.sqrt(dest.vx * dest.vx + dest.vy * dest.vy)
   if (dest_velocity === 0) {
     console.error("Zero dest velocity no tangent")
     return undefined
@@ -35,7 +35,7 @@ export function dubins(loc: PointV, dest: PointV, r: number, turn1: Turn, turn2:
   // Delta of dubin circles
   const cx_delta = c2.x - c1.x
   const cy_delta = c2.y - c1.y
-  const c_dist = Math.hypot(cx_delta, cy_delta)
+  const c_dist = Math.sqrt(cx_delta * cx_delta + cy_delta * cy_delta)
   if (turn1 !== turn2 && c_dist < 2 * r) {
     // console.error("Intersecting dubins circles", c2, dest)
     return undefined

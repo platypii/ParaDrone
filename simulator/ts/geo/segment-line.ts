@@ -1,5 +1,5 @@
 import { Point, PointV } from "../dtypes"
-import { ParaControls } from "../paracontrols"
+import { MotorPosition } from "../paracontrols"
 import { interpolate } from "../util"
 import { Path } from "./paths"
 
@@ -13,7 +13,7 @@ export class SegmentLine {
   constructor(start: Point, end: Point) {
     const dx = end.x - start.x
     const dy = end.y - start.y
-    const len = Math.hypot(dx, dy)
+    const len = Math.sqrt(dx * dx + dy * dy)
     this.start = {
       ...start,
       vx: dx / len,
@@ -29,7 +29,7 @@ export class SegmentLine {
     }
   }
 
-  public controls(): ParaControls {
+  public controls(): MotorPosition {
     return {
       left: 0,
       right: 0
@@ -39,7 +39,7 @@ export class SegmentLine {
   public length() {
     const dx = this.end.x - this.start.x
     const dy = this.end.y - this.start.y
-    return Math.hypot(dx, dy)
+    return Math.sqrt(dx * dx + dy * dy)
   }
 
   /**

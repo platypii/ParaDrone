@@ -1,30 +1,19 @@
 /**
- * Paramotor input controls (left and right toggle)
- * 0.0 = no deflection
- * 1.0 = full deflection
+ * Paraglider toggle positions
+ * 0 = no deflection
+ * 255 = full deflection
  */
-export interface ParaControls {
+export interface MotorPosition {
   left: number
   right: number
 }
 
-export const defaultControls: ParaControls = {
-  left: 0,
-  right: 0
-}
-
 /**
- * Return control inputs to achieve a desired turn rate
- * Positive is right, negative is left
- * @param turnRate desired turn rate in degrees / second
+ * Paraglider toggle positions
+ * -255 = no deflection
+ * 255 = full deflection
  */
-export function getControl(turnRate: number): ParaControls {
-  const pull = Math.min(1, Math.abs(turnRate) * 0.05)
-  if (turnRate < 5) {
-    return {left: pull, right: 0}
-  } else if (turnRate > 5) {
-    return {left: 0, right: pull}
-  } else {
-    return {left: 0, right: 0}
-  }
+export interface MotorSpeed {
+  left: number
+  right: number
 }

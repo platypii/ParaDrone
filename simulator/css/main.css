@@ -115,7 +115,15 @@ label {
 
 .ap-status {
   color: #1ce;
-  min-width: 170px;
+  min-width: 180px;
+  min-height: 56px;
+}
+#ap-alt {
+  display: inline-block;
+  width: 96px;
+}
+#ap-speed {
+  display: inline-block;
 }
 
 .param {

@@ -1,8 +1,8 @@
 import { GeoPointV } from "./dtypes"
 import * as geo from "./geo/geo"
 import { LandingZone } from "./geo/landingzone"
-import { toDegrees, toRadians } from "./geo/trig"
-import { ParaControls } from "./paracontrols"
+import { MotorPosition } from "./paracontrols"
+import { Toggles } from "./toggles"
 
 /**
  * Represents a paraglider, with flight characteristics, current location, orientation, and toggle position.
@@ -16,12 +16,10 @@ export class Paraglider {
   public readonly glide = -this.groundSpeed / this.climbRate
 
   // State
+  public readonly toggles: Toggles = new Toggles()
   public loc?: GeoPointV
   public pitch: number = 0
   public roll: number = 0
-
-  // Inputs
-  public controls: ParaControls = {left: 0, right: 0}
 
   private readonly locationListeners: Array<(point: GeoPointV) => void> = []
 
@@ -31,10 +29,10 @@ export class Paraglider {
 
   /**
    * Pull the toggles to given deflections
-   * @param controls how far to pull the toggles in meters
+   * @param targetPosition how far to pull the toggles in meters
    */
-  public setControls(controls: ParaControls): void {
-    this.controls = controls
+  public setControls(targetPosition: MotorPosition): void {
+    this.toggles.setTarget(targetPosition)
   }
 
   /**
@@ -63,7 +61,8 @@ export class Paraglider {
     p.loc = this.loc && {...this.loc}
     p.pitch = this.pitch
     p.roll = this.roll
-    p.controls = {...this.controls}
+    p.toggles.currentPosition = {...this.toggles.currentPosition}
+    p.toggles.targetPosition = {...this.toggles.targetPosition}
     return p
   }
 
@@ -72,12 +71,16 @@ export class Paraglider {
    * Takes into account position, speed, and toggle position.
    */
   public tick(dt: number): void {
+    const alpha = 0.5 // moving average filter applied to toggle inputs to simulate the fact that speed and direction don't change instantly
     if (this.loc) {
-      const vel = Math.hypot(this.loc.vE, this.loc.vN)
+      let vel = Math.sqrt(this.loc.vE * this.loc.vE + this.loc.vN * this.loc.vN)
+      // Update glider speed based on toggle position
+      const turnRate = this.toggles.turnRate()
+      vel += (turnRate.speed - vel) * alpha
+      // Update glider turn (yaw) rate based on toggle position
       const distance = vel * dt
-      const control = this.controls.right - this.controls.left // [-1, 1]
-      const toggle_yaw = distance * control / this.turnRadius
-      const bearing = toDegrees(Math.atan2(this.loc.vE, this.loc.vN) + toggle_yaw)
+      // The proof of this is beautiful:
+      const bearing = Math.atan2(this.loc.vE, this.loc.vN) + distance * turnRate.balance / this.turnRadius / 2
       // TODO: Adjust climb toward climbRate based on gravity or WSE
       // Move lat,lng by distance and bearing
       const moved = geo.moveBearing(this.loc.lat, this.loc.lng, bearing, distance)
@@ -85,8 +88,10 @@ export class Paraglider {
       this.loc.lng = moved.lng
       this.loc.alt += this.loc.climb
       // Adjust velocity
-      this.loc.vN = vel * Math.cos(toRadians(bearing))
-      this.loc.vE = vel * Math.sin(toRadians(bearing))
+      this.loc.vN = vel * Math.cos(bearing)
+      this.loc.vE = vel * Math.sin(bearing)
+      // Update motor position
+      this.toggles.tick(dt)
       // Notify listeners
       for (const listener of this.locationListeners) {
         listener(this.loc)
@@ -95,11 +100,10 @@ export class Paraglider {
   }
 
   /**
-   * Return the horizontal distance we could cover until landing
+   * Return the horizontal distance we could cover in a given amount of vertical distance
    */
   public flightDistanceRemaining(alt: number): number {
     const timeToGround = -alt / this.climbRate
     return this.groundSpeed * timeToGround
   }
-
 }

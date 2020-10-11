@@ -1,5 +1,5 @@
 import { Circle, Point, PointV, Turn } from "../dtypes"
-import { ParaControls } from "../paracontrols"
+import { MotorPosition } from "../paracontrols"
 import { Path } from "./paths"
 import { SegmentLine } from "./segment-line"
 import { toRadians } from "./trig"
@@ -35,8 +35,8 @@ export class SegmentTurn {
     }
   }
 
-  public controls(): ParaControls {
-    const deflect = Math.min(this.arcs() / minimum_turn, 1)
+  public controls(): MotorPosition {
+    const deflect = Math.min(this.arcs() / minimum_turn, 1) * 255
     if (this.turn === Turn.Right) {
       return {left: 0, right: deflect}
     } else {

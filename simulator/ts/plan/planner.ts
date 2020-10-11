@@ -49,8 +49,8 @@ export function best_plan(lz: LandingZone, paths: Path[]): Path | undefined {
  */
 function direction_error(a: PointV, b: PointV): number {
   // Dot product
-  const magA = Math.hypot(a.vx, a.vy)
-  const magB = Math.hypot(b.vx, b.vy)
+  const magA = Math.sqrt(a.vx * a.vx + a.vy * a.vy)
+  const magB = Math.sqrt(b.vx * b.vx + b.vy * b.vy)
   const dot = (a.vx * b.vx + a.vy * b.vy) / (magA * magB)
   if (dot >= 1) {
     return 0

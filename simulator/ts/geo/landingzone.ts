@@ -65,7 +65,7 @@ export class LandingZone {
    * Convert x, y coordinates to lat, lng
    */
   public toLatLng(point: Point): LatLng {
-    const bear = toDegrees(Math.atan2(point.x, point.y))
+    const bear = Math.atan2(point.x, point.y)
     const dist = Math.sqrt(point.x * point.x + point.y * point.y)
     return geo.moveBearing(this.destination.lat, this.destination.lng, bear, dist)
   }
@@ -74,7 +74,7 @@ export class LandingZone {
    * Convert x, y, alt agl coordinates to lat, lng, alt msl
    */
   public toLatLngAlt(point: Point3V): LatLngAlt {
-    const bear = toDegrees(Math.atan2(point.x, point.y))
+    const bear = Math.atan2(point.x, point.y)
     const dist = Math.sqrt(point.x * point.x + point.y * point.y)
     return {
       ...geo.moveBearing(this.destination.lat, this.destination.lng, bear, dist),
@@ -85,7 +85,7 @@ export class LandingZone {
 }
 
 export const kpow = new LandingZone({lat: 47.239, lng: -123.143, alt: 84}, toRadians(32))
-// export const chelan = new LandingZone({lat: 47.864, lng: -119.944, alt: 378}, 0) // chelan
-// export const milehi = new LandingZone({lat: 40.162, lng: -105.164, alt: 1535}, 0) // mile hi
+export const chelan = new LandingZone({lat: 47.864, lng: -119.944, alt: 378}, 0) // chelan
+export const milehi = new LandingZone({lat: 40.162, lng: -105.164, alt: 1535}, 0) // mile hi
 
-export const defaultLz = new LandingZone({lat: 47.864, lng: -119.944, alt: 378}, 0) // chelan
+export const defaultLz = kpow
