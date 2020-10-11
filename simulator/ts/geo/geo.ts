@@ -40,14 +40,13 @@ export function distancePoint(ll1: LatLng, ll2: LatLng): number {
 }
 
 /**
- * Moves the location along a bearing (degrees) by a given distance (meters)
+ * Moves the location along a bearing (radians) by a given distance (meters)
  */
-export function moveBearing(lat_degrees: number, lng_degrees: number, bear_degrees: number, dist: number): LatLng {
+export function moveBearing(lat_degrees: number, lng_degrees: number, bear: number, dist: number): LatLng {
   const d: number = dist / R
 
   const lat = toRadians(lat_degrees)
   const lng = toRadians(lng_degrees)
-  const bear = toRadians(bear_degrees)
 
   // Precompute trig
   const sin_d = Math.sin(d)

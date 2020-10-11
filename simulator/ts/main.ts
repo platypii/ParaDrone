@@ -104,12 +104,14 @@ function updateApScreen() {
   if (para.loc) {
     const dist = geo.distancePoint(para.loc, lz.destination)
     const alt = para.loc.alt - lz.destination.alt
+    const vel = Math.hypot(para.loc.vN, para.loc.vE) * 2.23694 // mph
     document.getElementById("ap-latlng")!.innerText = `${para.loc.lat.toFixed(6)}, ${para.loc.lng.toFixed(6)}`
     document.getElementById("ap-landingzone")!.innerText = `LZ: ${dist.toFixed(0)} m`
-    document.getElementById("ap-alt")!.innerText = `Alt: ${alt.toFixed(0)} m AGL`
+    document.getElementById("ap-alt")!.innerText = `${alt.toFixed(0)} m AGL`
+    document.getElementById("ap-speed")!.innerText = `${vel.toFixed(0)} mph`
   } else {
     document.getElementById("ap-latlng")!.innerText = ""
-    document.getElementById("ap-landingzone")!.innerText = "LZ:"
-    document.getElementById("ap-alt")!.innerText = "Alt:"
+    document.getElementById("ap-landingzone")!.innerText = ""
+    document.getElementById("ap-alt")!.innerText = ""
   }
 }

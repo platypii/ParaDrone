@@ -1,5 +1,5 @@
 import { Point, Point3V, PointV } from "../dtypes"
-import { ParaControls } from "../paracontrols"
+import { MotorPosition } from "../paracontrols"
 import { Paraglider } from "../paraglider"
 import { SegmentLine } from "./segment-line"
 import { SegmentTurn } from "./segment-turn"
@@ -19,7 +19,7 @@ export class Path {
     this.end = segments[segments.length - 1].end
   }
 
-  public controls(): ParaControls {
+  public controls(): MotorPosition {
     return this.segments[0].controls()
   }
 

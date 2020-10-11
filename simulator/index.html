@@ -23,20 +23,6 @@
           <div class="sidebar-header">
             Params
           </div>
-          <label title="Values used by the path planner">Expected</label>
-          <div class="param">
-            Vx <input type="number" step="0.1" id="expected-vx" value="4"> m/s
-          </div>
-          <div class="param">
-            Vy <input type="number" step="0.1" id="expected-vy" value="1"> m/s
-          </div>
-          <label title="Values used by the simulator">Actual</label>
-          <div class="param">
-            Vx <input type="number" step="0.1" id="actual-vx" value="4"> m/s
-          </div>
-          <div class="param">
-            Vy <input type="number" step="0.1" id="actual-vy" value="1"> m/s
-          </div>
           <label>Wind</label>
           <div class="param">
             W <input type="number" step="0.1" id="actual-vy" value="0"> m/s
@@ -82,8 +68,9 @@
         <div class="map-overlay">
           <div class="ap-status">
             <div id="ap-latlng"></div>
-            <div id="ap-landingzone"></div>
             <div id="ap-alt"></div>
+            <div id="ap-speed"></div>
+            <div id="ap-landingzone"></div>
           </div>
         </div>
       </div>

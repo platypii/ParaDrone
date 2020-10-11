@@ -41,8 +41,8 @@ export class Autopilot {
     // How much farther can we fly with available altitude?
     const flight_distance_remaining = this.para.flightDistanceRemaining(loc.alt)
 
-    const r = this.para.turnRadius
-    const dist = Math.hypot(loc.x, loc.y)
+    const r = this.para.turnRadius * 2 // Double the max rate of turn, due to toggle time
+    const dist = Math.sqrt(loc.x * loc.x + loc.y * loc.y)
 
     // No velocity, hard to plan, and holding into the wind seems good
     if (loc.vx === 0 && loc.vy === 0) {

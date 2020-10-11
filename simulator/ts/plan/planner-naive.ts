@@ -12,14 +12,14 @@ import { distance } from "../util"
  * You will probably not arrive at your destination in the DIRECTION you want though.
  */
 export function naive(loc: PointV, dest: Point, r: number): Path | undefined {
-  const velocity = Math.hypot(loc.vx, loc.vy)
+  const velocity = Math.sqrt(loc.vx * loc.vx + loc.vy * loc.vy)
   if (velocity === 0) {
     // console.log("Zero velocity no tangent")
     return undefined
   }
   const delta_x = dest.x - loc.x
   const delta_y = dest.y - loc.y
-  const delta = Math.hypot(delta_x, delta_y)
+  const delta = Math.sqrt(delta_x * delta_x + delta_y * delta_y)
   if (delta < 2 * r) {
     // On top of LZ, let planner fallback to straight plan
     // There is an unreachable area which is a subset of delta < 2r.
