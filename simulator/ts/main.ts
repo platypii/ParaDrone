@@ -1,20 +1,20 @@
+import { Autopilot } from "./autopilot"
 import { GeoPointV, LatLngAlt } from "./dtypes"
 import * as geo from "./geo/geo"
 import { defaultLz } from "./geo/landingzone"
 import { DroneMap } from "./map/drone-map"
 import { MarkerLayer } from "./map/marker-layer"
-import { Paramotor } from "./paramotor"
-import { search } from "./plan/search"
+import { Paraglider } from "./paraglider"
 import * as player from "./player"
 import { sim } from "./sim"
 import * as test from "./test"
 import { distance } from "./util"
 
 const lz = defaultLz
-const para = new Paramotor()
+const para = new Paraglider()
+const autopilot = new Autopilot(para, lz)
 
 let start: GeoPointV
-let loc: GeoPointV
 let map: DroneMap
 
 const planEnabled = document.getElementById("plan-enabled") as HTMLInputElement
@@ -38,13 +38,14 @@ export function init() {
   const hoverLayer = new MarkerLayer("hover", "img/pin.svg")
   map.addLayer(hoverLayer)
   map.onMouseMove((e) => {
-    // console.log("WTF", e)
-    // TODO: Show billboard
     hoverLayer.setLocation(e)
   })
   planEnabled.onclick = update
   simEnabled.onclick = update
   test.init()
+  para.onLocationUpdate(() => {
+    update()
+  })
   update()
 }
 
@@ -58,60 +59,52 @@ function setStart(latlng: LatLngAlt) {
     vE: para.groundSpeed, // TODO: handle init 0
     climb: para.climbRate // TODO: handle init 0
   }
-
-  // Update UI
-  loc = start
-  update()
+  para.setLocation(start)
 
   // Start player
-  player.start(start, lz, (next) => {
-    loc = next
-    update()
-  })
+  player.start(para, lz)
 }
 
 /**
  * Update views
  */
 function update() {
-  if (loc) {
-    para.setLocation(loc)
-    // Compute full plan
-    const alt_agl = loc.alt - lz.destination.alt
-    const plan = search(lz, para)
-    const rendered = plan.render3(para, alt_agl)
+  let plan: LatLngAlt[] = []
+  let actual: GeoPointV[] = []
+  if (planEnabled.checked && autopilot.plan && para.loc) {
+    // Render current plan
+    const alt_agl = para.loc.alt - lz.destination.alt
+    plan = autopilot.plan.render3(para, alt_agl)
       .map((p) => lz.toLatLngAlt(p))
-    const plan_error = distance(plan.end, lz.dest)
-    planName.innerText = plan.name
+    const plan_error = distance(autopilot.plan.end, lz.dest)
+    planName.innerText = autopilot.plan.name
     planError.innerText = `${plan_error.toFixed(1)}m`
-
-    // Simulate forward
-    let actual: GeoPointV[] = []
-    if (simEnabled.checked) {
-      const simsteps = sim(start, lz)
-      actual = simsteps.map((s) => s.loc)
-      const sim_error = geo.distancePoint(actual[actual.length - 1], lz.destination)
-      simError.innerText = `${sim_error.toFixed(1)}m`
-    } else {
-      simError.innerHTML = "&nbsp;"
-    }
-
-    // Update map
-    map.setState({
-      current: loc,
-      plan: planEnabled.checked ? rendered : [],
-      lz,
-      actual
-    })
   }
+  if (simEnabled.checked && start) {
+    // Simulate forward
+    const simsteps = sim(start, lz)
+    actual = simsteps.map((s) => s.loc)
+    const sim_error = geo.distancePoint(actual[actual.length - 1], lz.destination)
+    simError.innerText = `${sim_error.toFixed(1)}m`
+  } else {
+    simError.innerHTML = "&nbsp;"
+  }
+
+  // Update map
+  map.setState({
+    current: para.loc,
+    plan,
+    lz,
+    actual
+  })
   updateApScreen()
 }
 
 function updateApScreen() {
-  if (loc) {
-    const dist = geo.distance(loc.lat, loc.lng, lz.destination.lat, lz.destination.lng)
-    const alt = loc.alt - lz.destination.alt
-    document.getElementById("ap-latlng")!.innerText = `${loc.lat.toFixed(6)}, ${loc.lng.toFixed(6)}`
+  if (para.loc) {
+    const dist = geo.distancePoint(para.loc, lz.destination)
+    const alt = para.loc.alt - lz.destination.alt
+    document.getElementById("ap-latlng")!.innerText = `${para.loc.lat.toFixed(6)}, ${para.loc.lng.toFixed(6)}`
     document.getElementById("ap-landingzone")!.innerText = `LZ: ${dist.toFixed(0)} m`
     document.getElementById("ap-alt")!.innerText = `Alt: ${alt.toFixed(0)} m AGL`
   } else {

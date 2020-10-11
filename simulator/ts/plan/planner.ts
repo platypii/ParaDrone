@@ -1,12 +1,47 @@
 import { PointV } from "../dtypes"
 import { LandingZone } from "../geo/landingzone"
 import { Path } from "../geo/paths"
+import { Paraglider } from "../paraglider"
 import { distance } from "../util"
+
+// Planning params
+export const no_turns_below = 30 // meters
 
 export interface LandingScore {
   score: number
   distance: number
   angle: number
+}
+
+/**
+ * Fly until we are at no_turns_below altitude, and then fly straight
+ */
+export function path_no_turns_below(para: Paraglider, path: Path, alt_agl: number): Path {
+  if (alt_agl <= 0) {
+    console.error("Grounded")
+  }
+  if (alt_agl <= no_turns_below) {
+    console.error("No turns", alt_agl)
+  }
+  const turn_distance_remaining = para.flightDistanceRemaining(alt_agl - no_turns_below)
+  const flight_distance_remaining = para.flightDistanceRemaining(alt_agl)
+  return path.fly(turn_distance_remaining).fly(flight_distance_remaining)
+}
+
+/**
+ * Find the path that minimizes landing error
+ */
+export function best_plan(lz: LandingZone, paths: Path[]): Path | undefined {
+  let best
+  let bestScore = Infinity
+  for (const path of paths) {
+    const score = plan_score(lz, path)
+    if (score < bestScore) {
+      best = path
+      bestScore = score
+    }
+  }
+  return best
 }
 
 /**
@@ -31,7 +66,7 @@ function direction_error(a: PointV, b: PointV): number {
 }
 
 /**
- * Plan score. Lower is better.
+ * Landing score. Lower is better.
  */
 export function landing_score(lz: LandingZone, end: PointV): LandingScore {
   const distanceError = distance(end, lz.dest)
@@ -46,6 +81,6 @@ export function landing_score(lz: LandingZone, end: PointV): LandingScore {
 /**
  * Plan score. Lower is better.
  */
-export function plan_score(lz: LandingZone, path: Path): number {
+function plan_score(lz: LandingZone, path: Path): number {
   return landing_score(lz, path.end).score
 }

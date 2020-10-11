@@ -1,5 +1,4 @@
 import { GeoPointV, LatLng, LatLngAlt, Point, Point3V, Turn } from "../dtypes"
-import { Paramotor } from "../paramotor"
 import * as geo from "./geo"
 import { toDegrees, toRadians } from "./trig"
 
@@ -8,18 +7,21 @@ import { toDegrees, toRadians } from "./trig"
  * Also defines the coordinate system, centered on the landing zone, north aligned.
  */
 export class LandingZone {
-  public readonly destination: LatLngAlt
+  public readonly destination: GeoPointV
   /** Landing direction in radians */
   public readonly landingDirection: number
-
-  // Ground length of final approach
-  public readonly finalDistance: number = 150 // meters
 
   // Destination, as origin of coordinate system
   public readonly dest: Point3V
 
   constructor(destination: LatLngAlt, landingDirection: number) {
-    this.destination = destination
+    this.destination = {
+      ...destination,
+      vN: 0,
+      vE: 0,
+      climb: 0,
+      millis: 0
+    }
     this.landingDirection = landingDirection
     this.dest = {
       x: 0,
@@ -28,48 +30,6 @@ export class LandingZone {
       vx: Math.sin(landingDirection),
       vy: Math.cos(landingDirection),
       climb: 0
-    }
-  }
-
-  /**
-   * Landing pattern: start of final approach
-   */
-  public startOfFinal(para: Paramotor): Point3V {
-    return {
-      x: -this.finalDistance * this.dest.vx,
-      y: -this.finalDistance * this.dest.vy,
-      alt: this.dest.alt + this.finalDistance / para.glide,
-      vx: this.dest.vx,
-      vy: this.dest.vy,
-      climb: para.climbRate
-    }
-  }
-
-  /**
-   * Landing pattern: start of base leg
-   */
-  public startOfBase(para: Paramotor, turn: Turn): Point3V {
-    return {
-      x: this.finalDistance * (-this.dest.vx + turn * this.dest.vy),
-      y: this.finalDistance * (-turn * this.dest.vx - this.dest.vy),
-      alt: this.dest.alt + 2 * this.finalDistance / para.glide, // TODO: Doesn't account for turns
-      vx: -this.dest.vx,
-      vy: -this.dest.vy,
-      climb: para.climbRate
-    }
-  }
-
-  /**
-   * Landing pattern: start of downwind leg
-   */
-  public startOfDownwind(para: Paramotor, turn: Turn): Point3V {
-    return {
-      x: this.finalDistance * turn * this.dest.vy,
-      y: -this.finalDistance * turn * this.dest.vx,
-      alt: this.dest.alt + 3 * this.finalDistance / para.glide, // TODO: Doesn't account for turns
-      vx: -this.dest.vx,
-      vy: -this.dest.vy,
-      climb: para.climbRate
     }
   }
 

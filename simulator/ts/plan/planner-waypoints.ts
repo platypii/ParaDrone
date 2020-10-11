@@ -1,15 +1,13 @@
 import { Point3V, Turn } from "../dtypes"
-import { LandingZone } from "../geo/landingzone"
 import { Path } from "../geo/paths"
-import { Paramotor } from "../paramotor"
+import { LandingPattern } from "./pattern"
 import { shortestDubins } from "./shortest-dubins"
 
 /**
  * Find the best path to fly between a set of waypoints.
  * Waypoints include a velocity component to indicate the direction to arrive.
  */
-export function viaWaypoints(loc: Point3V, lz: LandingZone, para: Paramotor): Path[] {
-  const r = para.turnRadius
+export function viaWaypoints(loc: Point3V, pattern: LandingPattern, turnRadius: number): Path[] {
   // Fly straight for 10s
   const straight: Point3V = {
     ...loc,
@@ -17,27 +15,27 @@ export function viaWaypoints(loc: Point3V, lz: LandingZone, para: Paramotor): Pa
     y: loc.y + 10 * loc.vy,
     alt: loc.alt + 10 * loc.climb
   }
-  const rightPattern = [straight, lz.startOfDownwind(para, Turn.Right), lz.startOfBase(para, Turn.Right), lz.startOfFinal(para), lz.dest]
-  const leftPattern = [straight, lz.startOfDownwind(para, Turn.Left), lz.startOfBase(para, Turn.Left), lz.startOfFinal(para), lz.dest]
+  const rightPattern = [straight, pattern.startOfDownwind(Turn.Right), pattern.startOfBase(Turn.Right), pattern.startOfFinal(), pattern.lz.dest]
+  const leftPattern = [straight, pattern.startOfDownwind(Turn.Left), pattern.startOfBase(Turn.Left), pattern.startOfFinal(), pattern.lz.dest]
 
-  return [...searchPattern(loc, leftPattern, r), ...searchPattern(loc, rightPattern, r)]
+  return [...searchPattern(loc, leftPattern, turnRadius), ...searchPattern(loc, rightPattern, turnRadius)]
 }
 
 /**
  * Search all suffixes of a flight pattern.
  * In between each waypoint, follow the shortest dubins path.
  */
-function searchPattern(loc: Point3V, pattern: Point3V[], r: number): Path[] {
+function searchPattern(loc: Point3V, pattern: Point3V[], turnRadius: number): Path[] {
   // Pre-compute shortest dubins path from pattern[i] to pattern[i+1]
   const steps = []
   for (let i = 0; i < pattern.length - 1; i++) {
-    steps.push(shortestDubins(pattern[i], pattern[i + 1], r))
+    steps.push(shortestDubins(pattern[i], pattern[i + 1], turnRadius))
   }
   // Construct paths for all suffixes
   const paths = []
   for (let i = 0; i < pattern.length; i++) {
     // Construct path for [loc, pattern[i], ..., pattern[n]]
-    const first = shortestDubins(loc, pattern[i], r)
+    const first = shortestDubins(loc, pattern[i], turnRadius)
     const path = catPaths(first, ...steps.slice(i))
     if (path) paths.push(path)
   }

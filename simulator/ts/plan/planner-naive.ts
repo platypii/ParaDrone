@@ -3,7 +3,7 @@ import { Path } from "../geo/paths"
 import { SegmentLine } from "../geo/segment-line"
 import { SegmentTurn } from "../geo/segment-turn"
 import { toRadians } from "../geo/trig"
-import { Paramotor } from "../paramotor"
+import { Paraglider } from "../paraglider"
 import { distance } from "../util"
 
 /**
