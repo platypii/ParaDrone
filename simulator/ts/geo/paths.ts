@@ -1,6 +1,6 @@
 import { Point, Point3V, PointV } from "../dtypes"
 import { ParaControls } from "../paracontrols"
-import { Paramotor } from "../paramotor"
+import { Paraglider } from "../paraglider"
 import { SegmentLine } from "./segment-line"
 import { SegmentTurn } from "./segment-turn"
 
@@ -34,7 +34,7 @@ export class Path {
     return ([] as Point[]).concat(...this.segments.map((s) => s.render()))
   }
 
-  public render3(para: Paramotor, startAlt: number): Point3V[] {
+  public render3(para: Paraglider, startAlt: number): Point3V[] {
     // Render and compute altitudes
     let alt = startAlt
     let lastPoint: Point

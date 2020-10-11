@@ -1,24 +1,21 @@
-import { GeoPointV } from "./dtypes"
 import { LandingZone } from "./geo/landingzone"
-import { Paramotor } from "./paramotor"
-import { search } from "./plan/search"
+import { Paraglider } from "./paraglider"
 
 const interval = 80
 
 let player: number | undefined // interval id
 
-export function start(loc: GeoPointV, lz: LandingZone, listener: (loc: GeoPointV) => void) {
-  const paramotor = new Paramotor()
-  paramotor.setLocation(loc)
-  player = setInterval(() => {
-    const ctrl = search(lz, paramotor).controls()
-    paramotor.setControls(ctrl)
-    paramotor.tick(1)
-    if (paramotor.landed(lz)) {
-      stop()
-    }
-    listener(paramotor.loc!)
-  }, interval)
+export function start(para: Paraglider, lz: LandingZone) {
+  if (player === undefined) {
+    player = setInterval(() => {
+      para.tick(1)
+      if (para.landed(lz)) {
+        stop()
+      }
+    }, interval)
+  } else {
+    console.error("Player double start")
+  }
 }
 
 export function stop() {

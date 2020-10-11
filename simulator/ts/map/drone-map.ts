@@ -3,7 +3,6 @@ import { LandingZone } from "../geo/landingzone"
 import { BaseMap } from "./basemap"
 import { CanopyLayer } from "./canopy-layer"
 import { LandingLayer } from "./landing-layer"
-import { MarkerLayer } from "./marker-layer"
 import { PathLayer } from "./path-layer"
 
 interface MapState {
@@ -16,8 +15,8 @@ interface MapState {
 export class DroneMap extends BaseMap {
   private destLayer = new LandingLayer()
   private canopyLayer = new CanopyLayer()
-  private planLayer = new PathLayer("#1c1")
-  private actualLayer = new PathLayer("#c11")
+  private planLayer = new PathLayer("#2b2")
+  private actualLayer = new PathLayer("#b22")
 
   constructor(lz: LandingZone) {
     super({
