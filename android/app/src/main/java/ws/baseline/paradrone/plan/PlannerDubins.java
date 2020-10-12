@@ -7,6 +7,7 @@ import ws.baseline.paradrone.geo.PointV;
 import ws.baseline.paradrone.geo.SegmentLine;
 import ws.baseline.paradrone.geo.SegmentTurn;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import timber.log.Timber;
 
@@ -16,9 +17,9 @@ class PlannerDubins {
      * Find dubins path.
      */
     @Nullable
-    static Path dubins(PointV loc, PointV dest, double turnRadius, int turn1, int turn2) {
+    static Path dubins(@NonNull PointV loc, @NonNull PointV dest, double turnRadius, int turn1, int turn2) {
         // First dubins circle, perpendicular to velocity
-        final double velocity = Math.hypot(loc.vx, loc.vy);
+        final double velocity = Math.sqrt(loc.vx * loc.vx + loc.vy * loc.vy);
         if (velocity == 0) {
             Timber.w("Zero velocity no tangent");
             return null;
@@ -29,7 +30,7 @@ class PlannerDubins {
                 turnRadius
         );
         // Second dubins circle
-        final double dest_velocity = Math.hypot(dest.vx, dest.vy);
+        final double dest_velocity = Math.sqrt(dest.vx * dest.vx + dest.vy * dest.vy);
         if (dest_velocity == 0) {
             Timber.w("Zero velocity no tangent");
             return null;
@@ -42,7 +43,7 @@ class PlannerDubins {
         // Delta of dubin circles
         final double cx_delta = c2.x - c1.x;
         final double cy_delta = c2.y - c1.y;
-        final double c_dist = Math.hypot(cx_delta, cy_delta);
+        final double c_dist = Math.sqrt(cx_delta * cx_delta + cy_delta * cy_delta);
         if (turn1 != turn2 && c_dist < 2 * turnRadius) {
             // println("Intersecting dubins circles", c2, dest)
             return null;

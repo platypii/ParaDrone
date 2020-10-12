@@ -68,13 +68,18 @@ public class Convert {
             return Double.toString(m);
         } else {
             if (metric) {
-                if (m >= 1000) {
-                    return String.format(Locale.getDefault(), "%.1f km", m * 0.001);
+                if (m >= 10000) {
+                    return String.format(Locale.getDefault(), "%.0f km", m * 0.001);
+                } else if (m >= 1000) {
+                        return String.format(Locale.getDefault(), "%.1f km", m * 0.001);
                 } else {
                     return Math.round(m) + " m";
                 }
             } else {
-                if (m >= MILE) {
+                if (m >= 10 * MILE) {
+                    final double miles = Math.max(10, m * 0.000621371192);
+                    return String.format(Locale.getDefault(), "%.0f mi", miles);
+                } else if (m >= MILE) {
                     // Need max because of float error
                     final double miles = Math.max(1, m * 0.000621371192);
                     return String.format(Locale.getDefault(), "%.1f mi", miles);
@@ -128,35 +133,35 @@ public class Convert {
     }
 
     /**
-     * Convert the bearing to a human readable format, with more precision
+     * Convert the bearing to a human readable format
      *
-     * @param degrees bearing in degrees
-     * @return "40° (NE)"
+     * @param radians bearing in radians
+     * @return "NE"
      */
     @NonNull
-    public static String bearing2(double degrees) {
-        if (Double.isNaN(degrees)) {
+    public static String bearing3(double radians) {
+        if (Double.isNaN(radians)) {
             return "";
         } else {
+            double degrees = Math.toDegrees(radians);
+            degrees %= 360;
             if (degrees < 0) degrees += 360;
-            if (degrees > 360) degrees -= 360;
-            final String bearingStr = ((int) degrees) + "°";
             if (337.5 <= degrees || degrees < 22.5)
-                return bearingStr + " N";
+                return "N";
             else if (degrees < 67.5)
-                return bearingStr + " NE";
+                return "NE";
             else if (degrees < 112.5)
-                return bearingStr + " E";
+                return "E";
             else if (degrees < 157.5)
-                return bearingStr + " SE";
+                return "SE";
             else if (degrees < 202.5)
-                return bearingStr + " S";
+                return "S";
             else if (degrees < 247.5)
-                return bearingStr + " SW";
+                return "SW";
             else if (degrees < 292.5)
-                return bearingStr + " W";
+                return "W";
             else
-                return bearingStr + " NW";
+                return "NW";
         }
     }
 

@@ -13,7 +13,7 @@ class PlannerStraight {
      * Fly straight forever.
      */
     @NonNull
-    static Path straight(PointV loc) {
+    static Path straight(@NonNull PointV loc) {
         final Point target = new Point(loc.x + loc.vx, loc.y + loc.vy);
         return new Path(
                 "straight",
