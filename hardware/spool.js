@@ -7,7 +7,7 @@
 
 const qty = 1
 
-const pulleyRadius = 15.5 - 0.2
+const pulleyRadius = 19 - 0.8
 const axleRadius = 8
 const couplingRadius = 6
 
@@ -17,8 +17,8 @@ const threadRadius = 1.1
 
 function main() {
   return union(
-    translate([0, -16, 0], half1()),
-    translate([0, 16, 0], half2())
+    translate([0, -20, 0], half1()),
+    translate([0, 20, 0], half2())
   )
 }
 
