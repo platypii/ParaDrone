@@ -1,7 +1,5 @@
 package ws.baseline.paradrone.plan;
 
-import ws.baseline.paradrone.Paramotor;
-import ws.baseline.paradrone.geo.LandingZone;
 import ws.baseline.paradrone.geo.Path;
 import ws.baseline.paradrone.geo.Point3V;
 import ws.baseline.paradrone.geo.Segment;
@@ -24,8 +22,7 @@ class PlannerWaypoints {
      * In between each waypoint, follow the shortest dubins path.
      */
     @NonNull
-    static List<Path> viaWaypoints(Point3V loc, LandingZone lz, Paramotor para) {
-        final double r = para.turnRadius;
+    static List<Path> viaWaypoints(@NonNull Point3V loc, @NonNull LandingPattern pattern, double turnRadius) {
         // Fly straight for 10s
         final Point3V straight = new Point3V(
                 loc.x + 10 * loc.vx,
@@ -35,12 +32,12 @@ class PlannerWaypoints {
                 loc.vy,
                 loc.climb
         );
-        final List<Point3V> rightPattern = Arrays.asList(straight, lz.startOfDownwind(TURN_RIGHT), lz.startOfBase(TURN_RIGHT), lz.startOfFinal());
-        final List<Point3V> leftPattern = Arrays.asList(straight, lz.startOfDownwind(TURN_LEFT), lz.startOfBase(TURN_LEFT), lz.startOfFinal());
+        final List<Point3V> leftPattern = Arrays.asList(straight, pattern.startOfDownwind(TURN_LEFT), pattern.startOfBase(TURN_LEFT), pattern.startOfFinal());
+        final List<Point3V> rightPattern = Arrays.asList(straight, pattern.startOfDownwind(TURN_RIGHT), pattern.startOfBase(TURN_RIGHT), pattern.startOfFinal());
 
         final List<Path> plans = new ArrayList<>();
-        plans.addAll(searchPattern(loc, leftPattern, r));
-        plans.addAll(searchPattern(loc, rightPattern, r));
+        plans.addAll(searchPattern(loc, leftPattern, turnRadius));
+        plans.addAll(searchPattern(loc, rightPattern, turnRadius));
         return plans;
     }
 

@@ -16,7 +16,7 @@ public class Point {
         }
     }
 
-    public double distance(Point other) {
+    public double distance(@NonNull Point other) {
         return Math.hypot(x - other.x, y - other.y);
     }
 
