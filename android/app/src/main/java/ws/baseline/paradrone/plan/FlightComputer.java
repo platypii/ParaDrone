@@ -1,7 +1,7 @@
 package ws.baseline.paradrone.plan;
 
 import ws.baseline.paradrone.GeoPoint;
-import ws.baseline.paradrone.Paramotor;
+import ws.baseline.paradrone.Paraglider;
 import ws.baseline.paradrone.bluetooth.ApLandingZone;
 import ws.baseline.paradrone.bluetooth.ApLocationMsg;
 import ws.baseline.paradrone.bluetooth.ApSpeedMsg;
@@ -15,7 +15,7 @@ import org.greenrobot.eventbus.Subscribe;
 
 public class FlightComputer {
 
-    private Paramotor para = new Paramotor();
+    private Paraglider para = new Paraglider();
 
     @Nullable
     private LandingZone lastLz;
@@ -53,7 +53,7 @@ public class FlightComputer {
     private void replan() {
         if (para.loc != null && lastLz != null) {
             // Recompute plan
-            plan = Search.search(para, lastLz);
+            plan = Autopilot.search(para, lastLz);
             EventBus.getDefault().post(new PlanEvent());
         }
     }

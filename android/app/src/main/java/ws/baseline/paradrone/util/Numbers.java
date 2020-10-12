@@ -9,6 +9,13 @@ public class Numbers {
     }
 
     /**
+     * Faster than Math.hypot
+     */
+    public static double hypot(double x, double y) {
+        return Math.sqrt(x * x + y * y);
+    }
+
+    /**
      * Linear interpolation
      */
     public static double interpolate(double start, double end, double alpha) {

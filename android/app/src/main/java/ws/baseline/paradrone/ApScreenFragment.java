@@ -121,7 +121,7 @@ public class ApScreenFragment extends Fragment {
         if (ll != null && lz != null) {
             final double distance = Geo.distance(ll.lat, ll.lng, lz.destination.lat, lz.destination.lng);
             final double bearing = Geo.bearing(ll.lat, ll.lng, lz.destination.lat, lz.destination.lng);
-            binding.statusLandingZone.setText("LZ: " + Convert.distance3(distance) + " " + Convert.bearing2(bearing));
+            binding.statusLandingZone.setText("LZ: " + Convert.distance3(distance) + " " + Convert.bearing3(bearing));
         } else if (lz != null) {
             binding.statusLandingZone.setText(String.format(Locale.getDefault(), "LZ: %.2f, %.2f %.0fm", lz.destination.lat, lz.destination.lng, lz.destination.alt));
         } else {

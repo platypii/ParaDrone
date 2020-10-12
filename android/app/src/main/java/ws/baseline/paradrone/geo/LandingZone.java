@@ -1,13 +1,14 @@
 package ws.baseline.paradrone.geo;
 
 import ws.baseline.paradrone.GeoPoint;
-import ws.baseline.paradrone.Paramotor;
 import ws.baseline.paradrone.util.Convert;
 
 import androidx.annotation.NonNull;
 import java.util.Locale;
 
 public class LandingZone {
+    public static final LandingZone kpow = new LandingZone(47.239, -123.143, 84, Math.toRadians(32));
+
     public final LatLngAlt destination;
     /** Landing direction in radians */
     public final double landingDirection;
@@ -18,6 +19,14 @@ public class LandingZone {
     // Destination, as origin of coordinate system
     public final Point3V dest;
 
+    /**
+     * Construct a LandingZone object.
+     *
+     * @param lat latitude in decimal degrees
+     * @param lng longitude in decimal degrees
+     * @param alt altitude msl in meters
+     * @param landingDirection direction to be facing on landing in radians
+     */
     public LandingZone(double lat, double lng, double alt, double landingDirection) {
         this.destination = new LatLngAlt(lat, lng, alt);
         this.landingDirection = landingDirection;
@@ -32,52 +41,10 @@ public class LandingZone {
     }
 
     /**
-     * Landing pattern: start of final approach
-     */
-    public Point3V startOfFinal() {
-        return new Point3V(
-                -finalDistance * this.dest.vx,
-                -finalDistance * this.dest.vy,
-                dest.alt + finalDistance / Paramotor.glide,
-                dest.vx,
-                dest.vy,
-                Paramotor.descentRate
-        );
-    }
-
-    /**
-     * Landing pattern: start of base leg
-     */
-    public Point3V startOfBase(int turn) {
-        return new Point3V(
-                -finalDistance * (this.dest.vx - turn * this.dest.vy),
-                -finalDistance * (turn * this.dest.vx + this.dest.vy),
-                dest.alt + 2 * finalDistance / Paramotor.glide,
-                -dest.vx,
-                -dest.vy,
-                Paramotor.descentRate
-        );
-    }
-
-    /**
-     * Landing pattern: start of downwind leg
-     */
-    public Point3V startOfDownwind(int turn) {
-        return new Point3V(
-                finalDistance * turn * this.dest.vy,
-                -finalDistance * turn * this.dest.vx,
-                dest.alt + 3 * finalDistance / Paramotor.glide,
-                -dest.vx,
-                -dest.vy,
-                Paramotor.descentRate
-        );
-    }
-
-    /**
      * Convert lat, lng to x, y meters centered at current location
      */
-    public Point3V toPoint3V(GeoPoint point) {
-        final double bearing = Math.toRadians(Geo.bearing(this.destination.lat, this.destination.lng, point.lat, point.lng));
+    public Point3V toPoint3V(@NonNull GeoPoint point) {
+        final double bearing = Geo.bearing(this.destination.lat, this.destination.lng, point.lat, point.lng);
         final double distance = Geo.distance(this.destination.lat, this.destination.lng, point.lat, point.lng);
         return new Point3V(
                 distance * Math.sin(bearing),
@@ -92,10 +59,18 @@ public class LandingZone {
     /**
      * Convert x, y coordinates to lat, lng
      */
-    public LatLng toLatLng(Point point) {
-        final double bear = Math.toDegrees(Math.atan2(point.x, point.y));
-        final double dist = Math.sqrt(point.x * point.x + point.y * point.y);
-        return Geo.moveDirection(this.destination.lat, this.destination.lng, bear, dist);
+    public LatLng toLatLng(@NonNull Point point) {
+        final double bearing = Math.atan2(point.x, point.y);
+        final double distance = Math.sqrt(point.x * point.x + point.y * point.y);
+        return Geo.moveDirection(this.destination.lat, this.destination.lng, bearing, distance);
+    }
+
+    /**
+     * Convert Point3V to GeoPointV
+     */
+    public GeoPoint toGeoPoint(@NonNull Point3V point) {
+        final LatLng ll = toLatLng(point);
+        return new GeoPoint(ll.lat, ll.lng, point.alt, point.vy, point.vx, point.climb);
     }
 
     @NonNull

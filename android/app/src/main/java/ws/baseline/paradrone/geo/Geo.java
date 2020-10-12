@@ -51,7 +51,7 @@ public class Geo {
     /**
      * Computes the bearing from location1 to location2
      *
-     * @return the bearing in degrees (relative to true north, not magnetic)
+     * @return the bearing in radians (relative to true north, not magnetic)
      */
     public static double bearing(double lat1, double lon1, double lat2, double lon2) {
         final double lat1r = Math.toRadians(lat1);
@@ -59,11 +59,11 @@ public class Geo {
         final double delta_lon = Math.toRadians(lon2 - lon1);
         final double y = Math.sin(delta_lon) * Math.cos(lat2r);
         final double x = Math.cos(lat1r) * Math.sin(lat2r) - Math.sin(lat1r) * Math.cos(lat2r) * Math.cos(delta_lon);
-        return Math.toDegrees(Math.atan2(y, x));
+        return Math.atan2(y, x);
     }
 
     /**
-     * Moves the location along a bearing (degrees) by a given distance (meters)
+     * Moves the location along a bearing (radians) by a given distance (meters)
      */
     @NonNull
     public static LatLng moveDirection(double latitude, double longitude, double bearing, double distance) {
@@ -71,7 +71,6 @@ public class Geo {
 
         final double lat = Math.toRadians(latitude);
         final double lon = Math.toRadians(longitude);
-        final double bear = Math.toRadians(bearing);
 
         // Precompute trig
         final double sin_d = Math.sin(d);
@@ -80,8 +79,8 @@ public class Geo {
         final double cos_lat = Math.cos(lat);
         final double sin_d_cos_lat = sin_d * cos_lat;
 
-        final double lat2 = Math.asin(sin_lat * cos_d + sin_d_cos_lat * Math.cos(bear));
-        final double lon2 = lon + Math.atan2(Math.sin(bear) * sin_d_cos_lat, cos_d - sin_lat * Math.sin(lat2));
+        final double lat2 = Math.asin(sin_lat * cos_d + sin_d_cos_lat * Math.cos(bearing));
+        final double lon2 = lon + Math.atan2(Math.sin(bearing) * sin_d_cos_lat, cos_d - sin_lat * Math.sin(lat2));
 
         final double lat3 = Math.toDegrees(lat2);
         final double lon3 = mod360(Math.toDegrees(lon2));

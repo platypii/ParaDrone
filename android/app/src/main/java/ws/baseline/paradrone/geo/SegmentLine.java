@@ -14,7 +14,7 @@ public class SegmentLine implements Segment {
     public SegmentLine(Point start, Point end) {
         final double dx = end.x - start.x;
         final double dy = end.x - start.y;
-        final double len = Math.hypot(dx, dy);
+        final double len = Math.sqrt(dx * dx + dy * dy);
         this.start = new PointV(start.x, start.y, dx / len, dy / len);
         this.end = new PointV(end.x, end.y, dx / len, dy / len);
         if (len == 0) {
@@ -50,7 +50,7 @@ public class SegmentLine implements Segment {
     public double length() {
         final double dx = start.x - end.x;
         final double dy = start.y - end.y;
-        return Math.hypot(dx, dy);
+        return Math.sqrt(dx * dx + dy * dy);
     }
 
     @Override

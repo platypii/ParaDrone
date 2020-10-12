@@ -1,6 +1,6 @@
 package ws.baseline.paradrone.plan;
 
-import ws.baseline.paradrone.Paramotor;
+import ws.baseline.paradrone.Paraglider;
 import ws.baseline.paradrone.geo.LandingZone;
 import ws.baseline.paradrone.geo.Path;
 import ws.baseline.paradrone.geo.Point3V;
@@ -15,18 +15,19 @@ import static ws.baseline.paradrone.plan.PlannerNaive.naive;
 import static ws.baseline.paradrone.plan.PlannerStraight.straight;
 import static ws.baseline.paradrone.plan.PlannerWaypoints.viaWaypoints;
 
-public class Search {
+public class Autopilot {
     private static final double no_turns_below = 30; // meters
 
-    public static Path search(Paramotor para, LandingZone lz) {
+    public static Path search(Paraglider para, LandingZone lz) {
         final Point3V loc = lz.toPoint3V(para.loc);
+        final LandingPattern pattern = new LandingPattern(para, lz);
         // How much farther can we fly with available altitude?
-        final double turn_distance_remaining = Paramotor.flightDistanceRemaining(loc.alt - no_turns_below);
-        final double flight_distance_remaining = Paramotor.flightDistanceRemaining(loc.alt);
+        final double turn_distance_remaining = para.flightDistanceRemaining(loc.alt - no_turns_below);
+        final double flight_distance_remaining = para.flightDistanceRemaining(loc.alt);
 
-        final PointV sof = lz.startOfFinal();
+        final PointV sof = pattern.startOfFinal();
         final double r = para.turnRadius;
-        final double distance = Math.hypot(loc.x, loc.y);
+        final double distance = Math.sqrt(loc.x * loc.x + loc.y * loc.y);
 
         if (loc.vx == 0 && loc.vy == 0) {
             // No velocity, just go straight to lz
@@ -48,7 +49,7 @@ public class Search {
             }
         } else {
             final List<Path> paths = new ArrayList<>();
-            paths.addAll(viaWaypoints(loc, lz, para));
+            paths.addAll(viaWaypoints(loc, pattern, para.turnRadius));
 //            paths.add(dubins(loc, sof, r, TURN_RIGHT, TURN_RIGHT)); // rsr
 //            paths.add(dubins(loc, sof, r, TURN_RIGHT, TURN_LEFT)); // rsl
 //            paths.add(dubins(loc, sof, r, TURN_LEFT, TURN_RIGHT)); // lsr
