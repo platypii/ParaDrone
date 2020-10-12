@@ -2,7 +2,7 @@
 // author     : BASEline
 // license    : MIT License
 // revision   : 1.0
-// tags       : GPS,data,arduino,flysight
+// tags       : Battery,motor,drone,paraglider
 // file       : battery.jscad
 
 const qty = 1
@@ -11,40 +11,38 @@ const battery = {len: 115, width: 31.5, height: 17.4}
 
 const thic = 2 // wall thickness
 const h = battery.len / 2 + thic // height (1/2 battery length)
-const width = battery.height
-const len = battery.width
-const half_len = len / 2
+const xSize = battery.width
+const ySize = battery.height
+const halfX = xSize / 2
 const r = 8 // radius
 
 function main() {
   return difference(
     union(
-      translate([-half_len - 10, 0, 0], cube({size: [len + 20, thic, h]})), // mount1
-      translate([-half_len - thic, -10, 0], cuber(len + 2 * thic, width + thic + 10, h, r + thic)) // outer
+      translate([-halfX - 11, 0, 0], cube({size: [xSize + 22, thic, h]})), // mount1
+      translate([-halfX - thic, -10, 0], roundedRect(xSize + 2 * thic, ySize + thic + 10, h, r + thic, 30)) // outer
     ),
-    translate([-half_len, -10, thic], cuber(len, width + 10, h, r)), // inner
+    translate([-halfX, -10, thic], roundedRect(xSize, ySize + 10, h, r, 30)), // inner
     translate([-100, -400, -1], cube(400)), // bottom half
-    translate([-1.5, -1, -1], cuber(3, 5, 10, 1)), // wire hole
-    translate([-half_len - 6, -2, h / 4], screw()),
-    translate([half_len + 6, -2, h / 4], screw()),
-    translate([-half_len - 6, -2, h * 3 / 4], screw()),
-    translate([half_len + 6, -2, h * 3 / 4], screw())
+    translate([-1.5, -1, -1], roundedRect(3, 5, 10, 1, 15)), // wire hole
+    screws()
   )
 }
 
-function screw(shaftRadius) {
-  const r = shaftRadius || 1.6
+function screws() {
+  const screw = cylinder({r: 1.6, start: [0, 0, 0], end: [0, 4, 0], fn: 25 * qty})
+  const x = 6.5
   return union(
-    cylinder({r: r, start: [0, 0, 0], end: [0, 4, 0], fn: 30 * qty}),
-    cylinder({r1: 0, r2: 2.7, start: [0, 1.5, 0], end: [0, 4, 0], fn: 30 * qty})
+    translate([-halfX - x, -2, h / 4], screw),
+    translate([halfX + x, -2, h / 4], screw),
+    translate([-halfX - x, -2, h * 3 / 4], screw),
+    translate([halfX + x, -2, h * 3 / 4], screw)
   )
 }
 
-function cuber(x, y, z, r) {
-  if (r) {
-    return cube({size: [x, y, z], radius: [r, r, 0], fn: 30 * qty})
-    // return linear_extrude({height: z}, square({size: [x, y], radius: r, segments: 15 * qty}))
-  } else {
-    return cube({size: [x, y, z]}) //, center: [x / 2, y / 2, z / 2]})
-  }
+function roundedRect(x, y, z, r, q) {
+  return intersection(
+    translate([0, 0, -2 * r], cube({size: [x, y, z + 4 * r], radius: r, fn: qty * q})),
+    cube({size: [x, y, z]})
+  )
 }

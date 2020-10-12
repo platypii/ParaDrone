@@ -8,17 +8,20 @@
 const qty = 1
 
 const thic = 2 // wall thickness
-const h = 14 // Start of slope
-const width = 50
+const h = 20 // Start of slope
+const width = 40
 const width2 = width / 2
+const domeLen = 9
 const len = 16
 const sh = 2
 const sh2 = 2 * sh
 const motorR = 18
-const axleZ = 21
+const axleZ = 27
 const epsilon = 0.2
 const epsilon2 = 2 * epsilon
-const b = sh + 2.5
+const slope = 2.6
+const topZ = 36 - h
+const r = 1.5
 
 function main() {
    return union(
@@ -29,11 +32,28 @@ function main() {
 
 function plastic() {
   return difference(
-    shell(),
-    // translate([len - sh, -motorR, b], cube({size: [sh, motorR * 2, h]})), // motor square hole
-    // cylinder({r: motorR, start: [10, 0, axleZ], end: [40, 0, axleZ], fn: 80 * qty}), // motor round hole
-    translate([0, -4, b], cube({size: [sh2, 8, 6]})), // wire hole
+    union(
+      shell(),
+      ramp(),
+      base()
+    ),
+    // wire hole
+    translate([-2, -3.5, sh], cube({size: [6, 7, 2.8], radius: 1, fn: 15 * qty})),
     screws()
+  )
+}
+
+function base() {
+  return intersection(
+    translate([-8, -width2, -5], cube({size: [12, width, 10], radius: 2, fn: 15 * qty})),
+    translate([-8, -width2, 0], cube({size: [11, width, sh]}))
+  )
+}
+
+function ramp() {
+  return difference(
+    translate([6, -5, 0], cube({size: [6, 10, 8]})),
+    cylinder({r: 6, start: [6, -10, 8], end: [6, 10, 8]})
   )
 }
 
@@ -42,18 +62,18 @@ function shell() {
     union(
       bottom(),
       difference(
-        dome(0, 12, 0),
-        dome(sh, 12, sh)
+        dome(0, domeLen, 0),
+        dome(sh, domeLen, sh)
       ),
       support()
     ),
-    translate([0, -width2, 0], cube({size: [len, width, 80], radius: [1, 1, 0], fn: 15 * qty}))
+    // round the edges
+    translate([0, -width2, -10], cube({size: [len, width, h + topZ + 10], radius: r, fn: 15 * qty}))
   )
 }
 
 function dome(x1, x2, domeThic) {
-  const slope = 2
-  const domeHeight = 18 - domeThic
+  const domeHeight = topZ - domeThic
   const y1 = -width2 + domeThic// * Math.sqrt(2)
   const y2 = y1 + domeHeight / slope
   const y4 = width2 - domeThic// * Math.sqrt(2)
@@ -72,14 +92,14 @@ function dome(x1, x2, domeThic) {
 
 function bottom() {
   return difference(
-    translate([0, -width2, 0], cube({size: [len, width, h]})), // radius: [1, 1, 0], fn: 15 * qty})), // base
+    translate([0, -width2, 0], cube({size: [len, width, h]})), // base
     translate([sh, -width2 + sh, sh], cube({size: [len - sh, width - sh2, h - sh]})) // box hollow
   )
 }
 
 function support() {
   return difference(
-    translate([14, -10, 0], cube({size: [4, 20, 5]})),
+    translate([12, -10, 0], cube({size: [6, 20, axleZ - 16]})),
     motor()
   )
 }
@@ -93,28 +113,21 @@ function outer() {
 }
 
 function screws() {
-  const z = 0
-  const y = 12
-  return union(
-    translate([len / 2, y, z], screw()),
-    translate([len / 2, -y, z], screw())
+  const x = -3
+  const y = 15
+  const z = -2
+  const screw = union(
+    cylinder({r: 1.6, start: [0, 0, 0], end: [0, 0, 4], fn: 30 * qty}),
+    cylinder({r1: 0, r2: 2.95, start: [0, 0, 0.8], end: [0, 0, 4], fn: 30 * qty})
   )
-}
-function screw(shaftRadius) {
-  const r = shaftRadius || 1.7
   return union(
-    cylinder({r: r, start: [0, 0, 0], end: [0, 0, 4], fn: 30 * qty}),
-    cylinder({r1: 0, r2: 2.7, start: [0, 0, 1.5], end: [0, 0, 4], fn: 30 * qty})
+    translate([x, y, z], screw),
+    translate([x, -y, z], screw)
   )
 }
 
 function mechanism() {
-  return color("white", union(
-    motor(),
-    translate([10, -21, b], cube({size: [7.5, 7.5, 5.7]})),
-    translate([10, 13.5, b], cube({size: [7.5, 7.5, 5.7]})),
-    translate([0, -3.75, b], cube({size: [7.5, 7.5, 5.7]})) // front
-  ))
+  return color("white", motor())
 }
 
 function motor() {

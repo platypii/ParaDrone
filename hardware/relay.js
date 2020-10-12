@@ -2,7 +2,7 @@
 // author     : BASEline
 // license    : MIT License
 // revision   : 1.0
-// tags       : Motor,actuator,linear,drone,paraglider
+// tags       : Radio,relay,remote control,drone,paraglider
 // file       : relay.jscad
 
 const qty = .7
