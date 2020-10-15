@@ -77,3 +77,11 @@ simulator-lint:
     - cd simulator
     - npm i
     - npx tslint --project .
+
+simulator-mocha:
+  stage: test
+  image: node:14-slim
+  script:
+    - cd simulator
+    - npm i
+    - npm test
