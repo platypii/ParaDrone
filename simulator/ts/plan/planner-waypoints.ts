@@ -15,8 +15,8 @@ export function viaWaypoints(loc: Point3V, pattern: LandingPattern, turnRadius: 
     y: loc.y + 10 * loc.vy,
     alt: loc.alt + 10 * loc.climb
   }
-  const rightPattern = [straight, pattern.startOfDownwind(Turn.Right), pattern.startOfBase(Turn.Right), pattern.startOfFinal(), pattern.lz.dest]
-  const leftPattern = [straight, pattern.startOfDownwind(Turn.Left), pattern.startOfBase(Turn.Left), pattern.startOfFinal(), pattern.lz.dest]
+  const leftPattern = [straight, pattern.startOfDownwind(Turn.Left), pattern.startOfBase(Turn.Left), pattern.startOfFinal()]
+  const rightPattern = [straight, pattern.startOfDownwind(Turn.Right), pattern.startOfBase(Turn.Right), pattern.startOfFinal()]
 
   return [...searchPattern(loc, leftPattern, turnRadius), ...searchPattern(loc, rightPattern, turnRadius)]
 }

@@ -7,6 +7,7 @@ import { best_plan, no_turns_below, path_no_turns_below } from "./plan/planner"
 import { naive } from "./plan/planner-naive"
 import { straight } from "./plan/planner-straight"
 import { viaWaypoints } from "./plan/planner-waypoints"
+import { shortestDubins } from "./plan/shortest-dubins"
 
 /**
  * Controls a paraglider toward a landing zone
@@ -65,7 +66,7 @@ export class Autopilot {
         // dubins(loc, dest, r, Turn.Right, Turn.Left), // rsl
         // dubins(loc, dest, r, Turn.Left, Turn.Right), // lsr
         // dubins(loc, dest, r, Turn.Left, Turn.Left), // lsl
-        // shortestDubins(loc, dest, para.turnRadius),
+        shortestDubins(loc, this.lz.dest, r),
         // naive(loc, dest, r),
         straightPath
       ]
