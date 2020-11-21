@@ -9,6 +9,7 @@ import * as player from "./player"
 import { sim } from "./sim"
 import * as test from "./test"
 import { distance } from "./util"
+import { Windgram } from "./windgram"
 
 const lz = defaultLz
 const para = new Paraglider()
@@ -24,6 +25,7 @@ const simEnabled = document.getElementById("sim-enabled") as HTMLInputElement
 const simError = document.getElementById("sim-error") as HTMLElement
 
 export function init() {
+  new Windgram()
   // Setup map
   map = new DroneMap(lz)
   map.setState({lz})

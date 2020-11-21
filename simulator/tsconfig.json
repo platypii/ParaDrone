@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "es5",
-    "module": "umd",
+    "module": "umd", // UMD needed for tests (node), AMD needed for outFile
     "moduleResolution": "node",
     "sourceMap": true,
     "sourceRoot": "/js",
@@ -15,11 +15,11 @@
     // "noUnusedLocals": true, // TODO: stricter
     // "noUnusedParameters": true, // TODO: stricter
     "outDir": "js",
+    // "outFile": "js/main.js",
     "lib": ["es6", "dom"],
     "typeRoots": [
-      "target/web/node-modules/main/webjars/@types",
-      "target/web/node-modules/test/webjars/@types",
-      "node_modules/@types"
+      "node_modules/@types",
+      "node_modules/@platypii"
     ]
   },
   "include": [

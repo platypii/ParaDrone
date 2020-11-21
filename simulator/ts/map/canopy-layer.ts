@@ -1,3 +1,4 @@
+import * as Cesium from "cesium"
 import { GeoPointV } from "../dtypes"
 import { MapLayer } from "./basemap"
 
@@ -19,30 +20,31 @@ export class CanopyLayer implements MapLayer {
   }
 
   public onRemove(map: Cesium.Viewer) {
-    // TODO
-    // map.entities.remove()
+    if (this.entity) {
+      map.entities.remove(this.entity)
+    }
+    this.map = undefined
   }
 
   private update() {
     if (this.map) {
       if (this.entity && this.loc) {
-        this.entity.position = this.position()
-        this.entity.orientation = this.orientation()
+        this.entity.position = new Cesium.ConstantPositionProperty(this.position())
+        this.entity.orientation = new Cesium.ConstantPositionProperty(this.orientation())
       } else if (this.loc) {
-        this.entity = this.map.entities.add({
+        this.entity = this.map.entities.add(new Cesium.Entity({
           name: "Canopy",
           position: this.position(),
-          orientation: this.orientation(),
+          orientation: new Cesium.ConstantPositionProperty(this.orientation()),
           model: {
             uri: "img/paraglider.glb",
             scale: 0.02
           }
-        })
+        }))
       } else if (this.entity) {
-        // TODO: Remove it
+        // Remove it
+        this.map.entities.remove(this.entity)
       }
-      // TODO
-      // const bearing = Math.atan2(loc.vE, loc.vN)
     }
   }
 
@@ -54,7 +56,7 @@ export class CanopyLayer implements MapLayer {
     }
   }
 
-  private orientation(): Cesium.Cartesian3 {
+  private orientation(): Cesium.Cartesian3 | Cesium.Quaternion {
     if (this.loc) {
       const heading = Math.atan2(this.loc.vE, this.loc.vN) - Math.PI / 2
       const pitch = 0

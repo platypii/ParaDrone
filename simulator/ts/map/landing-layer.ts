@@ -1,8 +1,9 @@
+import * as Cesium from "cesium"
 import { LandingZone } from "../geo/landingzone"
 import { latLngToCart } from "../geo/latlng"
 import { Paraglider } from "../paraglider"
 import { LandingPattern } from "../plan/pattern"
-import { MapLayer } from "./basemap"
+import { lineMaterial, MapLayer } from "./basemap"
 
 export class LandingLayer implements MapLayer {
   private entity?: Cesium.Entity
@@ -11,14 +12,14 @@ export class LandingLayer implements MapLayer {
   private readonly para = new Paraglider()
 
   public onAdd(map: Cesium.Viewer) {
-    this.entity = map.entities.add({
+    this.entity = map.entities.add(new Cesium.Entity({
       name: "Final",
-      polyline: {
+      polyline: new Cesium.PolylineGraphics({
         positions: this.positions(),
-        material: Cesium.Color.fromCssColorString("#22bd"),
+        material: lineMaterial("#228d"),
         width: 6
-      }
-    })
+      })
+    }))
 
     this.update()
   }
@@ -40,7 +41,7 @@ export class LandingLayer implements MapLayer {
 
   private update() {
     if (this.entity) {
-      this.entity.polyline.positions = this.positions()
+      this.entity.polyline!.positions = new Cesium.ConstantProperty(this.positions())
     }
   }
 

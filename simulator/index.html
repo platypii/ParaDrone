@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>ParaDrone Simulator</title>
+    <title>Simulator - ParaDrone</title>
     <link rel="icon" type="image/png" href="https://paradr.one/favicon.png">
     <meta property="og:title" content="ParaDrone: Autopilot for Parachutes">
     <meta property="og:description" content="The ParaDrone project aims to create hardware and software for autonomous parachute flight at full human scale.">
@@ -10,8 +10,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#6b00ff">
     <link rel="stylesheet" href="css/main.css">
-    <script src="https://cesium.com/downloads/cesiumjs/releases/1.74/Build/Cesium/Cesium.js"></script>
-    <link rel="stylesheet" href="https://cesium.com/downloads/cesiumjs/releases/1.74/Build/Cesium/Widgets/widgets.css">
+    <link rel="stylesheet" href="https://cesium.com/downloads/cesiumjs/releases/1.75/Build/Cesium/Widgets/widgets.css">
   </head>
 
   <body>
@@ -21,14 +20,18 @@
 
         <div class="sidebar-section">
           <div class="sidebar-header">
-            Params
+            Wind
           </div>
-          <label>Wind</label>
-          <div class="param">
-            W <input type="number" step="0.1" id="actual-vy" value="0"> m/s
-          </div>
-          <div class="param">
-            Dir <input type="number" step="0.1" id="actual-vy" value="0"> °
+          <div>
+            <svg height="100" width="100" id="windgram">
+              <circle cx="50" cy="50" r="22.5" stroke="#333" stroke-width="1" fill="none"/>
+              <circle cx="50" cy="50" r="45" stroke="#333" stroke-width="1" fill="none"/>
+              <line x1="50" y1="50" x2="50" y2="50" stroke="#111" stroke-width="3" id="windgram-line"/>
+            </svg>
+            <div class="wind-labels">
+              <div id="wind-speed"></div>
+              <div id="wind-direction"></div>
+            </div>
           </div>
         </div>
 
@@ -77,9 +80,12 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=visualization&key=AIzaSyDYk5vsLVQO1Fe2SKHzwMEAQHnsA3SzO1I"></script>
     <script>
-      Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI0OTY0YWEzMi1iYTEzLTRkNTktOWU4Ni1kYTAzZTlhYzg1MDgiLCJpZCI6MTA1MCwiaWF0IjoxNTI2ODU0NTMwfQ.GPRBDfdeQZv-8jHMR4uZoccEuMcxuSTN88nCxrdqW1Y"
+      requirejs.config({
+        paths: {
+          cesium: "https://cesium.com/downloads/cesiumjs/releases/1.75/Build/Cesium/Cesium",
+        }
+      })
       // Load javascript modules
       require(["js/main"], function(main) {
         main.init()

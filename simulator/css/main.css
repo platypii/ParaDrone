@@ -64,7 +64,7 @@ label {
 
 .sidebar {
   height: 100%;
-  width: 300px;
+  width: 260px;
   padding: 10px;
   margin: 0;
 }
@@ -126,14 +126,6 @@ label {
   display: inline-block;
 }
 
-.param {
-  display: inline-block;
-  width: 49%;
-}
-.param input {
-  width: 50%;
-}
-
 #plan-error, #sim-error {
   float: right;
 }
@@ -142,4 +134,14 @@ label {
 }
 .sim-header {
   border-right: 4px solid #c33;
+}
+
+svg#windgram {
+  cursor: pointer;
+  stroke-linecap: round;
+}
+.wind-labels {
+  display: inline-block;
+  position: relative;
+  bottom: 32px;
 }

@@ -1,3 +1,4 @@
+import { Cartesian3 } from "cesium"
 import { LatLng, LatLngAlt } from "../dtypes"
 
 export function formatLatLng(point: LatLng): string {
@@ -16,6 +17,6 @@ export function formatLatLngAlt(point: LatLngAlt): string {
   }
 }
 
-export function latLngToCart(ll: LatLngAlt): Cesium.Cartesian3 {
-  return Cesium.Cartesian3.fromDegrees(ll.lng, ll.lat, ll.alt)
+export function latLngToCart(ll: LatLngAlt): Cartesian3 {
+  return Cartesian3.fromDegrees(ll.lng, ll.lat, ll.alt)
 }
