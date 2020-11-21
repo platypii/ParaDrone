@@ -1,6 +1,7 @@
+import * as Cesium from "cesium"
 import { LatLngAlt } from "../dtypes"
 import { latLngToCart } from "../geo/latlng"
-import { MapLayer } from "./basemap"
+import { lineMaterial, MapLayer } from "./basemap"
 
 export class PathLayer implements MapLayer {
   private readonly color: string
@@ -24,6 +25,7 @@ export class PathLayer implements MapLayer {
     map.scene.primitives.add(this.polylines)
     this.polyline = this.polylines.add({
       positions: this.points.map((d: LatLngAlt) => Cesium.Cartesian3.fromDegrees(d.lng, d.lat, d.alt)),
+      // material: lineMaterial(this.color),
       width: 4
       // strokeOpacity: 0.8 // TODO
     })

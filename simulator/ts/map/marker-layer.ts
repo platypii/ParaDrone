@@ -1,3 +1,4 @@
+import * as Cesium from "cesium"
 import { LatLngAlt } from "../dtypes"
 import { MapLayer } from "./basemap"
 

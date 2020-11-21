@@ -1,3 +1,4 @@
+import * as Cesium from "cesium"
 import { LatLng, LatLngAlt } from "../dtypes"
 import { toDegrees } from "../geo/trig"
 
@@ -14,7 +15,9 @@ export interface MapLayer {
   onRemove(map: Cesium.Viewer): void
 }
 
-const cesiumOptions: Cesium.CesiumOptions = {
+Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI0OTY0YWEzMi1iYTEzLTRkNTktOWU4Ni1kYTAzZTlhYzg1MDgiLCJpZCI6MTA1MCwiaWF0IjoxNTI2ODU0NTMwfQ.GPRBDfdeQZv-8jHMR4uZoccEuMcxuSTN88nCxrdqW1Y"
+
+const cesiumOptions = {
   animation: false, // dial in bottom left
   baseLayerPicker: true, // alternative map layers
   geocoder: false, // geo search box
@@ -36,6 +39,13 @@ export class BaseMap {
     this.map = new Cesium.Viewer(options.element, cesiumOptions)
     this.map.terrainProvider = Cesium.createWorldTerrain()
     this.map.scene.globe.depthTestAgainstTerrain = true
+
+    // Fix resolutionScale to make lines nice
+    let pixelRatio = window.devicePixelRatio
+    while (pixelRatio >= 2.0) { pixelRatio /= 2.0 }
+    this.map.resolutionScale = pixelRatio
+
+    // Center
     if (options.center) {
       this.map.camera.setView({
         destination: Cesium.Cartesian3.fromDegrees(options.center.lng, options.center.lat, 4000)
@@ -95,4 +105,12 @@ export class BaseMap {
       layer.onRemove(this.map)
     }
   }
+}
+
+export function lineMaterial(colorString: string): Cesium.PolylineOutlineMaterialProperty {
+  return new Cesium.PolylineOutlineMaterialProperty({
+    color: Cesium.Color.fromCssColorString(colorString),
+    outlineColor: Cesium.Color.BLACK,
+    outlineWidth: 2
+  })
 }

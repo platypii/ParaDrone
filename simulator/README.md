@@ -9,4 +9,6 @@ Run:
 
 `npm start`
 
-Go to http://locahost:8080/
+Go to:
+
+http://locahost:8080/
