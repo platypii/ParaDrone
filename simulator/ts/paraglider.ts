@@ -3,6 +3,7 @@ import * as geo from "./geo/geo"
 import { LandingZone } from "./geo/landingzone"
 import { MotorPosition } from "./paracontrols"
 import { Toggles } from "./toggles"
+import { Windgram } from "./windgram"
 
 /**
  * Represents a paraglider, with flight characteristics, current location, orientation, and toggle position.
@@ -18,6 +19,7 @@ export class Paraglider {
   // State
   public readonly toggles: Toggles = new Toggles()
   public loc?: GeoPointV
+  public heading: number = 0 // radians
   public pitch: number = 0
   public roll: number = 0
 
@@ -44,6 +46,8 @@ export class Paraglider {
     for (const listener of this.locationListeners) {
       listener(this.loc)
     }
+    // TODO: Update internal heading model
+    this.heading = Math.atan2(point.vE, point.vN)
   }
 
   /**
@@ -69,29 +73,49 @@ export class Paraglider {
   /**
    * Step forward dt seconds of time.
    * Takes into account position, speed, and toggle position.
+   * TODO: Adjust velocities on WSE
    */
-  public tick(dt: number): void {
+  public tick(wind: Windgram, dt: number): void {
     const alpha = 0.5 // moving average filter applied to toggle inputs to simulate the fact that speed and direction don't change instantly
     if (this.loc) {
-      let vel = Math.sqrt(this.loc.vE * this.loc.vE + this.loc.vN * this.loc.vN)
+      // Ground speed
+      const vE = this.loc.vE
+      const vN = this.loc.vN
+      const groundSpeed = Math.sqrt(vE * vE + vN * vN)
+
+      // Air speed
+      const vEair = this.loc.vE - wind.vE
+      const vNair = this.loc.vN - wind.vN
+      let airSpeed = Math.sqrt(vEair * vEair + vNair * vNair)
+
       // Update glider speed based on toggle position
+      // TODO: Special case for straight? Faster?
       const turnRate = this.toggles.turnRate()
-      vel += (turnRate.speed - vel) * alpha
+      airSpeed += (turnRate.speed - airSpeed) * alpha
       // Update glider turn (yaw) rate based on toggle position
-      const distance = vel * dt
+      const distance = airSpeed * dt
+      // Turn radius given toggle position
+      const startBearing = Math.atan2(vE, vN)
+      const endBearing = startBearing + distance * turnRate.balance / this.turnRadius
       // The proof of this is beautiful:
-      const bearing = Math.atan2(this.loc.vE, this.loc.vN) + distance * turnRate.balance / this.turnRadius / 2
-      // TODO: Adjust climb toward climbRate based on gravity or WSE
-      // Move lat,lng by distance and bearing
-      const moved = geo.moveBearing(this.loc.lat, this.loc.lng, bearing, distance)
-      this.loc.lat = moved.lat
-      this.loc.lng = moved.lng
+      const chordBearing = startBearing + distance * turnRate.balance / this.turnRadius / 2
+
+      // Move lat,lng by distance and bearing of flight path relative to wind
+      const prewind = geo.moveBearing(this.loc.lat, this.loc.lng, chordBearing, distance)
+      // Move lat,lng by wind drift
+      const postwind = geo.moveBearing(prewind.lat, prewind.lng, wind.bear(), wind.vel() * dt)
+      this.loc.lat = postwind.lat
+      this.loc.lng = postwind.lng
+
       this.loc.alt += this.loc.climb
+      this.loc.climb += (this.climbRate - this.loc.climb) * alpha
+
       // Adjust velocity
-      this.loc.vN = vel * Math.cos(bearing)
-      this.loc.vE = vel * Math.sin(bearing)
+      this.loc.vE = airSpeed * Math.sin(endBearing) + wind.vE
+      this.loc.vN = airSpeed * Math.cos(endBearing) + wind.vN
       // Update motor position
       this.toggles.tick(dt)
+
       // Notify listeners
       for (const listener of this.locationListeners) {
         listener(this.loc)

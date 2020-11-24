@@ -14,6 +14,7 @@ import { Windgram } from "./windgram"
 const lz = defaultLz
 const para = new Paraglider()
 const autopilot = new Autopilot(para, lz)
+const wind = new Windgram()
 
 let start: GeoPointV
 let map: DroneMap
@@ -25,7 +26,6 @@ const simEnabled = document.getElementById("sim-enabled") as HTMLInputElement
 const simError = document.getElementById("sim-error") as HTMLElement
 
 export function init() {
-  new Windgram()
   // Setup map
   map = new DroneMap(lz)
   map.setState({lz})
@@ -49,6 +49,11 @@ export function init() {
     update()
   })
   update()
+
+  // Setup wind
+  wind.onChange(() => {
+    update()
+  })
 }
 
 function setStart(latlng: LatLngAlt) {
@@ -64,7 +69,7 @@ function setStart(latlng: LatLngAlt) {
   para.setLocation(start)
 
   // Start player
-  player.start(para, lz)
+  player.start(para, lz, wind)
 }
 
 /**
@@ -84,7 +89,7 @@ function update() {
   }
   if (simEnabled.checked && start) {
     // Simulate forward
-    const simsteps = sim(start, lz)
+    const simsteps = sim(start, lz, wind)
     actual = simsteps.map((s) => s.loc)
     const sim_error = geo.distancePoint(actual[actual.length - 1], lz.destination)
     simError.innerText = `${sim_error.toFixed(1)}m`
