@@ -2,12 +2,15 @@ import { GeoPoint } from "./dtypes"
 import { kpow, LandingZone } from "./geo/landingzone"
 import { LandingScore, landing_score } from "./plan/planner"
 import { sim } from "./sim"
+import { Windgram } from "./windgram"
 
 // size x size grid centered on lz
 const gridSize = 10
 const gridStep = 200 // meters
 const gridBound = gridStep * (gridSize - 1) / 2
 const startAlt = 600
+
+const wind = new Windgram()
 
 const btn = document.getElementById("test-button") as HTMLButtonElement
 
@@ -67,7 +70,7 @@ function error(loc: GeoPoint, lz: LandingZone): LandingScore {
   // Immediate path error
   // return plan_score(lz, search(loc, lz))
   // Simulated path error
-  const plan = sim(loc, lz)
+  const plan = sim(loc, lz, wind)
   const landing = plan[plan.length - 1].loc
   const landingPoint = lz.toPoint3V(landing)
   return landing_score(lz, landingPoint)

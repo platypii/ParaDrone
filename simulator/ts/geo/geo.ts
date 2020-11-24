@@ -43,6 +43,11 @@ export function distancePoint(ll1: LatLng, ll2: LatLng): number {
  * Moves the location along a bearing (radians) by a given distance (meters)
  */
 export function moveBearing(lat_degrees: number, lng_degrees: number, bear: number, dist: number): LatLng {
+  if (dist === 0) {
+    // Fast case for dist = 0
+    return {lat: lat_degrees, lng: lng_degrees}
+  }
+
   const d: number = dist / R
 
   const lat = toRadians(lat_degrees)

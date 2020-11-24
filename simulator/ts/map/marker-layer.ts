@@ -33,8 +33,9 @@ export class MarkerLayer implements MapLayer {
     map.scene.primitives.add(this.billboards)
     this.billboard = this.billboards.add({
       position: Cesium.Cartesian3.ZERO,
-      image: this.icon
-      // text: this.title
+      // text: this.title,
+      image: this.icon,
+      verticalOrigin: Cesium.VerticalOrigin.BOTTOM
     })
     this.update()
   }
