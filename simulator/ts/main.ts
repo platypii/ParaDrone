@@ -5,7 +5,7 @@ import { defaultLz } from "./geo/landingzone"
 import { DroneMap } from "./map/drone-map"
 import { MarkerLayer } from "./map/marker-layer"
 import { Paraglider } from "./paraglider"
-import * as player from "./player"
+import { Player } from "./player"
 import { sim } from "./sim"
 import * as test from "./test"
 import { distance } from "./util"
@@ -15,6 +15,7 @@ const lz = defaultLz
 const para = new Paraglider()
 const autopilot = new Autopilot(para, lz)
 const wind = new Windgram()
+const player = new Player(para, lz, wind)
 
 let start: GeoPointV
 let map: DroneMap
@@ -67,9 +68,6 @@ function setStart(latlng: LatLngAlt) {
     climb: para.climbRate // TODO: handle init 0
   }
   para.setLocation(start)
-
-  // Start player
-  player.start(para, lz, wind)
 }
 
 /**

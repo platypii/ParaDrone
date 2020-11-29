@@ -40,6 +40,9 @@ export class BaseMap {
     this.map.terrainProvider = Cesium.createWorldTerrain()
     this.map.scene.globe.depthTestAgainstTerrain = true
 
+    // Set sun position
+    this.map.clock.currentTime = Cesium.JulianDate.fromDate(new Date(1597792800000))
+
     // Fix resolutionScale to make lines nice
     let pixelRatio = window.devicePixelRatio
     while (pixelRatio >= 2.0) { pixelRatio /= 2.0 }

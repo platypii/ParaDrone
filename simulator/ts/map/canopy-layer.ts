@@ -30,12 +30,12 @@ export class CanopyLayer implements MapLayer {
     if (this.map) {
       if (this.entity && this.loc) {
         this.entity.position = new Cesium.ConstantPositionProperty(this.position())
-        this.entity.orientation = new Cesium.ConstantPositionProperty(this.orientation())
+        this.entity.orientation = new Cesium.ConstantProperty(this.orientation())
       } else if (this.loc) {
         this.entity = this.map.entities.add(new Cesium.Entity({
           name: "Canopy",
           position: this.position(),
-          orientation: new Cesium.ConstantPositionProperty(this.orientation()),
+          orientation: new Cesium.ConstantProperty(this.orientation()),
           model: {
             uri: "img/paraglider.glb",
             scale: 0.02

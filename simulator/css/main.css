@@ -89,6 +89,7 @@ label {
   right: 4px;
 }
 
+/* Map */
 .map-container {
   position: relative;
   flex: 1;
@@ -108,11 +109,41 @@ label {
   left: 8px;
 }
 
+/* Playback */
+.playback-controls {
+  top: 80px;
+}
+.map-overlay-button {
+  background-color: transparent;
+  height: 48px;
+  width: 48px;
+  border: none;
+  border-radius: 5px;
+  background-position: center;
+  background-repeat: no-repeat;
+  outline: 0;
+  cursor: pointer;
+}
+.map-overlay-button:hover,
+.map-overlay-button:active:hover {
+  opacity: 0.5;
+}
+.icon-play {
+  background-image: url('../img/play.svg');
+}
+.icon-stop {
+  background-image: url('../img/stop.svg');
+}
+.icon-pause {
+  background-image: url('../img/pause.svg');
+}
+
 #map {
   width: 100%;
   height: 100%;
 }
 
+/* Autopilot overlay */
 .ap-status {
   color: #1ce;
   min-width: 180px;
@@ -136,6 +167,7 @@ label {
   border-right: 4px solid #c33;
 }
 
+/* Wind */
 svg#windgram {
   cursor: pointer;
   stroke-linecap: round;
