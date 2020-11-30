@@ -15,6 +15,16 @@ body {
   display: flex;
 }
 
+.text-right {
+  text-align: right;
+}
+.text-center {
+  text-align: center;
+}
+.text-faded {
+  color: #999;
+}
+
 h1 {
   margin-top: 0;
   margin-bottom: 10px;
@@ -78,7 +88,7 @@ label {
   color: #222;
   font-weight: bold;
   position: relative;
-  padding: 4px;
+  padding: 4px 6px;
   margin-left: -10px;
   margin-right: -10px;
   margin-bottom: 4px;
@@ -87,6 +97,15 @@ label {
   display: inline-block;
   position: absolute;
   right: 4px;
+}
+.sidebar-parameter {
+  display: flex;
+}
+.sidebar-parameter > * {
+  flex: 1;
+}
+.sidebar-parameter > *:last-child {
+  text-align: right;
 }
 
 /* Map */
@@ -157,14 +176,11 @@ label {
   display: inline-block;
 }
 
-#plan-error, #sim-error {
-  float: right;
-}
 .plan-header {
-  border-right: 4px solid #3c3;
+  border-right: 5px solid #33c;
 }
 .sim-header {
-  border-right: 4px solid #c33;
+  border-right: 5px solid #a3c;
 }
 
 /* Wind */

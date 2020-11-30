@@ -2,7 +2,7 @@ import { GeoPoint } from "./dtypes"
 import { kpow, LandingZone } from "./geo/landingzone"
 import { LandingScore, landing_score } from "./plan/planner"
 import { sim } from "./sim"
-import { Windgram } from "./windgram"
+import { Windgram } from "./view/windgram"
 
 // size x size grid centered on lz
 const gridSize = 10

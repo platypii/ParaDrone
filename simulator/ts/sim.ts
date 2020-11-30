@@ -1,9 +1,8 @@
 import { Autopilot } from "./autopilot"
-import { GeoPoint, GeoPointV } from "./dtypes"
+import { GeoPoint, GeoPointV, Wind } from "./dtypes"
 import { LandingZone } from "./geo/landingzone"
 import { Paraglider } from "./paraglider"
 import { LandingScore, landing_score } from "./plan/planner"
-import { Windgram } from "./windgram"
 
 interface SimStep {
   loc: GeoPointV
@@ -13,7 +12,8 @@ interface SimStep {
 /**
  * Run a simulation and return the list of points
  */
-export function sim(start: GeoPoint, lz: LandingZone, wind: Windgram): SimStep[] {
+export function sim(start: GeoPoint, lz: LandingZone, wind: Wind): SimStep[] {
+  const dt = 0.5 // step size in seconds
   const para = new Paraglider()
   const autopilot = new Autopilot(para, lz)
   const startV = {
@@ -26,7 +26,7 @@ export function sim(start: GeoPoint, lz: LandingZone, wind: Windgram): SimStep[]
 
   const actual: SimStep[] = []
   while (!para.landed(lz)) {
-    para.tick(wind, 1)
+    para.tick(wind, dt)
     if (para.loc) {
       const error = 0
       actual.push({loc: {...para.loc}, score: landing_score(lz, autopilot.plan!.end)})

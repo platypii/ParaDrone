@@ -35,8 +35,8 @@ export class Toggles {
    * Sustained rate of speed and turn for current toggle position
    */
   public turnRate(): TurnRate {
-    const minSpeed = 5 // m/s
-    const maxSpeed = 10 // m/s
+    const minSpeed = 6 // m/s
+    const maxSpeed = 12 // m/s
     return {
       speed: maxSpeed - (this.currentPosition.left + this.currentPosition.right) / 512 * (maxSpeed - minSpeed),
       balance: (this.currentPosition.right - this.currentPosition.left) / 255 // [-1..1]

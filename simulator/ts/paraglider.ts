@@ -1,9 +1,8 @@
-import { GeoPointV } from "./dtypes"
+import { GeoPointV, Wind } from "./dtypes"
 import * as geo from "./geo/geo"
 import { LandingZone } from "./geo/landingzone"
 import { MotorPosition } from "./paracontrols"
 import { Toggles } from "./toggles"
-import { Windgram } from "./windgram"
 
 /**
  * Represents a paraglider, with flight characteristics, current location, orientation, and toggle position.
@@ -75,7 +74,7 @@ export class Paraglider {
    * Takes into account position, speed, and toggle position.
    * TODO: Adjust velocities on WSE
    */
-  public tick(wind: Windgram, dt: number): void {
+  public tick(wind: Wind, dt: number): void {
     const alpha = 0.5 // moving average filter applied to toggle inputs to simulate the fact that speed and direction don't change instantly
     if (this.loc) {
       // Ground speed
@@ -88,14 +87,13 @@ export class Paraglider {
       const vNair = this.loc.vN - wind.vN
       let airSpeed = Math.sqrt(vEair * vEair + vNair * vNair)
 
-      // Update glider speed based on toggle position
+      // Update glider turn (yaw) rate and speed based on toggle position
       // TODO: Special case for straight? Faster?
       const turnRate = this.toggles.turnRate()
       airSpeed += (turnRate.speed - airSpeed) * alpha
-      // Update glider turn (yaw) rate based on toggle position
       const distance = airSpeed * dt
-      // Turn radius given toggle position
-      const startBearing = Math.atan2(vE, vN)
+      // Air bearing
+      const startBearing = Math.atan2(vEair, vNair)
       const endBearing = startBearing + distance * turnRate.balance / this.turnRadius
       // The proof of this is beautiful:
       const chordBearing = startBearing + distance * turnRate.balance / this.turnRadius / 2
@@ -107,7 +105,7 @@ export class Paraglider {
       this.loc.lat = postwind.lat
       this.loc.lng = postwind.lng
 
-      this.loc.alt += this.loc.climb
+      this.loc.alt += this.loc.climb * dt
       this.loc.climb += (this.climbRate - this.loc.climb) * alpha
 
       // Adjust velocity

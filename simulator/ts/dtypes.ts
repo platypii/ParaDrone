@@ -57,3 +57,10 @@ export interface Circle {
   y: number
   radius: number
 }
+
+export interface Wind {
+  vE: number
+  vN: number
+  bear(): number
+  vel(): number
+}
