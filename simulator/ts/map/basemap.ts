@@ -51,7 +51,7 @@ export class BaseMap {
     // Center
     if (options.center) {
       this.map.camera.setView({
-        destination: Cesium.Cartesian3.fromDegrees(options.center.lng, options.center.lat, 4000)
+        destination: Cesium.Cartesian3.fromDegrees(options.center.lng, options.center.lat, 3000)
       })
     }
   }

@@ -15,14 +15,14 @@ interface MapState {
 export class DroneMap extends BaseMap {
   private destLayer = new LandingLayer()
   private canopyLayer = new CanopyLayer()
-  private planLayer = new PathLayer("#2b2")
-  private actualLayer = new PathLayer("#b22")
+  private planLayer = new PathLayer("#22b")
+  private actualLayer = new PathLayer("#4422bb99")
 
   constructor(lz: LandingZone) {
     super({
       element: "map",
       center: lz.destination,
-      zoom: 16
+      zoom: 15
     })
     this.addLayer(this.destLayer)
     this.addLayer(this.canopyLayer)

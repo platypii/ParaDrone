@@ -1,20 +1,21 @@
+import { Wind } from "./dtypes"
 import { LandingZone } from "./geo/landingzone"
 import { Paraglider } from "./paraglider"
-import { Windgram } from "./windgram"
 
 /**
  * Control playback of the simulation
  */
 export class Player {
-  private readonly interval = 80
+  private readonly interval = 50
+  private readonly dt = 0.5
 
   private readonly para: Paraglider
   private readonly lz: LandingZone
-  private readonly wind: Windgram
+  private readonly wind: Wind
 
   private player: number | undefined // interval id
 
-  constructor(para: Paraglider, lz: LandingZone, wind: Windgram) {
+  constructor(para: Paraglider, lz: LandingZone, wind: Wind) {
     this.para = para
     this.lz = lz
     this.wind = wind
@@ -29,13 +30,11 @@ export class Player {
   public start(): void {
     if (this.player === undefined) {
       this.player = setInterval(() => {
-        this.para.tick(this.wind, 1)
+        this.para.tick(this.wind, this.dt)
         if (this.para.landed(this.lz)) {
-          stop()
+          this.stop()
         }
       }, this.interval)
-    } else {
-      console.error("Player double start")
     }
   }
 

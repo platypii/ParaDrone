@@ -36,19 +36,43 @@
         </div>
 
         <div class="sidebar-section">
+          <div class="sidebar-header">
+            Toggles
+          </div>
+          <div class="sidebar-parameter">
+            <div id="toggle-left-target"></div>
+            <div class="text-center text-faded">target</div>
+            <div id="toggle-right-target"></div>
+          </div>
+          <div class="sidebar-parameter">
+            <div id="toggle-left"></div>
+            <div class="text-center text-faded">pos</div>
+            <div id="toggle-right"></div>
+          </div>
+        </div>
+        <div class="sidebar-section">
           <div class="sidebar-header plan-header">
             Plan
             <input type="checkbox" id="plan-enabled" title="Show short term plan" checked>
           </div>
-          <div id="plan-name">&nbsp;</div>
-          <div id="plan-error">&nbsp;</div>
+          <div class="sidebar-parameter">
+            <div class="text-faded">mode</div>
+            <div id="plan-name"></div>
+          </div>
+          <div class="sidebar-parameter">
+            <div class="text-faded">error</div>
+            <div id="plan-error"></div>
+          </div>
         </div>
         <div class="sidebar-section">
           <div class="sidebar-header sim-header">
             Sim
             <input type="checkbox" id="sim-enabled" title="Show simulated path" checked>
           </div>
-          <div id="sim-error">&nbsp;</div>
+          <div class="sidebar-parameter">
+            <div class="text-faded">error</div>
+            <div id="sim-error"></div>
+          </div>
           <svg id="sim-error-chart"></svg> <!-- TODO -->
         </div>
 

@@ -16,7 +16,7 @@ export class LandingLayer implements MapLayer {
       name: "Final",
       polyline: new Cesium.PolylineGraphics({
         positions: this.positions(),
-        material: lineMaterial("#228d"),
+        material: lineMaterial("#262d"),
         width: 6
       })
     }))

@@ -9,13 +9,17 @@ import { Player } from "./player"
 import { sim } from "./sim"
 import * as test from "./test"
 import { distance } from "./util"
-import { Windgram } from "./windgram"
+import { ApScreen } from "./view/apscreen"
+import { ToggleView } from "./view/toggleview"
+import { Windgram } from "./view/windgram"
 
 const lz = defaultLz
 const para = new Paraglider()
 const autopilot = new Autopilot(para, lz)
 const wind = new Windgram()
 const player = new Player(para, lz, wind)
+const apScreen = new ApScreen()
+const toggleView = new ToggleView()
 
 let start: GeoPointV
 let map: DroneMap
@@ -51,6 +55,9 @@ export function init() {
   })
   update()
 
+  // Default starting position (watertower)
+  setStart({lat: 47.24, lng: -123.163, alt: 800})
+
   // Setup wind
   wind.onChange(() => {
     update()
@@ -83,14 +90,14 @@ function update() {
       .map((p) => lz.toLatLngAlt(p))
     const plan_error = distance(autopilot.plan.end, lz.dest)
     planName.innerText = autopilot.plan.name
-    planError.innerText = `${plan_error.toFixed(1)}m`
+    planError.innerText = `${plan_error.toFixed(0)} m`
   }
   if (simEnabled.checked && start) {
     // Simulate forward
     const simsteps = sim(start, lz, wind)
     actual = simsteps.map((s) => s.loc)
     const sim_error = geo.distancePoint(actual[actual.length - 1], lz.destination)
-    simError.innerText = `${sim_error.toFixed(1)}m`
+    simError.innerText = `${sim_error.toFixed(0)} m`
   } else {
     simError.innerHTML = "&nbsp;"
   }
@@ -102,21 +109,10 @@ function update() {
     lz,
     actual
   })
-  updateApScreen()
+  apScreen.update(para, lz)
+  toggleView.update(para)
 }
 
-function updateApScreen() {
-  if (para.loc) {
-    const dist = geo.distancePoint(para.loc, lz.destination)
-    const alt = para.loc.alt - lz.destination.alt
-    const vel = Math.hypot(para.loc.vN, para.loc.vE) * 2.23694 // mph
-    document.getElementById("ap-latlng")!.innerText = `${para.loc.lat.toFixed(6)}, ${para.loc.lng.toFixed(6)}`
-    document.getElementById("ap-landingzone")!.innerText = `LZ: ${dist.toFixed(0)} m`
-    document.getElementById("ap-alt")!.innerText = `${alt.toFixed(0)} m AGL`
-    document.getElementById("ap-speed")!.innerText = `${vel.toFixed(0)} mph`
-  } else {
-    document.getElementById("ap-latlng")!.innerText = ""
-    document.getElementById("ap-landingzone")!.innerText = ""
-    document.getElementById("ap-alt")!.innerText = ""
-  }
+function updateToggles() {
+  document.getElementById("ap-alt")!.innerText = ""
 }

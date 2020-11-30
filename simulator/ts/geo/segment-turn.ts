@@ -5,7 +5,7 @@ import { SegmentLine } from "./segment-line"
 import { toRadians } from "./trig"
 
 // If turn is less than minimum_turn, then don't bury a toggle
-const minimum_turn = toRadians(6)
+const minimum_turn = toRadians(10)
 
 /**
  * 2D curved segment with fixed turn radius.

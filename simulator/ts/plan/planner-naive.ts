@@ -52,7 +52,8 @@ export function naive(loc: PointV, dest: Point, r: number): Path | undefined {
   }
   const turn = new SegmentTurn(c1, loc, comm1, turn1)
   const line = new SegmentLine(comm1, dest)
-  return new Path("naive", turn, line)
+  const name = turn1 === Turn.Left ? "naive (L)" : "naive (R)"
+  return new Path(name, turn, line)
 }
 
 // If we are within angleError of on-target, return straight line
