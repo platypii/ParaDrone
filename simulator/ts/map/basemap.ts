@@ -43,10 +43,8 @@ export class BaseMap {
     // Set sun position
     this.map.clock.currentTime = Cesium.JulianDate.fromDate(new Date(1597792800000))
 
-    // Fix resolutionScale to make lines nice
-    let pixelRatio = window.devicePixelRatio
-    while (pixelRatio >= 2.0) { pixelRatio /= 2.0 }
-    this.map.resolutionScale = pixelRatio
+    // Fix resolution scale to make lines nice
+    this.map.useBrowserRecommendedResolution = false
 
     // Center
     if (options.center) {
