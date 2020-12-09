@@ -3,6 +3,7 @@ import { LandingZone } from "../geo/landingzone"
 import { BaseMap } from "./basemap"
 import { CanopyLayer } from "./canopy-layer"
 import { LandingLayer } from "./landing-layer"
+import { HoverLayer } from "./hover-layer"
 import { PathLayer } from "./path-layer"
 
 interface MapState {
@@ -17,6 +18,7 @@ export class DroneMap extends BaseMap {
   private canopyLayer = new CanopyLayer()
   private planLayer = new PathLayer("#22b")
   private actualLayer = new PathLayer("#4422bb99")
+  private hoverLayer = new HoverLayer()
 
   constructor(lz: LandingZone) {
     super({
@@ -28,6 +30,10 @@ export class DroneMap extends BaseMap {
     this.addLayer(this.canopyLayer)
     this.addLayer(this.planLayer)
     this.addLayer(this.actualLayer)
+    this.addLayer(this.hoverLayer)
+    this.onMouseMove((e) => {
+      this.hoverLayer.setLocation(e)
+    })
   }
 
   public setState(state: MapState) {

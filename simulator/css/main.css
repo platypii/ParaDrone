@@ -59,17 +59,24 @@ label {
 .btn:active {
   border: 1px solid #aaa;
   border-radius: 4px;
-  background-color: #e6e6e6;
+  background-color: #fff;
   color: #333;
-  font-weight: bold;
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 16px;
   padding-right: 16px;
   cursor: pointer;
 }
-.btn:hover {
-  background-color: #ccc;
+.btn:hover,
+.btn:focus {
+  background-color: #e6e6e6;
+}
+.btn:focus {
+  outline-offset: -2px;
+}
+.btn[disabled] {
+  cursor: not-allowed;
+  opacity: 0.65;
 }
 
 .sidebar {

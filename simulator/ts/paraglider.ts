@@ -9,7 +9,7 @@ import { Toggles } from "./toggles"
  */
 export class Paraglider {
   // Constants
-  public readonly turnRadius = 50 // Turn radius in meters with 1 toggle buried
+  public readonly turnRadius = 40 // Turn radius in meters with 1 toggle buried
   // public readonly yawRate = toDegrees(velocity / turnRadius) // Yaw degrees per second with 1 toggle buried
   public readonly climbRate = -3 // Meters of altitude lost per second
   public readonly groundSpeed = 12 // Meters per second

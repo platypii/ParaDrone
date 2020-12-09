@@ -3,7 +3,6 @@ import { GeoPointV, LatLngAlt } from "./dtypes"
 import * as geo from "./geo/geo"
 import { defaultLz } from "./geo/landingzone"
 import { DroneMap } from "./map/drone-map"
-import { MarkerLayer } from "./map/marker-layer"
 import { Paraglider } from "./paraglider"
 import { Player } from "./player"
 import { sim } from "./sim"
@@ -39,24 +38,19 @@ export function init() {
     setStart({
       lat: e.lat,
       lng: e.lng,
-      alt: 800 // TODO: Get elevation
+      alt: 600 // TODO: Get elevation
     })
-  })
-  const hoverLayer = new MarkerLayer("hover", "img/pin.svg")
-  map.addLayer(hoverLayer)
-  map.onMouseMove((e) => {
-    hoverLayer.setLocation(e)
   })
   planEnabled.onclick = update
   simEnabled.onclick = update
-  test.init()
+  test.init(map, wind)
   para.onLocationUpdate(() => {
     update()
   })
   update()
 
   // Default starting position (watertower)
-  setStart({lat: 47.24, lng: -123.163, alt: 800})
+  // setStart({lat: 47.24, lng: -123.163, alt: 800})
 
   // Setup wind
   wind.onChange(() => {
