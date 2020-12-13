@@ -1,11 +1,11 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
     defaultConfig {
         applicationId "ws.baseline.paradrone"
         minSdkVersion 23 // 21 for BLE, 23 for better BLE
-        targetSdkVersion 29
+        targetSdkVersion 30
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -32,7 +32,7 @@ dependencies {
     implementation 'com.google.maps:google-maps-services:0.13.0'
     implementation 'org.greenrobot:eventbus:3.2.0'
     implementation 'com.jakewharton.timber:timber:4.7.1'
-    testImplementation 'junit:junit:4.13'
+    testImplementation 'junit:junit:4.13.1'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 }
