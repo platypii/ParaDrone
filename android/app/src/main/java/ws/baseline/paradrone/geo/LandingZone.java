@@ -62,7 +62,7 @@ public class LandingZone {
     public LatLng toLatLng(@NonNull Point point) {
         final double bearing = Math.atan2(point.x, point.y);
         final double distance = Math.sqrt(point.x * point.x + point.y * point.y);
-        return Geo.moveDirection(this.destination.lat, this.destination.lng, bearing, distance);
+        return Geo.moveBearing(this.destination.lat, this.destination.lng, bearing, distance);
     }
 
     /**

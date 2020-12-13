@@ -17,7 +17,7 @@ public class ApLandingZone implements ApEvent {
     @Nullable
     public static ApLandingZone lastLz;
 
-    private ApLandingZone(@Nullable LandingZone lz, boolean pending) {
+    ApLandingZone(@Nullable LandingZone lz, boolean pending) {
         this.lz = lz;
         this.pending = pending;
     }
@@ -48,5 +48,19 @@ public class ApLandingZone implements ApEvent {
         }
         lastLz = new ApLandingZone(lz, false);
         EventBus.getDefault().post(lastLz);
+    }
+
+    public byte[] toBytes() {
+        // Pack LZ into bytes
+        final byte[] bytes = new byte[13];
+        bytes[0] = 'Z';
+        if (lz != null) {
+            final ByteBuffer buf = ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN);
+            buf.putInt(1, (int)(lz.destination.lat * 1e6)); // microdegrees
+            buf.putInt(5, (int)(lz.destination.lng * 1e6)); // microdegrees
+            buf.putShort(9, (short)(lz.destination.alt * 10)); // decimeters
+            buf.putShort(11, (short)(lz.landingDirection * 1000)); // milliradians
+        }
+        return bytes;
     }
 }

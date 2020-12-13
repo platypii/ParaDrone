@@ -7,6 +7,7 @@ import ws.baseline.paradrone.geo.Point3V;
 import ws.baseline.paradrone.geo.PointV;
 import ws.baseline.paradrone.geo.SegmentLine;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +19,7 @@ import static ws.baseline.paradrone.plan.PlannerWaypoints.viaWaypoints;
 public class Autopilot {
     private static final double no_turns_below = 30; // meters
 
-    public static Path search(Paraglider para, LandingZone lz) {
+    public static Path search(@NonNull Paraglider para, @NonNull LandingZone lz) {
         final Point3V loc = lz.toPoint3V(para.loc);
         final LandingPattern pattern = new LandingPattern(para, lz);
         // How much farther can we fly with available altitude?

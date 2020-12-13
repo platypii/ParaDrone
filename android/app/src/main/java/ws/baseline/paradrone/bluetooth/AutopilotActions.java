@@ -4,8 +4,6 @@ import ws.baseline.paradrone.geo.LandingZone;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import timber.log.Timber;
 
 public class AutopilotActions {
@@ -22,16 +20,8 @@ public class AutopilotActions {
     public void setLandingZone(@Nullable LandingZone lz) {
         Timber.i("phone -> ap: set lz %s", lz);
         // Pack LZ into bytes
-        final byte[] value = new byte[13];
-        value[0] = 'Z';
-        if (lz != null) {
-            final ByteBuffer buf = ByteBuffer.wrap(value).order(ByteOrder.LITTLE_ENDIAN);
-            buf.putInt(1, (int)(lz.destination.lat * 1e6)); // microdegrees
-            buf.putInt(5, (int)(lz.destination.lng * 1e6)); // microdegrees
-            buf.putShort(9, (short)(lz.destination.alt * 10)); // decimeters
-            buf.putShort(11, (short)(lz.landingDirection * 1000)); // milliradians
-        }
-        sendCommand(value);
+        final byte[] bytes = new ApLandingZone(lz, false).toBytes();
+        sendCommand(bytes);
         // Fetch after send
         try {
             Thread.sleep(1000); // TODO: Wait for async callback
@@ -61,19 +51,14 @@ public class AutopilotActions {
         sendCommand(new byte[] {'Q', 'Z'});
     }
 
-    public void fetchMotorConfig() {
-        Timber.i("phone -> ap: fetch motor config");
+    public void fetchConfig() {
+        Timber.i("phone -> ap: fetch config");
         sendCommand(new byte[] {'Q', 'C'});
     }
 
-    public void setFrequency(int freq) {
-        Timber.i("phone -> ap: set freq %d", freq);
-        // Pack frequency into bytes
-        final byte[] value = new byte[5];
-        value[0] = 'F';
-        final ByteBuffer buf = ByteBuffer.wrap(value).order(ByteOrder.LITTLE_ENDIAN);
-        buf.putInt(1, freq);
-        sendCommand(value);
+    public void setConfig(ApConfigMsg msg) {
+        Timber.i("phone -> ap: set config %s", msg);
+        sendCommand(msg.toBytes());
     }
 
     public void setMode(int mode) {
