@@ -9,7 +9,7 @@ import timber.log.Timber;
 class ViewState {
 
     enum ViewMode {
-        HOME, CTRL, LZ, CFG
+        HOME, CTRL, LZ, OPTIONS, CFG
     }
 
     static ViewMode mode = ViewMode.HOME;

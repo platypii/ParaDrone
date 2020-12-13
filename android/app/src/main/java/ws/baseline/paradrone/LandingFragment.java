@@ -27,7 +27,7 @@ import timber.log.Timber;
 public class LandingFragment extends Fragment {
 
     private LandingFragmentBinding binding;
-    private Handler handler = new Handler();
+    private final Handler handler = new Handler();
     private boolean savePending = false;
 
     @Override
@@ -43,9 +43,7 @@ public class LandingFragment extends Fragment {
                 save();
             }
         });
-        binding.lzCancel.setOnClickListener((e) -> {
-            getParentFragmentManager().popBackStack();
-        });
+        binding.lzCancel.setOnClickListener((e) -> getParentFragmentManager().popBackStack());
 
         return binding.getRoot();
     }

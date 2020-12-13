@@ -227,9 +227,12 @@ class BluetoothHandler {
     };
 
     private void processBytes(@NonNull byte[] value) {
-        if (value[0] == 'L' && value.length == 11) {
-            // Location message
-            ApLocationMsg.parse(value);
+        if (value[0] == 'C' && value.length == 10) {
+            // Config message
+            ApConfigMsg.parse(value);
+        } else if (value[0] == 'L' && value.length == 11) {
+                // Location message
+                ApLocationMsg.parse(value);
         } else if (value[0] == 'S' && value.length == 17) {
             // Speed message
             ApSpeedMsg.parse(value);

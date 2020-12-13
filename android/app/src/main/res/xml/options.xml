@@ -4,26 +4,20 @@
     <SwitchPreference
         app:key="device_mode_rc"
         app:title="R/C Mode"
-        app:icon="@drawable/ic_bluetooth"
+        app:icon="@drawable/bluetooth"
         app:summaryOn="Connecting to remote control"
         app:summaryOff="Connecting to autopilot"/>
 
     <Preference
         app:key="set_lz"
         app:title="Set LZ"
-        app:icon="@drawable/ic_target"
+        app:icon="@drawable/target"
         app:summary="Set target landing zone"/>
 
     <Preference
-        app:key="set_freq"
-        app:title="Set freq"
-        app:icon="@drawable/ic_freq"
-        app:summary="Set LoRa frequency"/>
-
-    <Preference
-        app:key="set_motor_config"
-        app:title="Set motor config"
-        app:icon="@drawable/ic_clockwise"
-        app:summary="Set motor direction and stroke length"/>
+        app:key="set_config"
+        app:title="Motor config"
+        app:icon="@drawable/frequency"
+        app:summary="Frequency, motor direction, and stroke length"/>
 
 </PreferenceScreen>

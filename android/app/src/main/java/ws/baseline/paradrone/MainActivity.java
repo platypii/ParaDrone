@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
         binding.setConfig.setOnClickListener((e) -> {
             getSupportFragmentManager()
                     .beginTransaction()
-                    .replace(R.id.control_plane, new ConfigFragment())
+                    .replace(R.id.control_plane, new OptionsFragment())
                     .addToBackStack(null)
                     .commit();
         });
