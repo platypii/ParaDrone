@@ -31,7 +31,9 @@ Path *naive(PointV loc, PointV dest, double r) {
   // Angle from circle center to target
   const double center_angle = atan2(dest.x - c1.x, dest.y - c1.y);
   // Commute
-  const double cdest = hypot(c1.x - dest.x, c1.y - dest.y);
+  const double cdx = c1.x - dest.x;
+  const double cdy = c1.y - dest.y;
+  const double cdest = sqrt(cdx * cdx + cdy * cdy);
   const double offset = turn1 * asin(r / cdest);
   const double commute_angle = center_angle + offset;
   // const double commute_length = sqrt(cdest * cdest - r * r);

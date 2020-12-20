@@ -18,7 +18,7 @@
 
 // Limit switch
 #define PIN_M1_LIMIT 37
-#define PIN_M2_LIMIT 33 // 36 no pull ups
+#define PIN_M2_LIMIT 36
 
 // ESP32 PWM channels
 #define CHANNEL_M1_IN1 0
@@ -116,7 +116,7 @@ float get_motor_current_left() {
   // 0..4096 => 0..3.3V @ 525 mV per amp
   const uint16_t analog = analogRead(PIN_M1_FB);
   const float volts = analog * 3.3f / 4096.0f;
-  return volts / 0.525f;
+  return volts / 0.525f; // amps
 }
 
 /**
@@ -126,7 +126,7 @@ float get_motor_current_right() {
   // 0..4096 => 0..3.3V @ 525 mV per amp
   const uint16_t analog = analogRead(PIN_M2_FB);
   const float volts = analog * 3.3f / 4096.0f;
-  return volts / 0.525f;
+  return volts / 0.525f; // amps
 }
 
 /**

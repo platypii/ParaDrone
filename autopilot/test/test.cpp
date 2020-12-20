@@ -11,9 +11,9 @@ Point3V start = {
   .x = 1000,
   .y = 1000,
   .alt = 800,
+  .climb = -3,
   .vx = 10,
-  .vy = 0,
-  .climb = -5
+  .vy = 0
 };
 
 void test_straight() {
@@ -50,6 +50,7 @@ void test_waypoints() {
   TEST_ASSERT_EQUAL(9, paths[1]->segment_count);
   TEST_ASSERT_EQUAL(6, paths[2]->segment_count);
   TEST_ASSERT_EQUAL(3, paths[3]->segment_count);
+  TEST_ASSERT_EQUAL_STRING("waypoints", paths[0]->name);
   TEST_ASSERT_FLOAT_WITHIN(0.1, 2979.3, path_length(paths[0]));
   TEST_ASSERT_FLOAT_WITHIN(0.1, 2793.1, path_length(paths[1]));
   TEST_ASSERT_FLOAT_WITHIN(0.1, 2778.8, path_length(paths[2]));
@@ -60,22 +61,26 @@ void test_waypoints() {
 }
 
 void test_autopilot_far() {
-  Path *path = search(start, &lz, r);
+  Path *path = search(start, &lz, PARAMOTOR_TURNRADIUS);
   TEST_ASSERT_NOT_NULL(path);
+  const double score = hypot(path->end.x, path->end.y);
   TEST_ASSERT_EQUAL_STRING("naive", path->name);
   TEST_ASSERT_EQUAL(2, path->segment_count);
-  TEST_ASSERT_FLOAT_WITHIN(0.1, 3580, path_length(path));
+  TEST_ASSERT_FLOAT_WITHIN(0.1, 3200, path_length(path));
+  TEST_ASSERT_FLOAT_WITHIN(0.1, 1701.7, score);
   free_path(path);
 }
 
 void test_autopilot_near() {
   GeoPointV loc = {1000, 47.24, -123.14, 884, 10, 0, -10};
   Point3V point = lz.to_point3V(&loc);
-  Path *path = search(point, &lz, r);
+  Path *path = search(point, &lz, PARAMOTOR_TURNRADIUS);
   TEST_ASSERT_NOT_NULL(path);
+  const double score = hypot(path->end.x, path->end.y);
   TEST_ASSERT_EQUAL_STRING("waypoints", path->name);
   TEST_ASSERT_EQUAL(13, path->segment_count);
-  TEST_ASSERT_FLOAT_WITHIN(0.1, 4000, path_length(path));
+  TEST_ASSERT_FLOAT_WITHIN(0.1, 3200, path_length(path));
+  TEST_ASSERT_FLOAT_WITHIN(0.1, 2330.9, score);
   free_path(path);
 }
 

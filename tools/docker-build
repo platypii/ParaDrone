@@ -3,10 +3,12 @@
 set -e
 
 echo "Building builder image"
-docker build -t baselinews/paradrone .
+docker build -t baselinews/paradrone tools
+
+docker tag baselinews/paradrone baselinews/paradrone:platformio
 
 if [[ "$1" == "push" ]]
 then
   echo "Pushing images"
-  docker push baselinews/paradrone
+  docker push baselinews/paradrone:platformio
 fi

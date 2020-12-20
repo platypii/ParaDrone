@@ -23,7 +23,6 @@ ParaControls turn_controls(Turn *turn);
 
 // Paths
 Path *new_path(const char *name, uint8_t segment_count, Segment *segments[]);
-Path *path_fly(Path *path, double distance);
 Path *path_fly_free(Path *path, double distance);
 double path_length(Path *path);
 ParaControls path_controls(Path *path);

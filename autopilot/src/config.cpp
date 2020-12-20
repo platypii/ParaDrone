@@ -98,7 +98,7 @@ static void load_motor_config() {
     EEPROM.get(ADDR_MC, motor_config);
     config_left_invert = (motor_config.dir & 1) * 2 - 1;
     config_right_invert = (motor_config.dir & 2) - 1;
-    Serial.printf("Cfg %d %d %d %d\n", motor_config.frequency, motor_config.top, motor_config.stall, motor_config.dir);
+    Serial.printf("Cfg %d T%d S%d L%d R%d\n", motor_config.frequency, motor_config.top, motor_config.stall, config_left_invert, config_right_invert);
   }
 }
 

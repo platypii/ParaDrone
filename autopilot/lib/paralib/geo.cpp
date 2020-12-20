@@ -34,3 +34,30 @@ double geo_distance(double lat1, double lng1, double lat2, double lng2) {
 
   return R * c;
 }
+
+LatLng geo_move_bearing(double lat_degrees, double lng_degrees, double bear, double dist) {
+  if (dist == 0) {
+    // Fast case for dist = 0
+    return {};
+  }
+
+  const double d = dist / R;
+
+  const double lat = to_radians(lat_degrees);
+  const double lng = to_radians(lng_degrees);
+
+  // Precompute trig
+  const double sin_d = sin(d);
+  const double cos_d = cos(d);
+  const double sin_lat = sin(lat);
+  const double cos_lat = cos(lat);
+  const double sin_d_cos_lat = sin_d * cos_lat;
+
+  const double lat2 = asin(sin_lat * cos_d + sin_d_cos_lat * cos(bear));
+  const double lng2 = lng + atan2(sin(bear) * sin_d_cos_lat, cos_d - sin_lat * sin(lat2));
+
+  const double lat3 = to_degrees(lat2);
+  const double lng3 = mod360(to_degrees(lng2));
+
+  return {lat: lat3, lng: lng3};
+}

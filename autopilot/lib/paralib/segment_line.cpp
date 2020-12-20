@@ -29,7 +29,7 @@ double line_length(Line *line) {
  */
 Path *line_fly(Line *line, const double distance) {
   if (distance < 0) {
-    printf("Flight distance cannot be negative %f", distance);
+    printf("segment_line distance must be positive %f\n", distance);
   }
   // Linear interpolate
   const double alpha = distance / line_length(line);
@@ -45,6 +45,10 @@ Point *line_render(Line *line) {
   return &line->start;
 }
 
+/**
+ * Linear interpolation
+ * @param alpha interpolation parameter from 0 (start) to 1 (end)
+ */
 static double interpolate(double start, double end, double alpha) {
   return start + alpha * (end - start);
 }

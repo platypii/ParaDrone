@@ -35,7 +35,7 @@ void loop() {
   lora_loop();
   TIME_END;
   // TODO: Sleep exactly enough to be ready for next gps
-  delay(60);
+  delay(80);
 }
 
 /**

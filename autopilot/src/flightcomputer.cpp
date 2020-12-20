@@ -88,13 +88,14 @@ void planner_update_location(GeoPointV *point) {
       // set_motor_speed(-255, -255); // TODO: Full speed up?
     } else if (valid_point(point)) {
       // Compute plan
-      Point3V loc3 = config_landing_zone->to_point3V(point);
-      Path *new_plan = search(loc3, config_landing_zone, PARAMOTOR_TURNRADIUS);
+      Path *new_plan = search3(point, config_landing_zone, get_turn_speed(), get_turn_balance());
       if (current_plan) free_path(current_plan);
       current_plan = new_plan;
       ParaControls ctrl = path_controls(current_plan);
       ap_set_position(ctrl.left, ctrl.right);
-      const double landing_error = hypot(current_plan->end.x, current_plan->end.y);
+      const double error_x = current_plan->end.x;
+      const double error_y = current_plan->end.y;
+      const double landing_error = sqrt(error_x * error_x + error_y * error_y);
       Serial.printf("Plan length %.1fm error %.2f\n", path_length(current_plan), landing_error);
     } else {
       // Do nothing
@@ -108,6 +109,6 @@ void planner_update_location(GeoPointV *point) {
 void planner_loop() {
   // If its been X seconds since GPS, then put glider into slight right turn
   if (gps_expired() && !rc_override()) {
-    ap_set_position(0, 10);
+    ap_set_position(1, 10);
   }
 }

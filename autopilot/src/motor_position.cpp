@@ -28,8 +28,8 @@ short motor_target_right = 10;
 
 // Current motor speed
 // -255 = full speed up, 255 = full speed down
-float motor_speed_left = 0;
-float motor_speed_right = 0;
+short motor_speed_left = 0;
+short motor_speed_right = 0;
 
 // Motor current
 float motor_current_left = 0;
@@ -54,12 +54,22 @@ void motor_loop() {
   // Limit switch engaged = toggles up
   motor_switch_left = get_motor_switch_left();
   motor_switch_right = get_motor_switch_right();
-  if (motor_switch_left < 64) {
+  if (motor_switch_left < 64 && motor_position_left != 0) {
     motor_position_left = 0;
+    if (motor_speed_left < 0) {
+      Serial.println("Left stop");
+      motor_speed_left = 0;
+    }
   }
-  if (motor_switch_right < 64) {
+  if (motor_switch_right < 64 && motor_position_right != 0) {
     motor_position_right = 0;
+    if (motor_speed_right < 0) {
+      Serial.println("Right stop");
+      motor_speed_right = 0;
+    }
   }
+  // Stop motor at the top
+  set_motor_speed_raw(motor_speed_left, motor_speed_right);
 
   // Only update speed if it hasn't been overridden
   if (last_speed_override < 0 || millis() - last_speed_override > RC_SPEED_OVERRIDE_DURATION) {
@@ -83,6 +93,7 @@ void set_motor_speed(const short left, const short right) {
   update_position_estimate();
   motor_speed_left = left;
   motor_speed_right = right;
+  // TODO: Only if limit is not hit
   set_motor_speed_raw(left, right);
   last_speed_override = millis();
 }
@@ -105,13 +116,23 @@ void set_motor_position(uint8_t new_left, uint8_t new_right) {
  */
 static void update_position_estimate() {
   const long now = millis();
-  const long delta = now - last_update;
+  const long dt = now - last_update;
   last_update = now;
   if (motor_speed_left || motor_speed_right) {
-    motor_position_left += motor_speed_left * delta / 8000;
-    motor_position_right += motor_speed_right * delta / 8000;
+    motor_position_left += 0.000125 * motor_speed_left * dt; // 1/8000
+    motor_position_right += 0.000125 * motor_speed_right * dt;
     motor_position_left = normalize_position(motor_position_left);
     motor_position_right = normalize_position(motor_position_right);
+
+    // Close enough
+    const float epsilon = 0.2;
+    if (fabs(motor_position_right - motor_target_right) <= epsilon) {
+      motor_position_right = motor_target_right;
+    }
+    if (fabs(motor_position_left - motor_target_left) <= epsilon) {
+      motor_position_left = motor_target_left;
+    }
+
     screen_update();
   }
 }

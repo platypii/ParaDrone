@@ -6,6 +6,11 @@
 #define TURN_LEFT -1
 #define TURN_RIGHT 1
 
+struct LatLng {
+  double lat;
+  double lng;
+};
+
 struct LatLngAlt {
   double lat;
   double lng;
@@ -38,9 +43,9 @@ struct Point3V {
   double x;
   double y;
   double alt;
+  double climb;
   double vx;
   double vy;
-  double climb;
 
   operator Point() {
     return Point {x, y};

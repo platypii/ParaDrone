@@ -37,6 +37,10 @@ extern short motor_target_right;
 extern float motor_current_left;
 extern float motor_current_right;
 
+// Toggle speed and left/right balance
+float get_turn_speed();
+float get_turn_balance();
+
 // Screen
 void screen_init();
 void screen_loop();

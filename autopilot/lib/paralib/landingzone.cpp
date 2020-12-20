@@ -15,9 +15,9 @@ LandingZone::LandingZone(double lat, double lng, double alt, double landingDir) 
     .x = 0,
     .y = 0,
     .alt = 0,
+    .climb = 0,
     .vx = sin(landingDirection),
-    .vy = cos(landingDirection),
-    .climb = 0
+    .vy = cos(landingDirection)
   };
 }
 
@@ -44,9 +44,9 @@ Point3V LandingZone::to_point3V(GeoPointV *loc) {
     .x = distance * sin(bearing),
     .y = distance * cos(bearing),
     .alt = loc->alt - destination.alt,
+    .climb = loc->climb,
     .vx = loc->vE,
-    .vy = loc->vN,
-    .climb = loc->climb
+    .vy = loc->vN
   };
   return point;
 }
@@ -59,9 +59,9 @@ Point3V LandingZone::start_of_final() {
     .x = -finalDistance * dest.vx,
     .y = -finalDistance * dest.vy,
     .alt = dest.alt + finalDistance / PARAMOTOR_GLIDE,
+    .climb = PARAMOTOR_CLIMBRATE,
     .vx = dest.vx,
-    .vy = dest.vy,
-    .climb = PARAMOTOR_DESCENTRATE
+    .vy = dest.vy
   };
   return point;
 }
@@ -74,9 +74,9 @@ Point3V LandingZone::start_of_base(int turn) {
     .x = -finalDistance * (dest.vx - turn * dest.vy),
     .y = -finalDistance * (turn * dest.vx + dest.vy),
     .alt = dest.alt + 2 * finalDistance / PARAMOTOR_GLIDE,
+    .climb = PARAMOTOR_CLIMBRATE,
     .vx = -dest.vx,
-    .vy = -dest.vy,
-    .climb = PARAMOTOR_DESCENTRATE
+    .vy = -dest.vy
   };
   return point;
 }
@@ -89,9 +89,9 @@ Point3V LandingZone::start_of_downwind(int turn) {
     .x = finalDistance * turn * dest.vy,
     .y = -finalDistance * turn * dest.vx,
     .alt = dest.alt + 3 * finalDistance / PARAMOTOR_GLIDE,
+    .climb = PARAMOTOR_CLIMBRATE,
     .vx = -dest.vx,
-    .vy = -dest.vy,
-    .climb = PARAMOTOR_DESCENTRATE
+    .vy = -dest.vy
   };
   return point;
 }

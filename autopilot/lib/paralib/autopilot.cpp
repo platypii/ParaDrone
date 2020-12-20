@@ -4,25 +4,38 @@
 #include "plan.h"
 using namespace std;
 
+static const double lookahead = 3; // seconds
+
 static Path* best_plan(LandingZone *lz, vector<Path*> plans);
 static double plan_score(LandingZone *lz, Path *plan);
 static double direction_error(PointV a, PointV b);
 
 /**
- * Search across a set of path plans
+ * Search for a 3D plan
  */
-Path *search(Point3V loc3, LandingZone *lz, const double r) {
+Path *search3(GeoPointV *ll, LandingZone *lz, float toggle_speed, float toggle_balance) {
+  // Run to where the ball is going
+  GeoPointV *next = para_predict(ll, lookahead, toggle_speed, toggle_balance);
+  Point3V loc = lz->to_point3V(next);
+  return search(loc, lz, PARAMOTOR_TURNRADIUS);
+}
+
+/**
+ * Apply autopilot rules, and then search over waypoint paths
+ */
+Path *search(Point3V loc3, LandingZone *lz, const double turn_radius) {
   PointV loc = {
     .x = loc3.x,
     .y = loc3.y,
     .vx = loc3.vx,
     .vy = loc3.vy
   };
+  const double effective_radius = turn_radius * 1.25;
+  const double distance2 = loc.x * loc.x + loc.y * loc.y; // squared
+
+  // How much farther can we fly with available altitude?
   const double turn_distance_remaining = flight_distance_remaining(loc3.alt - ALT_NO_TURNS_BELOW);
   const double fdr = flight_distance_remaining(loc3.alt);
-
-  PointV dest = lz->start_of_final();
-  const double distance = sqrt(loc.x * loc.x + loc.y * loc.y);
 
   if (loc.vx == 0 && loc.vy == 0) {
     Line *default_line = new Line {'L', {loc.x, loc.y}, lz->dest};
@@ -36,25 +49,26 @@ Path *search(Point3V loc3, LandingZone *lz, const double r) {
   if (loc3.alt <= ALT_NO_TURNS_BELOW) {
     // No turns under 100ft
     return straight_path;
-  } else if (distance > 1000) {
-    Path *naive_path = naive(loc, dest, r);
+  } else if (distance2 > 1000 * 1000) {
+    // Naive when far away
+    Path *naive_path = naive(loc, lz->start_of_final(), effective_radius);
     if (naive_path) {
       naive_path = path_fly_free(naive_path, turn_distance_remaining);
       naive_path = path_fly_free(naive_path, fdr);
+      free_path(straight_path);
       return naive_path;
     } else {
       return straight_path;
     }
   } else {
     vector<Path*> plans = {
-      // dubins(loc, dest, r, TURN_RIGHT, TURN_RIGHT),
-      // dubins(loc, dest, r, TURN_RIGHT, TURN_LEFT),
-      // dubins(loc, dest, r, TURN_LEFT, TURN_RIGHT),
-      // dubins(loc, dest, r, TURN_LEFT, TURN_LEFT),
-      // naive_path,
+      dubins(loc, lz->dest, effective_radius, TURN_RIGHT, TURN_RIGHT),
+      dubins(loc, lz->dest, effective_radius, TURN_RIGHT, TURN_LEFT),
+      dubins(loc, lz->dest, effective_radius, TURN_LEFT, TURN_RIGHT),
+      dubins(loc, lz->dest, effective_radius, TURN_LEFT, TURN_LEFT),
       straight_path
     };
-    vector<Path*> ways = via_waypoints(loc3, lz, PARAMOTOR_TURNRADIUS);
+    vector<Path*> ways = via_waypoints(loc3, lz, effective_radius);
     plans.insert(plans.end(), ways.begin(), ways.end());
     // Fly path to ground
     for (unsigned i = 0; i < plans.size(); i++) {
@@ -63,30 +77,33 @@ Path *search(Point3V loc3, LandingZone *lz, const double r) {
         plans[i] = path_fly_free(plans[i], fdr);
       }
     }
-    Path *best = best_plan(lz, plans);
-    // Free non-best
-    for (unsigned i = 0; i < plans.size(); i++) {
-      if (plans[i] != best && plans[i]) {
-        free_path(plans[i]);
-      }
-    }
-    return best;
+    // Find the best and free the rest
+    return best_plan(lz, plans);
   }
 }
 
 /**
- * Find the path plan with the smallest landing error
+ * Find the path plan with the smallest landing error.
+ * Free non-best plans as we go.
+ *
  * @return the best plan, or null if there were no valid plans
  */
 static Path* best_plan(LandingZone *lz, vector<Path*> plans) {
+  if (plans.size() == 1) return plans[0];
   Path *best = NULL;
   double best_score = INFINITY;
-  for (uint8_t i = 0; i < plans.size(); i++) {
-    if (plans[i]) {
-      const double score = plan_score(lz, plans[i]);
+  for (auto plan : plans) {
+    if (plan) {
+      const double score = plan_score(lz, plan);
       if (!isnan(score) && score < best_score) {
-        best = plans[i];
+        if (best) {
+          free_path(best);
+        }
+        best = plan;
         best_score = score;
+      } else {
+        // Free non-best
+        free_path(plan);
       }
     }
   }
@@ -100,7 +117,7 @@ static Path* best_plan(LandingZone *lz, vector<Path*> plans) {
 static double plan_score(LandingZone *lz, Path *plan) {
   if (plan) {
     // LZ is at origin
-    const double distance_error = hypot(plan->end.x, plan->end.y);
+    const double distance_error = sqrt(plan->end.x * plan->end.x + plan->end.y * plan->end.y);
     const double angle_error = 15 * direction_error(lz->dest, plan->end);
     return distance_error + angle_error;
   } else {

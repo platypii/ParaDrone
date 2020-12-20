@@ -15,12 +15,12 @@ static Path *cat_paths(Path *first, vector<Path*> paths);
 vector<Path*> via_waypoints(Point3V loc, LandingZone *lz, double radius) {
   // Fly straight for 10s
   Point3V straight = {
-    loc.x + 10 * loc.vx,
-    loc.y + 10 * loc.vy,
-    loc.alt + 10 * loc.climb,
-    loc.vx,
-    loc.vy,
-    loc.climb
+    .x = loc.x + 10 * loc.vx,
+    .y = loc.y + 10 * loc.vy,
+    .alt = loc.alt + 10 * loc.climb,
+    .climb = loc.climb,
+    .vx = loc.vx,
+    .vy = loc.vy
   };
   vector<Point3V> left_pattern = {straight, lz->start_of_downwind(TURN_LEFT), lz->start_of_base(TURN_LEFT), lz->start_of_final()};
   vector<Point3V> right_pattern = {straight, lz->start_of_downwind(TURN_RIGHT), lz->start_of_base(TURN_RIGHT), lz->start_of_final()};
@@ -39,7 +39,7 @@ vector<Path*> via_waypoints(Point3V loc, LandingZone *lz, double radius) {
  * In between each waypoint, follow the shortest dubins path.
  */
 static vector<Path*> search_pattern(Point3V loc, vector<Point3V> pattern, double radius) {
-  // Pre-compute shortest dubins path from pattern[i] to pattern[i+1]
+  // Pre-compute shortest dubins paths from pattern[i] to pattern[i+1]
   vector<Path*> steps;
   for (unsigned int i = 0; i < pattern.size() - 1; i++) {
     steps.push_back(shortest_dubins(pattern[i], pattern[i + 1], radius));
@@ -64,6 +64,7 @@ static vector<Path*> search_pattern(Point3V loc, vector<Point3V> pattern, double
 /**
  * Concatenate paths.
  * If any of the paths are null, return null.
+ * TODO: Check for empty segments?
  */
 static Path *cat_paths(Path *first, vector<Path*> paths) {
   vector<Segment*> segments;

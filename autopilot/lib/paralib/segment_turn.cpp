@@ -34,7 +34,7 @@ double turn_length(Turn *turn) {
  */
 Path *turn_fly(Turn *turn, const double distance) {
   if (distance < 0) {
-    printf("Flight distance cannot be negative %f", distance);
+    printf("segment_turn distance must be positive %f\n", distance);
   }
   const double len = turn_length(turn);
   if (distance < len) {
@@ -107,9 +107,12 @@ ParaControls turn_controls(Turn *turn) {
  * The arc angle in radians
  */
 static double arcs(Turn *turn) {
-    double arcs = turn->turn * (angle2(turn) - angle1(turn));
-    if (arcs < 0) arcs += 2 * M_PI;
-    return arcs;
+  if (turn->start.x == turn->end.x && turn->start.y == turn->end.y) {
+    return 0;
+  }
+  double arcs = turn->turn * (angle2(turn) - angle1(turn));
+  if (arcs < 0) arcs += 2 * M_PI;
+  return arcs;
 }
 
 /**

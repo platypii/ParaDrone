@@ -3,8 +3,20 @@ autopilot:
   image: baselinews/paradrone:platformio
   script:
     - cd autopilot
-    - platformio lib update
-    - platformio run
+    - pio lib update
+    - pio run
+  cache:
+    key: pio-deps
+    paths:
+      - .pio/libdeps
+
+autopilot-test:
+  stage: test
+  image: baselinews/paradrone:platformio
+  script:
+    - cd autopilot
+    - pio lib update
+    - pio test -e native
   cache:
     key: pio-deps
     paths:
@@ -15,8 +27,8 @@ rc:
   image: baselinews/paradrone:platformio
   script:
     - cd remotecontrol
-    - platformio lib update
-    - platformio run
+    - pio lib update
+    - pio run
   cache:
     key: pio-deps
     paths:

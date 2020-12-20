@@ -17,18 +17,14 @@ Path *shortest_dubins(PointV loc, PointV dest, double r) {
     dubins(loc, dest, r, TURN_LEFT, TURN_RIGHT), // lsr
     dubins(loc, dest, r, TURN_LEFT, TURN_LEFT) // lsl
   };
+  // Find the best and free the rest
   Path *shortest = shortest_path(paths);
-  // Free non-shortest paths
-  for (const auto path : paths) {
-    if (path != shortest) {
-      free_path(path);
-    }
-  }
   return shortest;
 }
 
 /**
- * Find the path that minimizes path length
+ * Find the path that minimizes path length.
+ * Free non-best plans as we go.
  */
 static Path *shortest_path(vector<Path*> paths) {
   Path *best = NULL;
@@ -37,8 +33,13 @@ static Path *shortest_path(vector<Path*> paths) {
     if (path) {
       const double score = path_length(path);
       if (score < best_score) {
+        if (best) {
+          free_path(best);
+        }
         best = path;
         best_score = score;
+      } else {
+        free_path(path);
       }
     }
   }
