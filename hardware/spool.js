@@ -8,7 +8,7 @@
 const qty = 1
 
 const pulleyRadius = 19 - 0.8
-const axleRadius = 8
+const axleRadius = 9
 const couplingRadius = 6
 
 const discThic = 2
@@ -16,17 +16,33 @@ const axleThic = 5
 const threadRadius = 1.1
 
 function main() {
+  return onepiece()
+  return twopiece()
+}
+
+function twopiece() {
   return union(
-    translate([0, -20, 0], half1()),
+    translate([0, -20, 0],
+      difference(
+        half1(),
+        gluechannel()
+      )
+    ),
     translate([0, 20, 0], half2())
+  )
+}
+
+function onepiece() {
+  return union(
+    translate([0, 0, 0], half1()),
+    translate([0, 0, discThic + axleThic], half2())
   )
 }
 
 function half1() {
   return difference(
     solid(axleRadius),
-    pin(),
-    gluechannel()
+    pin()
   )
 }
 
