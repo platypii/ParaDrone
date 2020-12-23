@@ -27,12 +27,15 @@ const pulleyRadius = 18
 const pulleyTolerance = 0.5
 const pulleyHole = pulleyRadius + pulleyTolerance
 
+const bumpX = 6.5
+const bumpY = -1.9
+
 const sh = 2 // shell thicness
 
 const colors = {
-  motor: "red",
+  motor: "darkred",
   pulley: "white",
-  limitswitch: "black",
+  limitswitch: "grey",
   topcase: "purple"
 }
 
@@ -44,25 +47,19 @@ function main() {
 }
 
 function actuator() {
-  const bumpX = 6.5
-  const bumpY = -2
   const holeY = 5.5
   return union(
     difference(
       hex(0, rightX, 0),
-      cylinder({r: 19, start: [sh, 0, axleZ], end: [rightX, 0, axleZ], fn: 120 * qty}), // pulley hole
-      // reserve line channel
-      // cylinder({r1: 20, r2: 19, start: [8, 0, axleZ], end: [rightX - sh, 0, axleZ], fn: 120 * qty}),
-      // cutout for switch
-      translate([sh, -8, topZ - 23], cube({size: [14, 16, 20], radius: [2, 2, 0], fn: 30 * qty})),
-      // tophole
-      cylinder({r: 1.4, start: [centerX, holeY, axleZ], end: [centerX, holeY, 60], fn: 30 * qty}),
       // motor hole
       cylinder({r: 6.3, start: [leftX, 0, axleZ], end: [rightX, 0, axleZ], fn: 80 * qty}),
+      // pulley hole
+      cylinder({r: 19, start: [sh, 0, axleZ], end: [rightX, 0, axleZ], fn: 120 * qty}),
+      switchhole(),
       // wire hole
-      translate([3, -20, topZ - 6.9],
-        rotate([6, 0, -5], cube({size: [6, 14, 2.5], radius: 1, fn: 30 * qty}))
-      ),
+      translate([-1, -9, topZ - 8], cube({size: [6, 2.2, 5], radius: 1, fn: 30 * qty})),
+      // tophole
+      cylinder({r: 1.4, start: [centerX, holeY, axleZ], end: [centerX, holeY, 60], fn: 30 * qty}),
       screws()
     ),
     cylinder({r1: 0, r2: 0.9, start: [centerX - bumpX / 2, bumpY, topZ - 4.5], end: [centerX - bumpX / 2, bumpY, topZ - 3], fn: 40 * qty}), // bump 1
@@ -115,12 +112,16 @@ function hex(x1, x2, domeThic) {
   )
 }
 
-function wirechannel() {
-  const w = 6
-  const h = 3
-  return union(
-    translate([leftX, nearY + 2, 2], cube({size: [widthX - 4, w, h]})),
-    translate([leftX, farY - w - 2, 2], cube({size: [widthX - 4, w, h]}))
+function switchhole() {
+  return translate([sh, -9, topZ - 23],
+    intersection(
+      translate([-6, 0, 0], cube({size: [30, 18, 20], radius: 2.5, fn: 40 * qty})),
+      union(
+        cube({size: [20, 18, 20]}),
+        // wire hole
+        translate([-3, 0, 14], cube({size: [6, 2.2, 5], radius: 1.1, fn: 30 * qty}))
+      )
+    )
   )
 }
 
@@ -144,13 +145,17 @@ function pulley() {
 }
 
 function limitswitch() {
-  return translate([2.1, -5.99, topZ - sh - 5.7], cube({size: [13, 6.5, 5.7]}))
+  return difference(
+    translate([2.1, -5, topZ - sh - 5.7], cube({size: [13, 6.5, 5.7]})),
+    cylinder({r: 0.9, start: [centerX - bumpX / 2, bumpY, topZ - 8], end: [centerX - bumpX / 2, bumpY, topZ - 3], fn: 40 * qty}), // bump 1
+    cylinder({r: 0.9, start: [centerX + bumpX / 2, bumpY, topZ - 8], end: [centerX + bumpX / 2, bumpY, topZ - 3], fn: 40 * qty}) // bump 2
+  )
 }
 
 function mechanism() {
   return union(
+    // color(colors.pulley, pulley()),
     color(colors.limitswitch, limitswitch()),
-    color(colors.motor, motor()),
-    color(colors.pulley, pulley())
+    color(colors.motor, motor())
   )
 }

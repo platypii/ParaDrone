@@ -32,92 +32,77 @@ const colors = {
 function main() {
   return union(
     // mechanism(),
-    color(colors.topcase, topcase())
-    // color(colors.bottomcase, bottomcase())
-  )
-}
-
-function both() {
-  return difference(
-    box(0, 0, sizeZ), // outer
-    box(sh, -1, sizeZ - sh) // inner
+    color(colors.topcase, topcase()),
+    color(colors.bottomcase, bottomcase())
   )
 }
 
 function topcase() {
-  const hole = union(
-    cube({size: [4, 10.2, 13.5], radius: .6, fn: 10 * qty}),
-    translate([0, 2.1, 0], cube({size: [4, 6, 16], radius: .6, fn: 10 * qty}))
-  )
-  return difference(
-    intersection(
-      both(),
-      translate([leftX, bottomY, -3], cube({size: [sizeX, sizeY, sizeZ + 4], radius: 2.5, fn: 22 * qty})) // rounding
+  return union(
+    difference(
+      // gentle bevel
+      intersection(
+        translate([leftX, bottomY, -9.2], cube({size: [sizeX, sizeY, sizeZ + 10], radius: 3, fn: 22 * qty})),
+        translate([leftX, bottomY, 0], cube({size: [sizeX, sizeY, sizeZ]}))
+      ),
+      box(sh, -1, sizeZ - sh), // inner
+      connectors(),
+      mechanism()
     ),
-    translate([rightX - 3, -24.6, -1], hole), // motor hole
-    translate([leftX - 1, -24.6, -1], hole), // motor hole
-    translate([leftX - 1, -15.6, -3.5], hole), // power hole
-    translate([leftX - 1, -18, -3.5], cube({size: [4, 6, 16]})), // power hole // bump remove
-    translate([leftX - 1, 9, sizeZ - 6.6], cube({size: [4, 8, 3], radius: .6, fn: 10 * qty})), // USB hole
-    translate([leftX - .1, 7.6, sizeZ - 8.5], cube({size: [1, 10.8, 7], radius: [0, 1, 1], fn: 10 * qty})), // USB reccess
-    translate([11, topY - 3, sizeZ - 8], cube({size: [4, 4, 4], radius: .2, fn: 10 * qty})), // antenna hole
-    latches(latchhole),
-    screwholes(),
-    mechanism()
+    topscrews()
   )
 }
 
 function bottomcase() {
-  return union(
-    difference(
+  const support = cylinder({r: 3.2, start: [0, 0, 1], end: [0, 0, 2.6], fn: 30 * qty})
+  return difference(
+    union(
       box(sh + 0.2, 0, sh),
-      translate([-25, -24, -1], roundedRect(50, 45, 4, 2, 16)), // Save bottom weight
-      cylinder({r: 2.1, start: [leftX + 4.7, -10.2, 0.8], end: [leftX + 4.8, -10.2, 3]}), // molex recess
-      cylinder({r: 2.1, start: [leftX + 4.7, -19.5, 0.8], end: [leftX + 4.8, -19.5, 3]}), // molex recess
-      cylinder({r: 2.1, start: [rightX - 4.7, -19.5, 0.8], end: [rightX - 4.8, -19.5, 3]}), // molex recess
-      boardholes()
+      translate([rightX - 2.5, -23.8, 0], cube({size: [2.5, 9.6, sh]})), // motor1 base
+      translate([leftX, -23.5, 0], cube({size: [2.5, 19.2, sh]})), // motor2 base
+      translate([0, topY - 10, 0], support),
+      translate([leftX + 5.8, bottomY + 5.8, 0], support),
+      translate([rightX - 5.8, bottomY + 5.8, 0], support)
     ),
-    translate([rightX - 2.5, -24.3, 0], cube({size: [2.5, 9.6, 2]})), // motor1 base
-    translate([leftX, -24.3, 0], cube({size: [2.5, 18.6, 2]})), // motor2 hole
-    screwblocks(),
-    latches(latch)
+    translate([-25, -24, -1], roundedRect(50, 38, 4, 2, 16)), // Save bottom weight
+    cylinder({r: 2.2, start: [leftX + 4.7, -9.7, 0.8], end: [leftX + 4.8, -9.7, 3]}), // molex recess
+    cylinder({r: 2.2, start: [leftX + 4.7, -19, 0.8], end: [leftX + 4.8, -19, 3]}), // molex recess
+    cylinder({r: 2.2, start: [rightX - 4.7, -19.3, 0.8], end: [rightX - 4.8, -19.3, 3]}), // molex recess
+    screws()
+  )
+}
+
+function connectors() {
+  const hole = union(
+    cube({size: [4, 10.4, 13.5], radius: .6, fn: 10 * qty}),
+    translate([0, 2.3, 0], cube({size: [4, 5.6, 16], radius: .6, fn: 10 * qty}))
+  )
+  return union(
+    translate([rightX - 3, -24.2, -1], hole), // motor hole
+    translate([leftX - 1, -23.9, -1], hole), // motor hole
+    translate([leftX - 1, -14.3, -3.5], hole), // power hole
+    translate([leftX - 1, -17, -3.5], cube({size: [4, 6, 16]})), // bump remove
+    translate([leftX - 1, 9, sizeZ - 6.6], cube({size: [4, 8, 3], radius: .6, fn: 10 * qty})), // USB hole
+    translate([leftX - .1, 7.6, sizeZ - 8.5], cube({size: [1, 10.8, 7], radius: [0, 1, 1], fn: 10 * qty})), // USB reccess
+    translate([11, topY - 3, sizeZ - 8], cube({size: [3.4, 4, 2.6], radius: .2, fn: 10 * qty})) // antenna hole
   )
 }
 
 function box(delta, z1, z2) {
-  const r = 3 - delta // corner radius
+  const r = 3.4 - delta // corner radius
   return translate(
     [leftX + delta, bottomY + delta, z1],
     roundedRect(sizeX - 2 * delta, sizeY - 2 * delta, z2 - z1, r, 16))
 }
 
-function boardholes() {
-  const mountingScrew = rotate([0, -90, 0], screw())
-  const margin = 6
+function screws() {
+  const screw = cylinder({r: 1.6, start: [0, 0, -1], end: [0, 0, 6], fn: 30 * qty})
+  const margin = 5.8
   const z = -2
   return union(
-    translate([leftX + margin, topY - margin, z], mountingScrew),
-    translate([rightX - margin, topY - margin, z], mountingScrew),
-    translate([leftX + margin, bottomY + margin, z], mountingScrew),
-    translate([rightX - margin, bottomY + margin, z], mountingScrew)
-  )
-}
-
-function screwblocks() {
-  return difference(
-    union(
-      translate([leftX + 9, bottomY + 2.2, 2], cube({size: [6, 4.5, 4.5]})),
-      translate([rightX - 15, bottomY + 2.2, 2], cube({size: [6, 4.5, 4.5]}))
-    ),
-    screwholes()
-  )
-}
-
-function screwholes() {
-  const scrw = rotate([0, 0, -90], screw())
-  return union(
-    translate([leftX + 12, bottomY + 4, 4], scrw),
-    translate([rightX - 12, bottomY + 4, 4], scrw)
+    translate([0, topY - 10, z], screw),
+    translate([leftX + margin, bottomY + margin, z], screw),
+    translate([rightX - margin, bottomY + margin, z], screw)
   )
 }
 
@@ -128,37 +113,17 @@ function roundedRect(x, y, z, r, q) {
     cube({size: [x, y, z]})
   )
 }
-function screw() {
+
+function topscrews() {
+  const trihole = rotate([90, 0, 0], difference(
+    linear_extrude({height: 10}, polygon([[0, 0], [7, 0], [0, 19]])),
+    translate([0, 2, 2], cube({size: [10, 20, 6]})),
+    cylinder({r: 1.6, start: [3, 0, 5], end: [3, 4, 5], fn: 20 * qty}),
+    cylinder({r1: 0, r2: 2.95, start: [3, -1.4, 5], end: [3, 2, 5], fn: 20 * qty})
+  ))
   return union(
-    cylinder({r: 1.6, start: [-1, 0, 0], end: [4, 0, 0], fn: 30 * qty}),
-    cylinder({r1: 0, r2: 2.95, start: [0.8, 0, 0], end: [4, 0, 0], fn: 30 * qty})
-  )
-}
-
-function bottomhalf(z) {
-  return translate([leftX, bottomY, 0], cube({size: [sizeX, sizeY, z]}))
-}
-function tophalf(z) {
-  return translate([leftX, bottomY, z], cube({size: [sizeX, sizeY, 200]}))
-}
-
-function latches(gen) {
-  return translate([-25, topY - 4.21, 0], gen(90, 50))
-}
-function latch(angle, len) {
-  return rotate(
-    [90, 0, angle],
-    linear_extrude({height: len}, polygon(
-      [[2, 0], [2, 2], [3.1, 2]]
-    ))
-  )
-}
-function latchhole(angle, len) {
-  return rotate(
-    [90, 0, angle],
-    linear_extrude({height: len}, polygon(
-      [[2, 0], [2, 2], [3, 2]]
-    ))
+    translate([rightX, 7, 0], trihole),
+    translate([leftX, -3, 0], rotate([0, 0, 180], trihole))
   )
 }
 
