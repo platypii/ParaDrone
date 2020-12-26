@@ -40,7 +40,9 @@ export class Path {
     let lastPoint: Point
     return this.render().map((p) => {
       if (lastPoint) {
-        const lastDistance = Math.hypot(p.x - lastPoint.x, p.y - lastPoint.y)
+        const dx = p.x - lastPoint.x
+        const dy = p.y - lastPoint.y
+        const lastDistance = Math.sqrt(dx * dx + dy * dy)
         alt -= lastDistance / para.glide
       }
       lastPoint = p

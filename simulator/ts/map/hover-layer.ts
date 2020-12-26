@@ -16,7 +16,7 @@ export class HoverLayer implements MapLayer {
     this.map = map
     this.entity = map.entities.add(new Cesium.Entity({
       cylinder: {
-        length: 800,
+        length: 400,
         topRadius: 15,
         bottomRadius: 15,
         heightReference: new Cesium.ConstantProperty(Cesium.HeightReference.CLAMP_TO_GROUND),

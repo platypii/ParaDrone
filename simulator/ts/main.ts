@@ -9,6 +9,7 @@ import { sim } from "./sim"
 import * as test from "./test"
 import { distance } from "./util"
 import { ApScreen } from "./view/apscreen"
+import { ErrorChart } from "./view/error-chart"
 import { ToggleView } from "./view/toggleview"
 import { Windgram } from "./view/windgram"
 
@@ -19,6 +20,7 @@ const wind = new Windgram()
 const player = new Player(para, lz, wind)
 const apScreen = new ApScreen()
 const toggleView = new ToggleView()
+const errorChart = new ErrorChart()
 
 let start: GeoPointV
 let map: DroneMap
@@ -38,7 +40,7 @@ export function init() {
     setStart({
       lat: e.lat,
       lng: e.lng,
-      alt: 600 // TODO: Get elevation
+      alt: 400 // TODO: Get elevation
     })
   })
   planEnabled.onclick = update
@@ -92,6 +94,8 @@ function update() {
     actual = simsteps.map((s) => s.loc)
     const sim_error = geo.distancePoint(actual[actual.length - 1], lz.destination)
     simError.innerText = `${sim_error.toFixed(0)} m`
+    // Update error chart
+    errorChart.update(simsteps.map((s) => s.score.score))
   } else {
     simError.innerHTML = "&nbsp;"
   }

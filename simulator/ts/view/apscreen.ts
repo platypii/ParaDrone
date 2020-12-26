@@ -12,7 +12,7 @@ export class ApScreen {
     if (para.loc) {
       const dist = geo.distancePoint(para.loc, lz.destination)
       const alt = para.loc.alt - lz.destination.alt
-      const vel = Math.hypot(para.loc.vN, para.loc.vE) * 2.23694 // mph
+      const vel = Math.sqrt(para.loc.vN * para.loc.vN + para.loc.vE * para.loc.vE) * 2.23694 // mph
       this.latlng.innerText = `${para.loc.lat.toFixed(6)}, ${para.loc.lng.toFixed(6)}`
       this.lz.innerText = `LZ: ${dist.toFixed(0)} m`
       this.alt.innerText = `${alt.toFixed(0)} m AGL`

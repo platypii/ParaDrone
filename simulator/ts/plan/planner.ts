@@ -32,6 +32,7 @@ export function path_no_turns_below(para: Paraglider, path: Path, alt_agl: numbe
  * Find the path that minimizes landing error
  */
 export function best_plan(lz: LandingZone, paths: Path[]): Path | undefined {
+  if (paths.length <= 1) return paths[0]
   let best
   let bestScore = Infinity
   for (const path of paths) {
