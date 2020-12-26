@@ -74,14 +74,9 @@ export class Paraglider {
    * Takes into account position, speed, and toggle position.
    * TODO: Adjust velocities on WSE
    */
-  public tick(wind: Wind, dt: number): void {
+  public tick(dt: number, wind: Wind): void {
     const alpha = 0.5 // moving average filter applied to toggle inputs to simulate the fact that speed and direction don't change instantly
     if (this.loc) {
-      // Ground speed
-      const vE = this.loc.vE
-      const vN = this.loc.vN
-      const groundSpeed = Math.sqrt(vE * vE + vN * vN)
-
       // Air speed
       const vEair = this.loc.vE - wind.vE
       const vNair = this.loc.vN - wind.vN

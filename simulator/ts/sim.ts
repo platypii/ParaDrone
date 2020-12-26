@@ -26,7 +26,7 @@ export function sim(start: GeoPoint, lz: LandingZone, wind: Wind): SimStep[] {
 
   const actual: SimStep[] = []
   while (!para.landed(lz)) {
-    para.tick(wind, dt)
+    para.tick(dt, wind)
     if (para.loc) {
       const error = 0
       actual.push({loc: {...para.loc}, score: landing_score(lz, autopilot.plan!.end)})

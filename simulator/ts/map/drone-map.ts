@@ -2,8 +2,8 @@ import { GeoPointV, LatLngAlt } from "../dtypes"
 import { LandingZone } from "../geo/landingzone"
 import { BaseMap } from "./basemap"
 import { CanopyLayer } from "./canopy-layer"
-import { LandingLayer } from "./landing-layer"
 import { HoverLayer } from "./hover-layer"
+import { LandingLayer } from "./landing-layer"
 import { PathLayer } from "./path-layer"
 
 interface MapState {

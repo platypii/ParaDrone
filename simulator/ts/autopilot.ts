@@ -13,13 +13,18 @@ import { shortestDubins } from "./plan/shortest-dubins"
  * Controls a paraglider toward a landing zone
  */
 export class Autopilot {
-  public para: Paraglider
-  public lz: LandingZone
   public plan?: Path
 
+  private readonly lz: LandingZone
+  private readonly para: Paraglider
+  private readonly pattern: LandingPattern
+  private readonly effectiveRadius: number // toggles take time
+
   constructor(para: Paraglider, lz: LandingZone) {
-    this.para = para
     this.lz = lz
+    this.para = para
+    this.pattern = new LandingPattern(this.para, this.lz)
+    this.effectiveRadius = this.para.turnRadius * 2
     // Subscribe to gps updates
     para.onLocationUpdate(() => {
       // Replan with new location
@@ -34,7 +39,6 @@ export class Autopilot {
    */
   private replan(): Path {
     const loc = this.lz.toPoint3V(this.para.loc!)
-    const pattern = new LandingPattern(this.para, this.lz)
     if (isNaN(loc.x)) {
       console.error("invalid location", this.para.loc)
       throw new Error("invalid location")
@@ -42,7 +46,6 @@ export class Autopilot {
     // How much farther can we fly with available altitude?
     const flight_distance_remaining = this.para.flightDistanceRemaining(loc.alt)
 
-    const r = this.para.turnRadius * 2 // Double the max rate of turn, due to toggle time
     const dist = Math.sqrt(loc.x * loc.x + loc.y * loc.y)
 
     // No velocity, hard to plan, and holding into the wind seems good
@@ -57,16 +60,16 @@ export class Autopilot {
       // No turns under 100ft
       return straightPath
     } else if (dist > 1000) {
-      const naivePath = naive(loc, pattern.startOfFinal(), r) || straightPath
+      const naivePath = naive(loc, this.pattern.startOfFinal(), this.effectiveRadius) || straightPath
       return path_no_turns_below(this.para, naivePath, loc.alt)
     } else {
       const paths = [
-        ...viaWaypoints(loc, pattern, r),
+        ...viaWaypoints(loc, this.pattern, this.effectiveRadius),
         // dubins(loc, dest, r, Turn.Right, Turn.Right), // rsr
         // dubins(loc, dest, r, Turn.Right, Turn.Left), // rsl
         // dubins(loc, dest, r, Turn.Left, Turn.Right), // lsr
         // dubins(loc, dest, r, Turn.Left, Turn.Left), // lsl
-        shortestDubins(loc, this.lz.dest, r),
+        shortestDubins(loc, this.lz.dest, this.effectiveRadius),
         // naive(loc, dest, r),
         straightPath
       ]

@@ -30,7 +30,7 @@ export class Player {
   public start(): void {
     if (this.player === undefined) {
       this.player = setInterval(() => {
-        this.para.tick(this.wind, this.dt)
+        this.para.tick(this.dt, this.wind)
         if (this.para.landed(this.lz)) {
           this.stop()
         }
