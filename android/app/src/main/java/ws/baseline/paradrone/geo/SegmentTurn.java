@@ -1,17 +1,21 @@
 package ws.baseline.paradrone.geo;
 
+import androidx.annotation.NonNull;
 import java.util.ArrayList;
 import java.util.List;
 import timber.log.Timber;
 
 public class SegmentTurn implements Segment {
 
+    @NonNull
     private final Circle circle;
+    @NonNull
     private final PointV start;
+    @NonNull
     private final PointV end;
     private final int turn;
 
-    public SegmentTurn(Circle circle, Point start, Point end, int turn) {
+    public SegmentTurn(@NonNull Circle circle, @NonNull Point start, @NonNull Point end, int turn) {
         this.circle = circle;
         final double start_dx = start.x - circle.x;
         final double start_dy = start.y - circle.y;
@@ -22,16 +26,19 @@ public class SegmentTurn implements Segment {
         this.turn = turn;
     }
 
+    @NonNull
     @Override
     public PointV start() {
         return start;
     }
 
+    @NonNull
     @Override
     public PointV end() {
         return end;
     }
 
+    @NonNull
     @Override
     public Path fly(double distance) {
         if (distance < 0) {
@@ -63,6 +70,7 @@ public class SegmentTurn implements Segment {
         return circle.radius * arcs();
     }
 
+    @NonNull
     @Override
     public List<Point> render() {
         final List<Point> points = new ArrayList<>();

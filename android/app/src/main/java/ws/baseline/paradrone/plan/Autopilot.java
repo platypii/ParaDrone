@@ -75,7 +75,7 @@ public class Autopilot {
      * Find the path that minimizes landing error
      */
     @Nullable
-    private static Path bestPlan(LandingZone lz, List<Path> paths) {
+    private static Path bestPlan(@NonNull LandingZone lz, @NonNull List<Path> paths) {
         Path best = null;
         double bestScore = Double.POSITIVE_INFINITY;
         for (Path path : paths) {
@@ -93,7 +93,7 @@ public class Autopilot {
     /**
      * Plan score. Lower is better.
      */
-    private static double planScore(LandingZone lz, Path plan) {
+    private static double planScore(@NonNull LandingZone lz, Path plan) {
         if (plan != null) {
             final double distance = plan.end().distance(lz.dest);
             return distance;

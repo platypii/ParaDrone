@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2019 Martijn van Welie
+ *   Copyright (c) 2020 Martijn van Welie
  *
  *   Permission is hereby granted, free of charge, to any person obtaining a copy
  *   of this software and associated documentation files (the "Software"), to deal
@@ -24,6 +24,7 @@
 package ws.baseline.paradrone.bluetooth.blessed;
 
 import android.bluetooth.le.ScanResult;
+import androidx.annotation.NonNull;
 
 public abstract class BluetoothCentralCallback {
 
@@ -32,8 +33,7 @@ public abstract class BluetoothCentralCallback {
      *
      * @param peripheral the peripheral that was connected.
      */
-    public void onConnectedPeripheral(final BluetoothPeripheral peripheral) {}
-
+    public void onConnectedPeripheral(@NonNull final BluetoothPeripheral peripheral) {}
 
     /**
      * Connecting with the peripheral has failed.
@@ -41,8 +41,7 @@ public abstract class BluetoothCentralCallback {
      * @param peripheral the peripheral for which the connection was attempted
      * @param status the status code for the connection failure
      */
-    public void onConnectionFailed(final BluetoothPeripheral peripheral, final int status) {}
-
+    public void onConnectionFailed(@NonNull final BluetoothPeripheral peripheral, @NonNull final HciStatus status) {}
 
     /**
      * Peripheral disconnected
@@ -50,8 +49,7 @@ public abstract class BluetoothCentralCallback {
      * @param peripheral the peripheral that disconnected.
      * @param status the status code for the disconnection
      */
-    public void onDisconnectedPeripheral(final BluetoothPeripheral peripheral, final int status) {}
-
+    public void onDisconnectedPeripheral(@NonNull final BluetoothPeripheral peripheral, @NonNull final HciStatus status) {}
 
     /**
      * Discovered a peripheral
@@ -59,8 +57,7 @@ public abstract class BluetoothCentralCallback {
      * @param peripheral the peripheral that was found
      * @param scanResult the scanResult describing the peripheral
      */
-    public void onDiscoveredPeripheral(final BluetoothPeripheral peripheral, final ScanResult scanResult) {}
-
+    public void onDiscoveredPeripheral(@NonNull final BluetoothPeripheral peripheral, @NonNull final ScanResult scanResult) {}
 
     /**
      * Scanning failed
@@ -68,7 +65,6 @@ public abstract class BluetoothCentralCallback {
      * @param errorCode the status code for the scanning failure
      */
     public void onScanFailed(final int errorCode) {}
-
 
     /**
      * Bluetooth adapter status changed

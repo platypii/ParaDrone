@@ -67,7 +67,7 @@ public class LandingFragment extends Fragment {
             binding.landingStatus.setText(R.string.fetching_elevation);
             Elevation.get(ctx, ll, new PendingResult.Callback<ElevationResult>() {
                 @Override
-                public void onResult(ElevationResult result) {
+                public void onResult(@NonNull ElevationResult result) {
                     Timber.i("Got elevation %f", result.elevation);
                     handler.post(() -> {
                         binding.landingStatus.setText("");
