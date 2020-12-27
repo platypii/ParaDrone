@@ -7,7 +7,7 @@ import { Paraglider } from "./paraglider"
  */
 export class Player {
   private readonly interval = 50
-  private readonly dt = 0.5
+  private readonly dt = 0.5 // seconds
 
   private readonly para: Paraglider
   private readonly lz: LandingZone

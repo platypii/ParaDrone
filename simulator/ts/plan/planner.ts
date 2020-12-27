@@ -1,6 +1,6 @@
 import { PointV } from "../dtypes"
 import { LandingZone } from "../geo/landingzone"
-import { Path } from "../geo/paths"
+import { Path } from "../geo/path"
 import { Paraglider } from "../paraglider"
 import { distance } from "../util"
 

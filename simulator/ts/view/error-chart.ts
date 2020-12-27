@@ -43,8 +43,9 @@ export class ErrorChart {
   }
 
   public update(errors: number[]): void {
+    const upperBound = Math.max(d3.max(errors) || 1, 100)
     this.xAxis.scale.domain([0, errors.length])
-    this.yAxis.scale.domain([0, d3.max(errors) || 1])
+    this.yAxis.scale.domain([0, upperBound])
     this.xAxis.layer.call(this.xAxis.axis)
     this.yAxis.layer.call(this.yAxis.axis)
 

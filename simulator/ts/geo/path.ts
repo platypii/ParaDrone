@@ -1,6 +1,5 @@
-import { Point, Point3V, PointV } from "../dtypes"
+import { Point, PointV } from "../dtypes"
 import { MotorPosition } from "../paracontrols"
-import { Paraglider } from "../paraglider"
 import { SegmentLine } from "./segment-line"
 import { SegmentTurn } from "./segment-turn"
 
@@ -34,28 +33,6 @@ export class Path {
     return ([] as Point[]).concat(...this.segments.map((s) => s.render()))
   }
 
-  public render3(para: Paraglider, startAlt: number): Point3V[] {
-    // Render and compute altitudes
-    let alt = startAlt
-    let lastPoint: Point
-    return this.render().map((p) => {
-      if (lastPoint) {
-        const dx = p.x - lastPoint.x
-        const dy = p.y - lastPoint.y
-        const lastDistance = Math.sqrt(dx * dx + dy * dy)
-        alt -= lastDistance / para.glide
-      }
-      lastPoint = p
-      return {
-        ...p,
-        alt,
-        vx: 0,
-        vy: 0,
-        climb: para.climbRate
-      }
-    })
-  }
-
   /**
    * Fly a given distance along the path.
    * If the end of the path is reached, extend a straight line out to infinity.
@@ -71,16 +48,21 @@ export class Path {
       const segment = this.segments[i]
       const segmentLength = segment.length()
       if (distance < flown + segmentLength) {
-        // End point is within segment
+        // End is within segment
         break
       } else {
         trimmed.push(segment)
         flown += segmentLength
       }
     }
-    // Fly last segment
-    const last = this.segments[i].fly(distance - flown)
-    trimmed.push(...last.segments)
+    const remaining = distance - flown
+    if (remaining > 0) {
+      // Fly last segment
+      const last = this.segments[i].fly(distance - flown)
+      trimmed.push(...last.segments)
+    } else if (remaining < 0) {
+      console.error("remaining distance must be positive", distance, flown)
+    }
     return new Path(this.name, ...trimmed)
   }
 

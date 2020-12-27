@@ -1,5 +1,5 @@
 import { Point3V, Turn } from "../dtypes"
-import { Path } from "../geo/paths"
+import { Path } from "../geo/path"
 import { LandingPattern } from "./pattern"
 import { shortestDubins } from "./shortest-dubins"
 
@@ -26,7 +26,7 @@ export function viaWaypoints(loc: Point3V, pattern: LandingPattern, turnRadius: 
  * In between each waypoint, follow the shortest dubins path.
  */
 function searchPattern(loc: Point3V, pattern: Point3V[], turnRadius: number): Path[] {
-  // Pre-compute shortest dubins path from pattern[i] to pattern[i+1]
+  // Pre-compute shortest dubins paths from pattern[i] to pattern[i+1]
   const steps = []
   for (let i = 0; i < pattern.length - 1; i++) {
     steps.push(shortestDubins(pattern[i], pattern[i + 1], turnRadius))
@@ -46,6 +46,7 @@ function searchPattern(loc: Point3V, pattern: Point3V[], turnRadius: number): Pa
 /**
  * Concatenate paths.
  * If any of the paths are null, return null.
+ * TODO: Check for empty segments?
  */
 function catPaths(...paths: Array<Path | undefined>): Path | undefined {
   const segments = []
