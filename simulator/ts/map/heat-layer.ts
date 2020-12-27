@@ -1,8 +1,7 @@
 import * as Cesium from "cesium"
-import { LatLng, LatLngAlt } from "../dtypes"
+import { LatLng } from "../dtypes"
 import { moveBearing } from "../geo/geo"
-import { latLngToCart } from "../geo/latlng"
-import { lineMaterial, MapLayer } from "./basemap"
+import { MapLayer } from "./basemap"
 
 /**
  * Heat map like layer

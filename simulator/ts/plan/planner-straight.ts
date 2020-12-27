@@ -1,5 +1,5 @@
 import { PointV } from "../dtypes"
-import { Path } from "../geo/paths"
+import { Path } from "../geo/path"
 import { SegmentLine } from "../geo/segment-line"
 
 /**

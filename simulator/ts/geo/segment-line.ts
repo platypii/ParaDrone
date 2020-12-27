@@ -1,7 +1,7 @@
 import { Point, PointV } from "../dtypes"
 import { MotorPosition } from "../paracontrols"
 import { interpolate } from "../util"
-import { Path } from "./paths"
+import { Path } from "./path"
 
 /**
  * 2D line segment.

@@ -82,10 +82,10 @@ function update() {
   if (planEnabled.checked && autopilot.plan && para.loc) {
     // Render current plan
     const alt_agl = para.loc.alt - lz.destination.alt
-    plan = autopilot.plan.render3(para, alt_agl)
+    plan = autopilot.plan.render3(para)
       .map((p) => lz.toLatLngAlt(p))
-    const plan_error = distance(autopilot.plan.end, lz.dest)
-    planName.innerText = autopilot.plan.name
+    const plan_error = distance(autopilot.plan.path.end, lz.dest)
+    planName.innerText = autopilot.plan.path.name
     planError.innerText = `${plan_error.toFixed(0)} m`
   }
   if (simEnabled.checked && start) {

@@ -12,7 +12,7 @@ interface TestScore extends LandingScore {
 }
 
 // size x size grid centered on lz
-const gridDim = 15
+const gridDim = 13
 const gridStep = 100 // meters
 const startAlt = 600
 
@@ -90,7 +90,7 @@ function evaluate(location: GeoPoint): TestScore {
   // Update map layer
   // TODO: Color by score
   let color = "#1f15"
-  if (score.distance > 100) {
+  if (score.distance > 50) {
     color = "#f115"
   }
   const layer = new HeatLayer(location, gridStep, color)

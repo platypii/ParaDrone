@@ -1,10 +1,5 @@
 import { MotorPosition } from "./paracontrols"
 
-interface TurnRate {
-  speed: number // m/s
-  balance: number // right-left balance [-1..1]
-}
-
 /**
  * Represents toggle position for a paraglider
  */
@@ -32,15 +27,19 @@ export class Toggles {
   }
 
   /**
-   * Sustained rate of speed and turn for current toggle position
+   * Sustained rate of speed for current toggle position (m/s)
    */
-  public turnRate(): TurnRate {
+  public turnSpeed(): number {
     const minSpeed = 6 // m/s
     const maxSpeed = 12 // m/s
-    return {
-      speed: maxSpeed - (this.currentPosition.left + this.currentPosition.right) / 512 * (maxSpeed - minSpeed),
-      balance: (this.currentPosition.right - this.currentPosition.left) / 255 // [-1..1]
-    }
+    return maxSpeed - (this.currentPosition.left + this.currentPosition.right) / 512 * (maxSpeed - minSpeed)
+  }
+
+  /**
+   * Left/right balance of current toggle position
+   */
+  public turnBalance(): number {
+    return (this.currentPosition.right - this.currentPosition.left) / 255 // [-1..1]
   }
 }
 
