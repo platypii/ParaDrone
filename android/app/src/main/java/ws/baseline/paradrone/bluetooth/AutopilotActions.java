@@ -56,7 +56,7 @@ public class AutopilotActions {
         sendCommand(new byte[] {'Q', 'C'});
     }
 
-    public void setConfig(ApConfigMsg msg) {
+    public void setConfig(@NonNull ApConfigMsg msg) {
         Timber.i("phone -> ap: set config %s", msg);
         sendCommand(msg.toBytes());
     }
@@ -66,7 +66,7 @@ public class AutopilotActions {
         sendCommand(new byte[] {'M', (byte) mode});
     }
 
-    private void sendCommand(byte[] value) {
+    private void sendCommand(@NonNull byte[] value) {
         if (bt.bluetoothHandler != null) {
             bt.bluetoothHandler.sendCommand(value);
         }

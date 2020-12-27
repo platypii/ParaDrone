@@ -15,6 +15,7 @@ public class BluetoothPreferences {
 
     private SharedPreferences prefs;
 
+    @NonNull
     public DeviceMode load(@NonNull Context context) {
         prefs = PreferenceManager.getDefaultSharedPreferences(context);
         return prefs.getBoolean(PREF_RC_MODE, false) ? RC : AP;

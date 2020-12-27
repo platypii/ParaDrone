@@ -40,6 +40,7 @@ public class ApConfigMsg implements ApEvent {
         }
     }
 
+    @NonNull
     public byte[] toBytes() {
         // Pack frequency into bytes
         final byte[] bytes = new byte[10];

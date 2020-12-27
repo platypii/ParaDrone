@@ -3,6 +3,7 @@ package ws.baseline.paradrone.plan;
 import ws.baseline.paradrone.geo.Path;
 import ws.baseline.paradrone.geo.PointV;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import static ws.baseline.paradrone.geo.Turn.TURN_LEFT;
@@ -12,7 +13,7 @@ import static ws.baseline.paradrone.plan.PlannerDubins.dubins;
 public class ShortestDubins {
 
     @Nullable
-    static Path shortestDubins(PointV loc, PointV dest, double r) {
+    static Path shortestDubins(@NonNull PointV loc, @NonNull PointV dest, double r) {
         // Construct flight paths
         final Path[] paths = {
                 dubins(loc, dest, r, TURN_RIGHT, TURN_RIGHT),
@@ -24,7 +25,7 @@ public class ShortestDubins {
     }
 
     @Nullable
-    private static Path shortestPath(Path[] paths) {
+    private static Path shortestPath(@NonNull Path[] paths) {
         Path best = null;
         double bestScore = Double.POSITIVE_INFINITY;
         for (Path path : paths) {
