@@ -4,6 +4,9 @@ import ws.baseline.paradrone.bluetooth.blessed.BluetoothCentral;
 import ws.baseline.paradrone.bluetooth.blessed.BluetoothCentralCallback;
 import ws.baseline.paradrone.bluetooth.blessed.BluetoothPeripheral;
 import ws.baseline.paradrone.bluetooth.blessed.BluetoothPeripheralCallback;
+import ws.baseline.paradrone.bluetooth.blessed.GattStatus;
+import ws.baseline.paradrone.bluetooth.blessed.HciStatus;
+import ws.baseline.paradrone.bluetooth.blessed.WriteType;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothGattCharacteristic;
@@ -16,8 +19,6 @@ import java.util.UUID;
 import timber.log.Timber;
 
 import static android.bluetooth.BluetoothGatt.CONNECTION_PRIORITY_HIGH;
-import static android.bluetooth.BluetoothGatt.GATT_SUCCESS;
-import static android.bluetooth.BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT;
 import static ws.baseline.paradrone.bluetooth.BluetoothPreferences.DeviceMode.AP;
 import static ws.baseline.paradrone.bluetooth.BluetoothPreferences.DeviceMode.RC;
 import static ws.baseline.paradrone.bluetooth.BluetoothState.BT_CONNECTED;
@@ -43,9 +44,13 @@ class BluetoothHandler {
     private static final UUID rcCharacteristicId = UUID.fromString("ba5e0004-be98-4de9-9e9a-080b5bb41404");
 
     private final Handler handler = new Handler();
+    @NonNull
     private final BluetoothService service;
+    @NonNull
     private final BluetoothCentral central;
+    @Nullable
     private BluetoothPeripheral currentPeripheral;
+    @Nullable
     private BluetoothGattCharacteristic currentCharacteristic;
 
     boolean connected_ap = false;
@@ -62,7 +67,7 @@ class BluetoothHandler {
         } else if (service.getState() == BT_SEARCHING) {
             Timber.w("Already searching");
         } else if (service.getState() == BT_STOPPING || service.getState() != BT_STOPPED) {
-            // Stopping or stopped, don't search
+            Timber.w("Already stopping");
         }
     }
 
@@ -82,7 +87,7 @@ class BluetoothHandler {
     // Callback for peripherals
     private final BluetoothPeripheralCallback peripheralCallback = new BluetoothPeripheralCallback() {
         @Override
-        public void onServicesDiscovered(BluetoothPeripheral peripheral) {
+        public void onServicesDiscovered(@NonNull BluetoothPeripheral peripheral) {
             Timber.i("Bluetooth services discovered for '%s'", peripheral.getName());
 
             // Request a new connection priority
@@ -103,8 +108,8 @@ class BluetoothHandler {
         }
 
         @Override
-        public void onNotificationStateUpdate(BluetoothPeripheral peripheral, BluetoothGattCharacteristic characteristic, int status) {
-            if (status == GATT_SUCCESS) {
+        public void onNotificationStateUpdate(@NonNull final BluetoothPeripheral peripheral, @NonNull final BluetoothGattCharacteristic characteristic, @NonNull final GattStatus status) {
+            if (status == GattStatus.SUCCESS) {
                 if (peripheral.isNotifying(characteristic)) {
                     Timber.d("SUCCESS: Notify set to 'on' for %s", characteristic.getUuid());
                 } else {
@@ -116,8 +121,8 @@ class BluetoothHandler {
         }
 
         @Override
-        public void onCharacteristicWrite(BluetoothPeripheral peripheral, byte[] value, BluetoothGattCharacteristic characteristic, int status) {
-            if (status == GATT_SUCCESS) {
+        public void onCharacteristicWrite(@NonNull BluetoothPeripheral peripheral, @NonNull byte[] value, @NonNull BluetoothGattCharacteristic characteristic, @NonNull final GattStatus status) {
+            if (status == GattStatus.SUCCESS) {
 //                Timber.d("SUCCESS: Writing <%s> to <%s>", byteArrayToHex(value), characteristic.getUuid().toString());
             } else {
                 Timber.w("ERROR: Failed writing <%s> to <%s>", byteArrayToHex(value), characteristic.getUuid().toString());
@@ -125,8 +130,8 @@ class BluetoothHandler {
         }
 
         @Override
-        public void onCharacteristicUpdate(BluetoothPeripheral peripheral, byte[] value, BluetoothGattCharacteristic characteristic, int status) {
-            if (status != GATT_SUCCESS) return;
+        public void onCharacteristicUpdate(@NonNull BluetoothPeripheral peripheral, @NonNull byte[] value, @NonNull BluetoothGattCharacteristic characteristic, @NonNull final GattStatus status) {
+            if (status != GattStatus.SUCCESS) return;
             if (value.length == 0) return;
             final UUID characteristicUUID = characteristic.getUuid();
 
@@ -143,7 +148,7 @@ class BluetoothHandler {
     private final BluetoothCentralCallback bluetoothCentralCallback = new BluetoothCentralCallback() {
 
         @Override
-        public void onConnectedPeripheral(BluetoothPeripheral connectedPeripheral) {
+        public void onConnectedPeripheral(@NonNull BluetoothPeripheral connectedPeripheral) {
             currentPeripheral = connectedPeripheral;
             Timber.i("Connected to '%s'", connectedPeripheral.getName());
             if (connectedPeripheral.getService(apServiceId) != null) {
@@ -157,14 +162,14 @@ class BluetoothHandler {
         }
 
         @Override
-        public void onConnectionFailed(BluetoothPeripheral peripheral, final int status) {
-            Timber.e("Autopilot connection '%s' failed with status %d", peripheral.getName(), status);
+        public void onConnectionFailed(@NonNull BluetoothPeripheral peripheral, @NonNull final HciStatus status) {
+            Timber.e("Autopilot connection '%s' failed with status %s", peripheral.getName(), status);
             start(); // start over
         }
 
         @Override
-        public void onDisconnectedPeripheral(final BluetoothPeripheral peripheral, final int status) {
-            Timber.i("Autopilot disconnected '%s' with status %d", peripheral.getName(), status);
+        public void onDisconnectedPeripheral(@NonNull final BluetoothPeripheral peripheral, @NonNull final HciStatus status) {
+            Timber.i("Autopilot disconnected '%s' with status %s", peripheral.getName(), status);
             if (connected_ap && service.deviceMode == AP) {
                 Timber.d("Auto reconnecting to AP");
                 connected_ap = false;
@@ -196,7 +201,7 @@ class BluetoothHandler {
         }
 
         @Override
-        public void onDiscoveredPeripheral(BluetoothPeripheral peripheral, ScanResult scanResult) {
+        public void onDiscoveredPeripheral(@NonNull BluetoothPeripheral peripheral, @NonNull ScanResult scanResult) {
             if (service.getState() != BT_SEARCHING) {
                 Timber.e("Invalid BT state: %s", BluetoothState.toString(service.getState()));
                 // TODO: return?
@@ -248,7 +253,7 @@ class BluetoothHandler {
         Timber.d("phone -> ap: cmd %c", (char) value[0]);
         final BluetoothGattCharacteristic ch = getCharacteristic();
         if (ch != null) {
-            if (!currentPeripheral.writeCharacteristic(ch, value, WRITE_TYPE_DEFAULT)) {
+            if (!currentPeripheral.writeCharacteristic(ch, value, WriteType.WITH_RESPONSE)) {
                 Timber.e("Failed to send cmd %c", (char) value[0]);
             }
         } else {

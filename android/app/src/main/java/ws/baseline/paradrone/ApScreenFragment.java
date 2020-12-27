@@ -27,6 +27,7 @@ import org.greenrobot.eventbus.ThreadMode;
  */
 public class ApScreenFragment extends Fragment {
     private ApScreenBinding binding;
+    @NonNull
     private Handler handler = new Handler();
     Runnable updateRunner;
 

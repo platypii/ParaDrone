@@ -1,5 +1,6 @@
 package ws.baseline.paradrone.geo;
 
+import androidx.annotation.NonNull;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -33,6 +34,7 @@ public class Path implements PathLike {
         return segments.get(segments.size() - 1).end();
     }
 
+    @NonNull
     @Override
     public Path fly(double distance) {
         final List<Segment> trimmed = new ArrayList<>();
@@ -63,6 +65,7 @@ public class Path implements PathLike {
         return len;
     }
 
+    @NonNull
     @Override
     public List<Point> render() {
         final List<Point> points = new ArrayList<>();

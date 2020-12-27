@@ -45,7 +45,8 @@ class PlannerWaypoints {
      * Search all suffixes of a flight pattern.
      * In between each waypoint, follow the shorest dubins path.
      */
-    private static List<Path> searchPattern(Point3V loc, List<Point3V> pattern, double r) {
+    @NonNull
+    private static List<Path> searchPattern(@NonNull Point3V loc, @NonNull List<Point3V> pattern, double r) {
         // Pre-compute shortest dubins path from pattern[i] to pattern[i+1]
         final List<Path> steps = new ArrayList<>();
         for (int i = 0; i < pattern.size() - 1; i++) {
@@ -67,7 +68,7 @@ class PlannerWaypoints {
      * If any of the paths are null, return null.
      */
     @Nullable
-    private static Path catPaths(Path first, List<Path> paths) {
+    private static Path catPaths(@Nullable Path first, @NonNull List<Path> paths) {
         if (first == null) return null; // No shortest path
         final List<Segment> segments = new ArrayList<>(first.segments);
         for (Path path : paths) {

@@ -1,5 +1,6 @@
 package ws.baseline.paradrone;
 
+import androidx.annotation.NonNull;
 import com.google.android.gms.maps.model.LatLng;
 
 public class GeoPoint {
@@ -27,6 +28,7 @@ public class GeoPoint {
         return Math.sqrt(vN * vN + vE * vE);
     }
 
+    @NonNull
     public LatLng toLatLng() {
         // TODO: Cache and reuse
         return new LatLng(lat, lng);

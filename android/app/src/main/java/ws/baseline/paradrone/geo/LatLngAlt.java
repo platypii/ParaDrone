@@ -15,6 +15,7 @@ public class LatLngAlt {
         this.alt = alt;
     }
 
+    @NonNull
     public LatLng toLatLng() {
         // TODO: Cache and reuse
         return new LatLng(lat, lng);

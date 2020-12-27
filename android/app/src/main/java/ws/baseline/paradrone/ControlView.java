@@ -15,7 +15,9 @@ import timber.log.Timber;
 public class ControlView extends View {
 
     // x,y screen coordinates
+    @Nullable
     private Point touch1;
+    @Nullable
     private Point touch2;
 
     // 0 = no deflection, 255 = full deflection

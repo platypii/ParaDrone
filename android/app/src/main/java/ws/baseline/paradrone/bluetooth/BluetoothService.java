@@ -25,7 +25,8 @@ public class BluetoothService {
 
     private static final int ENABLE_BLUETOOTH_CODE = 13;
 
-    private BluetoothPreferences prefs = new BluetoothPreferences();
+    @NonNull
+    private final BluetoothPreferences prefs = new BluetoothPreferences();
     public BluetoothPreferences.DeviceMode deviceMode = AP;
 
     // Bluetooth state
@@ -33,7 +34,8 @@ public class BluetoothService {
     @Nullable
     BluetoothHandler bluetoothHandler;
 
-    public AutopilotActions actions = new AutopilotActions(this);
+    @NonNull
+    public final AutopilotActions actions = new AutopilotActions(this);
 
     public void start(@NonNull Context context) {
         deviceMode = prefs.load(context);
@@ -102,6 +104,7 @@ public class BluetoothService {
     /**
      * Return AP or RC device mode
      */
+    @NonNull
     public String getBtString() {
         if (deviceMode == AP) {
             return "AP";

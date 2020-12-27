@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2019 Martijn van Welie
+ *   Copyright (c) 2020 Martijn van Welie
  *
  *   Permission is hereby granted, free of charge, to any person obtaining a copy
  *   of this software and associated documentation files (the "Software"), to deal
@@ -25,6 +25,7 @@ package ws.baseline.paradrone.bluetooth.blessed;
 
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
+import androidx.annotation.NonNull;
 
 @SuppressWarnings("SpellCheckingInspection")
 public abstract class BluetoothPeripheralCallback {
@@ -34,7 +35,7 @@ public abstract class BluetoothPeripheralCallback {
      * for the remote device have been updated, ie new services have been discovered.
      *
      */
-    public void onServicesDiscovered(final BluetoothPeripheral peripheral) {}
+    public void onServicesDiscovered(@NonNull final BluetoothPeripheral peripheral) {}
 
     /**
      * Callback invoked when the notification state of a characteristic has changed.
@@ -45,7 +46,7 @@ public abstract class BluetoothPeripheralCallback {
      * @param characteristic the characteristic for which the notification state changed
      * @param status GATT status code
      */
-    public void onNotificationStateUpdate(final BluetoothPeripheral peripheral, final BluetoothGattCharacteristic characteristic, final int status) {}
+    public void onNotificationStateUpdate(@NonNull final BluetoothPeripheral peripheral, @NonNull final BluetoothGattCharacteristic characteristic, @NonNull final GattStatus status) {}
 
     /**
      * Callback invoked as the result of a characteristic read operation or notification
@@ -57,7 +58,7 @@ public abstract class BluetoothPeripheralCallback {
      * @param characteristic the characteristic for which the new value was received
      * @param status GATT status code
      */
-    public void onCharacteristicUpdate(final BluetoothPeripheral peripheral, byte[] value, final BluetoothGattCharacteristic characteristic, final int status) {}
+    public void onCharacteristicUpdate(@NonNull final BluetoothPeripheral peripheral, @NonNull byte[] value, @NonNull final BluetoothGattCharacteristic characteristic, @NonNull final GattStatus status) {}
 
     /**
      * Callback indicating the result of a characteristic write operation.
@@ -69,7 +70,7 @@ public abstract class BluetoothPeripheralCallback {
      * @param characteristic the characteristic written to
      * @param status GATT status code
      */
-    public void onCharacteristicWrite(final BluetoothPeripheral peripheral, byte[] value, final BluetoothGattCharacteristic characteristic, final int status) {}
+    public void onCharacteristicWrite(@NonNull final BluetoothPeripheral peripheral, @NonNull byte[] value, @NonNull final BluetoothGattCharacteristic characteristic, @NonNull final GattStatus status) {}
 
     /**
      * Callback invoked as the result of a descriptor read operation
@@ -79,46 +80,46 @@ public abstract class BluetoothPeripheralCallback {
      * @param descriptor the descriptor that was read
      * @param status GATT status code
      */
-    public void onDescriptorRead(final BluetoothPeripheral peripheral, byte[] value, final BluetoothGattDescriptor descriptor, final int status) {}
+    public void onDescriptorRead(@NonNull final BluetoothPeripheral peripheral, @NonNull byte[] value, @NonNull final BluetoothGattDescriptor descriptor, @NonNull final GattStatus status) {}
 
     /**
      * Callback invoked as the result of a descriptor write operation.
-     * This callback is not called for the Client Characteristic Configuration descriptor. Instead the {@link BluetoothPeripheralCallback#onNotificationStateUpdate(BluetoothPeripheral, BluetoothGattCharacteristic, int)} will be called
+     * This callback is not called for the Client Characteristic Configuration descriptor. Instead the {@link BluetoothPeripheralCallback#onNotificationStateUpdate(BluetoothPeripheral, BluetoothGattCharacteristic, GattStatus)} will be called
      *
      * @param peripheral the peripheral
      * @param value the value that to be written
      * @param descriptor the descriptor written to
      * @param status the GATT status code
      */
-    public void onDescriptorWrite(final BluetoothPeripheral peripheral, byte[] value, final BluetoothGattDescriptor descriptor, final int status) {}
+    public void onDescriptorWrite(@NonNull final BluetoothPeripheral peripheral, @NonNull byte[] value, @NonNull final BluetoothGattDescriptor descriptor, @NonNull final GattStatus status) {}
 
     /**
      * Callback invoked when a bonding process is started
      *
      * @param peripheral the peripheral
      */
-    public void onBondingStarted(final BluetoothPeripheral peripheral) {}
+    public void onBondingStarted(@NonNull final BluetoothPeripheral peripheral) {}
 
     /**
      * Callback invoked when a bonding process has succeeded
      *
      * @param peripheral the peripheral
      */
-    public void onBondingSucceeded(final BluetoothPeripheral peripheral) {}
+    public void onBondingSucceeded(@NonNull final BluetoothPeripheral peripheral) {}
 
     /**
      * Callback invoked when a bonding process has failed
      *
      * @param peripheral the peripheral
      */
-    public void onBondingFailed(final BluetoothPeripheral peripheral) {}
+    public void onBondingFailed(@NonNull final BluetoothPeripheral peripheral) {}
 
     /**
      * Callback invoked when a bond has been lost and the peripheral is not bonded anymore.
      *
      * @param peripheral the peripheral
      */
-    public void onBondLost(final BluetoothPeripheral peripheral) {}
+    public void onBondLost(@NonNull final BluetoothPeripheral peripheral) {}
 
     /**
      * Callback invoked as the result of a read RSSI operation
@@ -127,7 +128,7 @@ public abstract class BluetoothPeripheralCallback {
      * @param rssi the RSSI value
      * @param status GATT status code
      */
-    public void onReadRemoteRssi(final BluetoothPeripheral peripheral, int rssi, int status) {}
+    public void onReadRemoteRssi(@NonNull final BluetoothPeripheral peripheral, int rssi, @NonNull GattStatus status) {}
 
     /**
      * Callback invoked as the result of a MTU request operation
@@ -135,6 +136,5 @@ public abstract class BluetoothPeripheralCallback {
      * @param mtu the new MTU
      * @param status GATT status code
      */
-    public void onMtuChanged(final BluetoothPeripheral peripheral, int mtu, int status) {}
-
+    public void onMtuChanged(@NonNull final BluetoothPeripheral peripheral, int mtu, @NonNull GattStatus status) {}
 }

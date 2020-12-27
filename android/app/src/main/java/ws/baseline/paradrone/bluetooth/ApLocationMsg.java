@@ -1,7 +1,6 @@
 package ws.baseline.paradrone.bluetooth;
 
 import androidx.annotation.NonNull;
-import com.google.android.gms.maps.model.LatLng;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Locale;
@@ -33,11 +32,6 @@ public class ApLocationMsg implements ApEvent {
         this.lat = lat;
         this.lng = lng;
         this.alt = alt;
-    }
-
-    public LatLng toLatLng() {
-        // TODO: Cache and reuse
-        return new LatLng(lat, lng);
     }
 
     @NonNull

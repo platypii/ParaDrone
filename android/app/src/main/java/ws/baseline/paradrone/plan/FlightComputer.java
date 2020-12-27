@@ -15,7 +15,8 @@ import org.greenrobot.eventbus.Subscribe;
 
 public class FlightComputer {
 
-    private Paraglider para = new Paraglider();
+    @NonNull
+    private final Paraglider para = new Paraglider();
 
     @Nullable
     private LandingZone lastLz;

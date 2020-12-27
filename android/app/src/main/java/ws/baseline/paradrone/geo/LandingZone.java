@@ -9,6 +9,7 @@ import java.util.Locale;
 public class LandingZone {
     public static final LandingZone kpow = new LandingZone(47.239, -123.143, 84, Math.toRadians(32));
 
+    @NonNull
     public final LatLngAlt destination;
     /** Landing direction in radians */
     public final double landingDirection;
@@ -17,6 +18,7 @@ public class LandingZone {
     public final double finalDistance = 150; // meters
 
     // Destination, as origin of coordinate system
+    @NonNull
     public final Point3V dest;
 
     /**
@@ -43,6 +45,7 @@ public class LandingZone {
     /**
      * Convert lat, lng to x, y meters centered at current location
      */
+    @NonNull
     public Point3V toPoint3V(@NonNull GeoPoint point) {
         final double bearing = Geo.bearing(this.destination.lat, this.destination.lng, point.lat, point.lng);
         final double distance = Geo.distance(this.destination.lat, this.destination.lng, point.lat, point.lng);
@@ -59,6 +62,7 @@ public class LandingZone {
     /**
      * Convert x, y coordinates to lat, lng
      */
+    @NonNull
     public LatLng toLatLng(@NonNull Point point) {
         final double bearing = Math.atan2(point.x, point.y);
         final double distance = Math.sqrt(point.x * point.x + point.y * point.y);
@@ -68,6 +72,7 @@ public class LandingZone {
     /**
      * Convert Point3V to GeoPointV
      */
+    @NonNull
     public GeoPoint toGeoPoint(@NonNull Point3V point) {
         final LatLng ll = toLatLng(point);
         return new GeoPoint(ll.lat, ll.lng, point.alt, point.vy, point.vx, point.climb);

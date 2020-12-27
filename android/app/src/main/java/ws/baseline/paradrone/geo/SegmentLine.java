@@ -1,5 +1,6 @@
 package ws.baseline.paradrone.geo;
 
+import androidx.annotation.NonNull;
 import java.util.Arrays;
 import java.util.List;
 import timber.log.Timber;
@@ -8,10 +9,12 @@ import static ws.baseline.paradrone.util.Numbers.interpolate;
 
 public class SegmentLine implements Segment {
 
+    @NonNull
     private final PointV start;
+    @NonNull
     private final PointV end;
 
-    public SegmentLine(Point start, Point end) {
+    public SegmentLine(@NonNull Point start, @NonNull Point end) {
         final double dx = end.x - start.x;
         final double dy = end.x - start.y;
         final double len = Math.sqrt(dx * dx + dy * dy);
@@ -22,16 +25,19 @@ public class SegmentLine implements Segment {
         }
     }
 
+    @NonNull
     @Override
     public PointV start() {
         return start;
     }
 
+    @NonNull
     @Override
     public PointV end() {
         return end;
     }
 
+    @NonNull
     @Override
     public Path fly(double distance) {
         if (distance < 0) {
@@ -53,6 +59,7 @@ public class SegmentLine implements Segment {
         return Math.sqrt(dx * dx + dy * dy);
     }
 
+    @NonNull
     @Override
     public List<Point> render() {
         return Arrays.asList(start, end);

@@ -50,6 +50,7 @@ public class ApLandingZone implements ApEvent {
         EventBus.getDefault().post(lastLz);
     }
 
+    @NonNull
     public byte[] toBytes() {
         // Pack LZ into bytes
         final byte[] bytes = new byte[13];

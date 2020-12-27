@@ -12,6 +12,7 @@ public class LatLng {
         this.lng = lng;
     }
 
+    @NonNull
     public com.google.android.gms.maps.model.LatLng toLatLng() {
         // TODO: Cache and reuse
         return new com.google.android.gms.maps.model.LatLng(lat, lng);
