@@ -47,7 +47,7 @@ class PlannerWaypoints {
      */
     @NonNull
     private static List<Path> searchPattern(@NonNull Point3V loc, @NonNull List<Point3V> pattern, double r) {
-        // Pre-compute shortest dubins path from pattern[i] to pattern[i+1]
+        // Pre-compute shortest dubins paths from pattern[i] to pattern[i+1]
         final List<Path> steps = new ArrayList<>();
         for (int i = 0; i < pattern.size() - 1; i++) {
             steps.add(shortestDubins(pattern.get(i), pattern.get(i + 1), r));
@@ -66,6 +66,7 @@ class PlannerWaypoints {
     /**
      * Concatenate paths.
      * If any of the paths are null, return null.
+     * TODO: Check for empty segments?
      */
     @Nullable
     private static Path catPaths(@Nullable Path first, @NonNull List<Path> paths) {

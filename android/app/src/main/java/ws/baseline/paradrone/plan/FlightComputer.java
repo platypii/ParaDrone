@@ -54,7 +54,7 @@ public class FlightComputer {
     private void replan() {
         if (para.loc != null && lastLz != null) {
             // Recompute plan
-            plan = Autopilot.search(para, lastLz);
+            plan = Autopilot.search3(para, lastLz);
             EventBus.getDefault().post(new PlanEvent());
         }
     }

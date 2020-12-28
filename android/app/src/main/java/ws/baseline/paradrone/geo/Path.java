@@ -44,15 +44,20 @@ public class Path implements PathLike {
             final Segment segment = segments.get(i);
             final double segmentLength = segment.length();
             if (distance < flown + segmentLength) {
-                // End point is within segment
+                // End is within segment
                 break;
             } else {
                 trimmed.add(segment);
                 flown += segmentLength;
             }
         }
-        // Fly last segment
-        trimmed.addAll(segments.get(i).fly(distance - flown).segments);
+        final double remaining = distance - flown;
+        if (remaining > 0) {
+            // Fly last segment
+            trimmed.addAll(segments.get(i).fly(distance - flown).segments);
+        } else if (remaining < 0) {
+            Timber.w("segment_fly distance must be positive %f - %f < 0", distance, flown);
+        }
         return new Path(name, trimmed);
     }
 
@@ -73,5 +78,11 @@ public class Path implements PathLike {
             points.addAll(segment.render());
         }
         return points;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return "Path(" + name + ")";
     }
 }
