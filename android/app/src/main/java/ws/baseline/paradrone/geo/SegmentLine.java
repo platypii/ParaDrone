@@ -64,4 +64,10 @@ public class SegmentLine implements Segment {
     public List<Point> render() {
         return Arrays.asList(start, end);
     }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return "Line " + length();
+    }
 }

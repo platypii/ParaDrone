@@ -1,5 +1,6 @@
 package ws.baseline.paradrone.plan;
 
+import ws.baseline.paradrone.GeoPoint;
 import ws.baseline.paradrone.Paraglider;
 import ws.baseline.paradrone.geo.LandingZone;
 import ws.baseline.paradrone.geo.Path;
@@ -10,25 +11,41 @@ import ws.baseline.paradrone.geo.SegmentLine;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static ws.baseline.paradrone.plan.PlannerNaive.naive;
 import static ws.baseline.paradrone.plan.PlannerStraight.straight;
 import static ws.baseline.paradrone.plan.PlannerWaypoints.viaWaypoints;
+import static ws.baseline.paradrone.plan.ShortestDubins.allDubins;
 
 public class Autopilot {
     private static final double no_turns_below = 30; // meters
+    private static final double lookahead = 3;
 
-    public static Path search(@NonNull Paraglider para, @NonNull LandingZone lz) {
-        final Point3V loc = lz.toPoint3V(para.loc);
+    /**
+     * Search for a 3D plan
+     */
+    public static Path search3(@NonNull Paraglider para, @NonNull LandingZone lz) {
+        // Run to where the ball is going
+        final GeoPoint next = para.predict(lookahead);
+        final Point3V loc = lz.toPoint3V(next);
+        return search(loc, para, lz);
+    }
+
+    /**
+     * Apply autopilot rules, and then search over waypoint paths
+     */
+    public static Path search(@NonNull Point3V loc, @NonNull Paraglider para, @NonNull LandingZone lz) {
         final LandingPattern pattern = new LandingPattern(para, lz);
+        final double effectiveRadius = para.turnRadius * 1.25;
+
         // How much farther can we fly with available altitude?
         final double turn_distance_remaining = para.flightDistanceRemaining(loc.alt - no_turns_below);
         final double flight_distance_remaining = para.flightDistanceRemaining(loc.alt);
 
         final PointV sof = pattern.startOfFinal();
-        final double r = para.turnRadius;
-        final double distance = Math.sqrt(loc.x * loc.x + loc.y * loc.y);
+        final double distance2 = loc.x * loc.x + loc.y * loc.y; // squared
 
         if (loc.vx == 0 && loc.vy == 0) {
             // No velocity, just go straight to lz
@@ -41,8 +58,9 @@ public class Autopilot {
         if (loc.alt <= no_turns_below) {
             // No turns under 100ft
             return straightPath;
-        } else if (distance > 1000) {
-            final Path naivePath = naive(loc, sof, r);
+        } else if (distance2 > 1000 * 1000) {
+            // Naive when far away
+            final Path naivePath = naive(loc, sof, effectiveRadius);
             if (naivePath != null) {
                 return naivePath.fly(turn_distance_remaining).fly(flight_distance_remaining);
             } else {
@@ -50,12 +68,8 @@ public class Autopilot {
             }
         } else {
             final List<Path> paths = new ArrayList<>();
-            paths.addAll(viaWaypoints(loc, pattern, para.turnRadius));
-//            paths.add(dubins(loc, sof, r, TURN_RIGHT, TURN_RIGHT)); // rsr
-//            paths.add(dubins(loc, sof, r, TURN_RIGHT, TURN_LEFT)); // rsl
-//            paths.add(dubins(loc, sof, r, TURN_LEFT, TURN_RIGHT)); // lsr
-//            paths.add(dubins(loc, sof, r, TURN_LEFT, TURN_LEFT)); // lsl
-//            paths.add(naivePath);
+            paths.addAll(viaWaypoints(loc, pattern, effectiveRadius));
+            paths.addAll(Arrays.asList(allDubins(loc, lz.dest, effectiveRadius)));
             paths.add(straightPath);
             for (int i = 0; i < paths.size(); i++) {
                 if (paths.get(i) != null) {
