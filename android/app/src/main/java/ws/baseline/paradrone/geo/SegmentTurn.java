@@ -110,4 +110,10 @@ public class SegmentTurn implements Segment {
     private double angle2() {
         return Math.atan2(end.x - circle.x, end.y - circle.y);
     }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return (turn == Turn.TURN_LEFT ? "Left" : "Right") + " " + Math.toDegrees(arcs());
+    }
 }
