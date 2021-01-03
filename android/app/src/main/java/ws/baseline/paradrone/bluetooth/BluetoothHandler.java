@@ -59,6 +59,7 @@ class BluetoothHandler {
     BluetoothHandler(@NonNull BluetoothService service, @NonNull Context context) {
         this.service = service;
         central = new BluetoothCentralManager(context, bluetoothCentralManagerCallback, new Handler());
+        central.startPairingPopupHack();
     }
 
     public void start() {
