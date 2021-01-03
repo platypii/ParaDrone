@@ -1,9 +1,8 @@
-apply plugin: 'com.android.application'
+apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion 30
     defaultConfig {
-        applicationId "ws.baseline.paradrone"
         minSdkVersion 23 // 21 for BLE, 23 for better BLE
         targetSdkVersion 30
         versionCode 1

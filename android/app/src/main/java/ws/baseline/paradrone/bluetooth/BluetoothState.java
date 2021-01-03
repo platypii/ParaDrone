@@ -1,5 +1,8 @@
 package ws.baseline.paradrone.bluetooth;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 public class BluetoothState {
 
     public final int state;
@@ -22,7 +25,19 @@ public class BluetoothState {
         return state == BT_STARTED || state == BT_SEARCHING || state == BT_CONNECTING || state == BT_CONNECTED;
     }
 
+    @NonNull
     public static String toString(int state) {
         return BT_STATES[state];
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        return obj instanceof BluetoothState && ((BluetoothState) obj).state == state;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return toString(state);
     }
 }

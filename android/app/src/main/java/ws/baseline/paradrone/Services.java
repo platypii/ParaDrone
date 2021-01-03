@@ -20,19 +20,19 @@ public class Services {
             started = true;
             Timber.i("Starting services...");
             bluetooth.start(activity);
-            flightComputer.start();
+//            flightComputer.start();
             location.start();
         } else {
             Timber.e("Services started twice");
         }
     }
 
-    static void stop() {
+    public static void stop() {
         if (!started) {
             Timber.e("Stop called but services not started");
         }
         Timber.i("Stopping services...");
-        flightComputer.stop();
+//        flightComputer.stop();
         bluetooth.stop();
         location.stop();
         started = false;

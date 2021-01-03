@@ -1,2 +1,3 @@
+include ':wear'
 include ':app'
 rootProject.name='BASEline ParaDrone'
