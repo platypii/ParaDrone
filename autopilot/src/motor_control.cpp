@@ -110,7 +110,8 @@ static void set_motor_right(const int drive, uint8_t speed) {
 }
 
 /**
- * Return the current in amps for motor 1
+ * The current in amps for motor 1
+ * @returns current in amps
  */
 float get_motor_current_left() {
   // 0..4096 => 0..3.3V @ 525 mV per amp
@@ -120,7 +121,8 @@ float get_motor_current_left() {
 }
 
 /**
- * Return the current in amps for motor 2
+ * The current in amps for motor 2
+ * @returns current in amps
  */
 float get_motor_current_right() {
   // 0..4096 => 0..3.3V @ 525 mV per amp
@@ -130,7 +132,8 @@ float get_motor_current_right() {
 }
 
 /**
- * Return the limit switch state for motor 1
+ * Limit switch state for motor 1
+ * @returns pin voltage 0..4096
  */
 int get_motor_switch_left() {
   const uint16_t analog = analogRead(PIN_M1_LIMIT);
@@ -138,7 +141,8 @@ int get_motor_switch_left() {
 }
 
 /**
- * Return the limit switch state for motor 2
+ * Limit switch state for motor 2
+ * @returns pin voltage 0..4096
  */
 int get_motor_switch_right() {
   const uint16_t analog = analogRead(PIN_M2_LIMIT);

@@ -69,24 +69,28 @@ Path *turn_fly(Turn *turn, const double distance) {
   }
 }
 
-Point *turn_render(Turn *turn) {
-  const double a1 = angle1(turn);
-  const double a2 = angle2(turn);
-  const int n = 10; // TODO: Pre-determine based on length
-  Point *points = new Point[n];
-  const double step = 0.1; // ~6 degrees
-  double arcs = turn->turn * (a2 - a1);
-  if (arcs < 0) arcs += 2 * M_PI;
-  for (int i = 0; i < n - 1; i++) {
-    const double delta = i * step;
-    const double theta = a1 + turn->turn * delta;
-    points[i].x = turn->circle.x + turn->circle.radius * sin(theta);
-    points[i].y = turn->circle.y + turn->circle.radius * cos(theta);
-  }
-  points[n - 1] = turn->end;
-  return points;
-}
+// Point *turn_render(Turn *turn) {
+//   const double a1 = angle1(turn);
+//   const double a2 = angle2(turn);
+//   const double step = 0.1; // ~6 degrees
 
+//   // Arc length
+//   double arcs = turn->turn * (a2 - a1);
+//   if (arcs < 0) arcs += 2 * M_PI;
+
+//   const int n = ceil(arcs / step) + 1;
+//   Point *points = new Point[n];
+//   points[0] = turn->start;
+
+//   for (int i = 1; i < n - 1; i++) {
+//     const double delta = i * step;
+//     const double theta = a1 + turn->turn * delta;
+//     points[i].x = turn->circle.x + turn->circle.radius * sin(theta);
+//     points[i].y = turn->circle.y + turn->circle.radius * cos(theta);
+//   }
+//   points[n - 1] = turn->end;
+//   return points;
+// }
 
 /**
  * Return target toggle position for a given turn.

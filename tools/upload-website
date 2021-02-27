@@ -1,0 +1,9 @@
+#!/bin/bash
+
+set -e
+
+DRY=--dryrun
+
+aws --profile paradrone s3 sync $DRY html/ s3://paradr.one/
+
+# aws s3 cp $DRY simulator/index.html s3://paradr.one/simulator/

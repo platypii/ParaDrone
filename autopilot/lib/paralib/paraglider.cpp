@@ -43,7 +43,7 @@ GeoPointV *para_predict(GeoPointV *loc, double dt, double turn_speed, double tur
   const double climb = loc->climb + (PARAMOTOR_CLIMBRATE - loc->climb) * alpha;
 
   return new GeoPointV {
-    .millis = loc->millis + (long long)(1000 * dt),
+    .millis = loc->millis + (uint64_t)(1000 * dt),
     .lat = prewind.lat,
     .lng = prewind.lng,
     .alt = alt,

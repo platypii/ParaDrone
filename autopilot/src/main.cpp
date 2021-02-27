@@ -49,7 +49,7 @@ void update_location(GeoPointV *point) {
   last_fix_millis = millis();
   motor_loop();
   screen_update();
-  blink(1);
+  // blink(1);
   // Plan and update controls
   planner_update_location(point);
   // log_point(point);

@@ -18,7 +18,7 @@ In this repository:
 
 ## Software
 
-Autopilot and remote control software runs on ESP32 dev boards, using the arduino framework. These are super cheap but powerful microcontrollers. The Heltec ESP32 LoRa V2 is recommended as it also has a 128x64 display and a LoRa radio. PlatformIO is used to manage the software.
+Autopilot and remote control software runs on small ESP32 dev boards, using the arduino framework. These are super cheap but powerful microcontrollers. The Heltec ESP32 LoRa V2 is recommended as it also has a 128x64 display and a LoRa radio. PlatformIO is used to manage the software.
 
 ### To program the autopilot device:
 

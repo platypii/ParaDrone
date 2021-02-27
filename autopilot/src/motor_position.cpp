@@ -17,13 +17,13 @@ float get_motor_current_right();
 
 // Best guess of position
 // 0 = no deflection, 255 = full deflection
-float motor_position_left = 0;
+float motor_position_left = 10;
 float motor_position_right = 10;
 // TODO: Gaussian estimate
 
 // Target motor position
 // 0 = no deflection, 255 = full deflection
-short motor_target_left = 0;
+short motor_target_left = 10;
 short motor_target_right = 10;
 
 // Current motor speed
@@ -54,19 +54,21 @@ void motor_loop() {
   // Limit switch engaged = toggles up
   motor_switch_left = get_motor_switch_left();
   motor_switch_right = get_motor_switch_right();
-  if (motor_switch_left < 64 && motor_position_left != 0) {
+  if (motor_switch_left > 64 && motor_position_left != 0) {
     motor_position_left = 0;
     if (motor_speed_left < 0) {
       Serial.println("Left stop");
       motor_speed_left = 0;
     }
+    screen_update();
   }
-  if (motor_switch_right < 64 && motor_position_right != 0) {
+  if (motor_switch_right > 64 && motor_position_right != 0) {
     motor_position_right = 0;
     if (motor_speed_right < 0) {
       Serial.println("Right stop");
       motor_speed_right = 0;
     }
+    screen_update();
   }
   // Stop motor at the top
   set_motor_speed_raw(motor_speed_left, motor_speed_right);

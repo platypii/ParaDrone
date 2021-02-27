@@ -56,6 +56,7 @@ void set_flight_mode(uint8_t mode) {
   EEPROM.put(ADDR_AP, mode);
   EEPROM.commit();
   config_flight_mode = mode;
+  planner_loop(); // handles mode change for flight computer
   screen_update();
 }
 

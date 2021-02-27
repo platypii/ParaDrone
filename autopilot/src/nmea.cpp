@@ -11,8 +11,8 @@
 static void parse_gga(const char *line);
 static void parse_rmc(char *line);
 static double parse_degrees_minutes(const char *dm, const char *nsew);
-static long long int parse_date(const char *str);
-static long long int parse_time(const char *str);
+static uint64_t parse_date(const char *str);
+static uint64_t parse_time(const char *str);
 static double parse_double(const char *str);
 
 // Global altitude
@@ -66,7 +66,7 @@ static void parse_rmc(char *line) {
   }
 
   // sscanf(line, "$GPRMC,%s,%c,%s,%c,%s,%c,%lf,%lf,%s", timeStr, &status, latDM, &latNS, lngDM, &lngEW, &hspeed, &bearing, dateStr);
-  const long long int millis = parse_date(dateStr) + parse_time(timeStr);
+  const uint64_t millis = parse_date(dateStr) + parse_time(timeStr);
   const double lat = parse_degrees_minutes(latDM, latNS);
   const double lng = parse_degrees_minutes(lngDM, lngEW);
   const double climb = NAN; // TODO: Kalman
@@ -114,7 +114,7 @@ static double parse_degrees_minutes(const char *dm, const char *nsew) {
 /**
  * Parse DDMMYY into milliseconds since epoch
  */
-static long long int parse_date(const char *str) {
+static uint64_t parse_date(const char *str) {
   struct tm date;
   date.tm_hour = 0;
   date.tm_min = 0;
@@ -129,7 +129,7 @@ static long long int parse_date(const char *str) {
 /**
  * Parse HHMMSS.SS UTC time into milliseconds since midnight
  */
-static long long int parse_time(const char *str) {
+static uint64_t parse_time(const char *str) {
   const int h = parseInt2(str[0], str[1]);
   const int m = parseInt2(str[2], str[3]);
   const int s = parseInt2(str[4], str[5]);

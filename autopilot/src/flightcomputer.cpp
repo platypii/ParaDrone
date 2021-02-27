@@ -37,7 +37,7 @@ static bool gps_expired() {
 }
 
 /**
- * Return true GPS point is reasonable
+ * Return true if GPS point is reasonable
  */
 static bool valid_point(GeoPointV * p) {
   return !isnan(p->alt) && !isnan(p->vN) && !isnan(p->vE);
@@ -62,15 +62,6 @@ void rc_set_position(uint8_t new_left, uint8_t new_right) {
 }
 
 /**
- * Called when autopilot updates the plan
- */
-static void ap_set_position(uint8_t new_left, uint8_t new_right) {
-  if (autopilot_enabled()) {
-    set_motor_position(new_left, new_right);
-  }
-}
-
-/**
  * Called when a new location arrives to begin planning
  */
 void planner_update_location(GeoPointV *point) {
@@ -81,10 +72,10 @@ void planner_update_location(GeoPointV *point) {
       // No alt, do nothing
     } else if (alt_agl < ALT_FLARE) {
       // Flare!!
-      ap_set_position(255, 255);
+      set_motor_position(255, 255);
     } else if (alt_agl < ALT_NO_TURNS_BELOW) {
       // Hands up for landing
-      ap_set_position(0, 0);
+      set_motor_position(0, 0);
       // set_motor_speed(-255, -255); // TODO: Full speed up?
     } else if (valid_point(point)) {
       // Compute plan
@@ -92,7 +83,7 @@ void planner_update_location(GeoPointV *point) {
       if (current_plan) free_path(current_plan);
       current_plan = new_plan;
       ParaControls ctrl = path_controls(current_plan);
-      ap_set_position(ctrl.left, ctrl.right);
+      set_motor_position(ctrl.left, ctrl.right);
       const double error_x = current_plan->end.x;
       const double error_y = current_plan->end.y;
       const double landing_error = sqrt(error_x * error_x + error_y * error_y);
@@ -107,8 +98,13 @@ void planner_update_location(GeoPointV *point) {
  * Called periodically to ensure that we do something in case of lost signal
  */
 void planner_loop() {
-  // If its been X seconds since GPS, then put glider into slight right turn
-  if (gps_expired() && !rc_override()) {
-    ap_set_position(1, 10);
+  if (!rc_override()) {
+    if (!autopilot_enabled()) {
+      // Idle mode
+      set_motor_position(10, 10);
+    } else if (gps_expired()) {
+      // Autopilot + expired GPS signal, put glider into slight right turn
+      set_motor_position(1, 10);
+    }
   }
 }

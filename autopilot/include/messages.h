@@ -21,7 +21,7 @@ struct LocationMessage {
  */
 #pragma pack(1)
 struct SpeedMessage {
-  char msg_type; // 'S'
+  char msg_type; // 'D'
   int lat; // microdegrees
   int lng; // microdegrees
   short alt; // decimeters
@@ -60,5 +60,7 @@ struct MotorConfigMessage {
 // Packers
 LandingZoneMessage pack_lz(LandingZone *lz);
 LandingZone *unpack_lz(LandingZoneMessage *lz);
+SpeedMessage *pack_speed(GeoPointV *point);
+GeoPointV *unpack_speed(SpeedMessage *packed);
 
 #endif

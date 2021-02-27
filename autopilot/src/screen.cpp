@@ -44,10 +44,10 @@ static void screen_draw() {
     // Lat/lng
     sprintf(buf, "%f, %f", last_location->lat, last_location->lng);
     Heltec.display->setTextAlignment(TEXT_ALIGN_LEFT);
-    Heltec.display->drawString(0, 0, buf);
+    Heltec.display->drawString(0, 2, buf);
   } else {
     Heltec.display->setTextAlignment(TEXT_ALIGN_CENTER);
-    Heltec.display->drawString(DISPLAY_WIDTH / 2, 0, "ParaDrone");
+    Heltec.display->drawString(DISPLAY_WIDTH / 2, 2, "ParaDrone");
     Heltec.display->setTextAlignment(TEXT_ALIGN_LEFT);
   }
 
@@ -55,19 +55,19 @@ static void screen_draw() {
   if (last_location != NULL && !isnan(last_location->alt)) {
     if (config_landing_zone != NULL) {
       const double alt = last_location->alt - config_landing_zone->destination.alt;
-      sprintf(buf, "Alt: %.0f m AGL", alt);
+      sprintf(buf, "%.0f m AGL", alt);
     } else {
       sprintf(buf, "%.0f m MSL", last_location->alt);
     }
   }
-  Heltec.display->drawString(0, 10, buf);
+  Heltec.display->drawString(0, 12, buf);
 
   // Speed
   if (last_location != NULL) {
     const double vel = sqrt(last_location->vN * last_location->vN + last_location->vE * last_location->vE);
     if (!isnan(vel)) {
       sprintf(buf, "%.0f mph", vel * 2.23694);
-      Heltec.display->drawString(64, 10, buf);
+      Heltec.display->drawString(70, 12, buf);
    }
   }
 
@@ -76,7 +76,7 @@ static void screen_draw() {
     long delta = millis() - last_fix_millis;
     sprintd(buf, delta);
     Heltec.display->setTextAlignment(TEXT_ALIGN_RIGHT);
-    Heltec.display->drawString(DISPLAY_WIDTH, 10, buf);
+    Heltec.display->drawString(DISPLAY_WIDTH, 12, buf);
     Heltec.display->setTextAlignment(TEXT_ALIGN_LEFT);
   }
 
@@ -91,13 +91,21 @@ static void screen_draw() {
   } else {
     sprintf(buf, "LZ:");
   }
-  Heltec.display->drawString(0, 20, buf);
+  Heltec.display->drawString(0, 22, buf);
 
   // Flight mode
   if (config_flight_mode == MODE_IDLE) {
-    Heltec.display->drawString(0, 30, "Idle");
+    Heltec.display->drawString(0, 32, "Idle");
   } else if (config_flight_mode == MODE_AP) {
-    Heltec.display->drawString(0, 30, "Auto");
+    Heltec.display->drawString(0, 32, "Auto");
+  }
+
+  // Limit switch state
+  if (get_motor_switch_left() > 64) {
+    Heltec.display->drawString(0, -8, "_");
+  }
+  if (get_motor_switch_right() > 64) {
+    Heltec.display->drawString(122, -8, "_");
   }
 
   // Current motor position

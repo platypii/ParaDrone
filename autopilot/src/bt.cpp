@@ -35,6 +35,10 @@ class AutopilotCharacteristic : public BLECharacteristicCallbacks {
       std::string value = pCharacteristic->getValue();
       if (value[0] == 'C' && value.length() == 10) {
         set_motor_config((MotorConfigMessage*) value.c_str());
+      } else if (value[0] == 'D' && value.length() == 17) {
+        // Location from bluetooth
+        GeoPointV *point = unpack_speed((SpeedMessage*) value.c_str());
+        update_location(point);
       } else if (value[0] == 'M' && value.length() == 2) {
         const uint8_t mode = value[1];
         Serial.printf("BT %.1fs mode %d\n", millis() * 1e-3, mode);
@@ -95,19 +99,12 @@ void bt_init() {
 
 void bt_send_location(GeoPointV *point) {
   // Pack point into location message
-  SpeedMessage msg = {
-    'S',
-    (int)(point->lat * 1e6), // microdegrees
-    (int)(point->lng * 1e6), // microdegrees
-    (short)(point->alt * 10), // decimeters
-    (short)(point->vN * 0.01), // cm/s
-    (short)(point->vE * 0.01), // cm/s
-    (short)(point->climb * 0.01) // cm/s
-  };
+  SpeedMessage *msg = pack_speed(point);
   uint8_t *data = (uint8_t*) &msg;
   size_t len = sizeof(msg);
   ap_ch->setValue(data, len);
   ap_ch->notify();
+  delete msg;
 }
 
 static void bt_send_lz() {

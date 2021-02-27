@@ -18,7 +18,7 @@ struct LatLngAlt {
 };
 
 struct GeoPointV {
-  long long int millis;
+  uint64_t millis;
   double lat;
   double lng;
   double alt;

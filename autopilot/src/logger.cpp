@@ -9,19 +9,18 @@ static FILE *fp = NULL;
 static FILE *get_file();
 
 void log_point(GeoPointV *loc) {
-  // Log to screen
+  // Date string
   char dateStr[40];
-  time_t seconds = loc->millis / 1000;
+  const time_t seconds = loc->millis / 1000;
   struct tm date = *localtime(&seconds);
-  strftime(dateStr, sizeof(dateStr), "%Y-%m-%d %H:%M:%S", &date);
-  printf("%s, %.6f, %.6f, %.2fm\n", dateStr, loc->lat, loc->lng, loc->alt);
+  strftime(dateStr, sizeof(dateStr), "%Y-%m-%dT%H:%M:%SZ", &date);
 
   // Log to file
   if (!fp) {
     fp = get_file();
-    fputs("millis,lat,lng,alt,vN,vE\n", fp);
+    fputs("time,lat,lng,hMSL,velN,velE,velD\n", fp);
   }
-  fprintf(fp, "%lld,%.6f,%.6f,%.2f,%.2f,%.2f\n", loc->millis, loc->lat, loc->lng, loc->alt, loc->vN, loc->vE);
+  fprintf(fp, "%s,%.6f,%.6f,%.2f,%.2f,%.2f,%.2f\n", dateStr, loc->lat, loc->lng, loc->alt, loc->vN, loc->vE, -loc->climb);
   fflush(fp);
 }
 
