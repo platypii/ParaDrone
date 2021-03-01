@@ -72,7 +72,7 @@ void test_autopilot_far() {
 }
 
 void test_autopilot_near() {
-  GeoPointV loc = {1000, 47.24, -123.14, 884, 10, 0, -10};
+  GeoPointV loc = {1000, 47.24, -123.14, 884, 0, -10, -3};
   Point3V point = lz.to_point3V(&loc);
   Path *path = search(point, &lz, PARAMOTOR_TURNRADIUS);
   TEST_ASSERT_NOT_NULL(path);

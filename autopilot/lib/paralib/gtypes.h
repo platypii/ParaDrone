@@ -22,9 +22,9 @@ struct GeoPointV {
   double lat;
   double lng;
   double alt;
-  double climb;
   double vN;
   double vE;
+  double climb;
 };
 
 struct Point {

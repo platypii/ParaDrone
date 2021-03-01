@@ -23,6 +23,7 @@ void setup() {
   screen_init(); // 200ms
   bt_init(); // 680ms
   lora_init(); // 70ms
+  // web_init("ssid", "password");
   // blink(4); // 350ms
 }
 
@@ -33,6 +34,7 @@ void loop() {
   motor_loop();
   screen_loop();
   lora_loop();
+  web_loop();
   TIME_END;
   // TODO: Sleep exactly enough to be ready for next gps
   delay(80);
@@ -52,7 +54,7 @@ void update_location(GeoPointV *point) {
   // blink(1);
   // Plan and update controls
   planner_update_location(point);
-  // log_point(point);
+  log_point(point);
   // Notify listeners
   bt_send_location(point);
   lora_send_location(point);

@@ -83,7 +83,15 @@ static void parse_rmc(char *line) {
   // Filter out unlikely lat/lng
   if (fabs(lat) > 0.1 || fabs(lng) > 0.1) {
     // Generate point
-    GeoPointV *point = new GeoPointV { millis, lat, lng, altitude, climb, vN, vE };
+    GeoPointV *point = new GeoPointV {
+      .millis = millis,
+      .lat = lat,
+      .lng = lng,
+      .alt = altitude,
+      .vN = vN,
+      .vE = vE,
+      .climb = climb
+    };
     update_location(point);
   }
 }

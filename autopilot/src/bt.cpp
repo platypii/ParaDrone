@@ -19,12 +19,12 @@ class AutopilotServer : public BLEServerCallbacks {
     void onConnect(BLEServer* pServer) {
       bt_connected = true;
       screen_update();
-      Serial.println("BT client connected");
+      Serial.printf("BT %.1fs client connected\n", millis() * 1e-3);
     };
     void onDisconnect(BLEServer* pServer) {
       bt_connected = false;
       screen_update();
-      Serial.println("BT client disconnected");
+      Serial.printf("BT %.1fs client disconnected\n", millis() * 1e-3);
     }
 };
 
@@ -61,6 +61,12 @@ class AutopilotCharacteristic : public BLECharacteristicCallbacks {
       } else if (value[0] == 'T' && value.length() == 3) {
         // Serial.printf("BT toggle %d %d\n", value[1], value[2]);
         rc_set_position(value[1], value[2]);
+      } else if (value[0] == 'W') {
+        Serial.printf("BT %.1fs web server\n", millis() * 1e-3);
+        const char *userpass = value.c_str();
+        const char *password = strchr(value.c_str(), ':') + 1;
+        const char *ssid = value.substr(1, password - userpass - 2).c_str();
+        web_init(ssid, password);
       } else if (value[0] == 'Z' && value.length() == 13) {
         set_landing_zone((LandingZoneMessage*) value.c_str());
         screen_update();
@@ -99,12 +105,11 @@ void bt_init() {
 
 void bt_send_location(GeoPointV *point) {
   // Pack point into location message
-  SpeedMessage *msg = pack_speed(point);
+  SpeedMessage msg = pack_speed(point);
   uint8_t *data = (uint8_t*) &msg;
   size_t len = sizeof(msg);
   ap_ch->setValue(data, len);
   ap_ch->notify();
-  delete msg;
 }
 
 static void bt_send_lz() {
@@ -119,5 +124,13 @@ static void bt_send_motor_config() {
   uint8_t *data = (uint8_t*) &motor_config;
   size_t len = sizeof(motor_config);
   ap_ch->setValue(data, len);
+  ap_ch->notify();
+}
+
+void bt_send_url(const char *url) {
+  const size_t len = strnlen(url, 19);
+  uint8_t data[20] = "U";
+  memcpy(data + 1, url, len);
+  ap_ch->setValue(data, len + 1);
   ap_ch->notify();
 }

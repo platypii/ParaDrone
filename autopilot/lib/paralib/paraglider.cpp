@@ -47,8 +47,8 @@ GeoPointV *para_predict(GeoPointV *loc, double dt, double turn_speed, double tur
     .lat = prewind.lat,
     .lng = prewind.lng,
     .alt = alt,
-    .climb = climb,
     .vN = vN,
-    .vE = vE
+    .vE = vE,
+    .climb = climb
   };
 }

@@ -49,6 +49,7 @@ void screen_update();
 // Bluetooth
 void bt_init();
 void bt_send_location(GeoPointV *point);
+void bt_send_url(const char *url);
 
 // GPS
 void gps_init();
@@ -80,7 +81,6 @@ int get_motor_switch_right();
 
 // Planner
 void planner_loop();
-void rc_set_position(uint8_t new_left, uint8_t new_right);
 void planner_update_location(GeoPointV *point);
 double plan_score(LandingZone *lz, Path *plan);
 ParaControls path_controls(Path *path);
@@ -89,5 +89,9 @@ ParaControls path_controls(Path *path);
 void set_flight_mode(uint8_t mode);
 void rc_set_speed(const short new_left, const short new_right);
 void rc_set_position(uint8_t new_left, uint8_t new_right);
+
+// Web server
+void web_init(const char *ssid, const char *password);
+void web_loop();
 
 #endif

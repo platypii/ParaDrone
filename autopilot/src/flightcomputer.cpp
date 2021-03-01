@@ -87,7 +87,7 @@ void planner_update_location(GeoPointV *point) {
       const double error_x = current_plan->end.x;
       const double error_y = current_plan->end.y;
       const double landing_error = sqrt(error_x * error_x + error_y * error_y);
-      Serial.printf("Plan length %.1fm error %.2f\n", path_length(current_plan), landing_error);
+      Serial.printf("Plan %s length %.1fm error %.2f\n", current_plan->name, path_length(current_plan), landing_error);
     } else {
       // Do nothing
     }
