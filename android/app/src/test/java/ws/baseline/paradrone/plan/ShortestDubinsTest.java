@@ -15,7 +15,7 @@ public class ShortestDubinsTest {
         final PointV start = new PointV(1000, 1000, 10, 0);
         final Path plan = ShortestDubins.shortestDubins(start, kpow.dest, 100);
         assertNotNull(plan);
-        assertEquals("dubins", plan.name);
+        assertEquals("DubinR", plan.name);
         assertEquals(3, plan.segments.size());
         assertEquals(1848.3, plan.length(), 0.1);
     }

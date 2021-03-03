@@ -37,9 +37,10 @@ public class ConvertTest {
     public void convertDistance3Metric() {
         Convert.metric = true;
         assertEquals("1 m", Convert.distance3(1));
-        assertEquals("1.0 km", Convert.distance3(1000));
-        assertEquals("1.6 km", Convert.distance3(1609.34));
-        assertEquals("16 km", Convert.distance3(16093.4));
+        assertEquals("1000 m", Convert.distance3(1000));
+        assertEquals("1609 m", Convert.distance3(1609.34));
+        assertEquals("16.1 km", Convert.distance3(16093.4));
+        assertEquals("161 km", Convert.distance3(160934));
     }
 
     @Test

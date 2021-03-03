@@ -57,8 +57,9 @@ class PlannerNaive {
                 c1.x - turn1 * turnRadius * Math.cos(commute_angle),
                 c1.y + turn1 * turnRadius * Math.sin(commute_angle)
         );
+        final String name = turn1 == TURN_LEFT ? "NaiveL" : "NaiveR";
         return new Path(
-                "naive",
+                name,
                 new SegmentTurn(c1, loc, comm1, turn1),
                 new SegmentLine(comm1, dest)
         );
