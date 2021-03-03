@@ -11,6 +11,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import timber.log.Timber;
 
+import static ws.baseline.paradrone.geo.Turn.TURN_LEFT;
+
 class PlannerDubins {
 
     /**
@@ -74,8 +76,9 @@ class PlannerDubins {
                 c2.x - turn2 * turnRadius * Math.cos(commute_angle),
                 c2.y + turn2 * turnRadius * Math.sin(commute_angle)
         );
+        final String name = turn1 == TURN_LEFT ? "DubinL" : "DubinR";
         return new Path(
-                "dubins",
+                name,
                 new SegmentTurn(c1, loc, comm1, turn1),
                 new SegmentLine(comm1, comm2),
                 new SegmentTurn(c2, comm2, dest, turn2)

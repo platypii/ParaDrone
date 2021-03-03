@@ -66,6 +66,11 @@ public class AutopilotActions {
         sendCommand(new byte[] {'M', (byte) mode});
     }
 
+    public void webInit(@NonNull String ssid, @NonNull String password) {
+        Timber.i("phone -> ap: web init %s:%s", ssid, password);
+        sendCommand(("W" + ssid + ":" + password).getBytes());
+    }
+
     private void sendCommand(@NonNull byte[] value) {
         if (bt.bluetoothHandler != null) {
             bt.bluetoothHandler.sendCommand(value);

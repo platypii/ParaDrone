@@ -21,7 +21,7 @@ public class AutopilotTest {
         final Path plan = Autopilot.search(far, para, kpow);
         assertNotNull(plan);
         final double score = Math.hypot(plan.end().x, plan.end().y);
-        assertEquals("naive", plan.name);
+        assertEquals("NaiveR", plan.name);
         assertEquals(2, plan.segments.size());
         assertEquals(3200, plan.length(), 0.1);
         assertEquals(1701.7, score, 0.1);
@@ -34,7 +34,7 @@ public class AutopilotTest {
         final Path plan = Autopilot.search(near, para, kpow);
         assertNotNull(plan);
         final double score = Math.hypot(plan.end().x, plan.end().y);
-        assertEquals("waypoints", plan.name);
+        assertEquals("Waypoint", plan.name);
         assertEquals(13, plan.segments.size());
         assertEquals(3200, plan.length(), 0.1);
         assertEquals(2330.9, score, 0.1);

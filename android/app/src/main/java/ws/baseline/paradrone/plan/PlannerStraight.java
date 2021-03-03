@@ -16,7 +16,7 @@ class PlannerStraight {
     static Path straight(@NonNull PointV loc) {
         final Point target = new Point(loc.x + loc.vx, loc.y + loc.vy);
         return new Path(
-                "straight",
+                "Str",
                 new SegmentLine(loc, target)
         );
     }

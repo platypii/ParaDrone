@@ -6,6 +6,7 @@ import ws.baseline.paradrone.bluetooth.BluetoothState;
 import ws.baseline.paradrone.databinding.ApScreenBinding;
 import ws.baseline.paradrone.geo.Geo;
 import ws.baseline.paradrone.geo.LandingZone;
+import ws.baseline.paradrone.geo.Path;
 import ws.baseline.paradrone.util.Convert;
 
 import android.annotation.SuppressLint;
@@ -28,7 +29,7 @@ import org.greenrobot.eventbus.ThreadMode;
 public class ApScreenFragment extends Fragment {
     private ApScreenBinding binding;
     @NonNull
-    private Handler handler = new Handler();
+    private final Handler handler = new Handler();
     Runnable updateRunner;
 
     @Override
@@ -100,12 +101,18 @@ public class ApScreenFragment extends Fragment {
         // Alt
         if (ll != null && !Double.isNaN(ll.alt)) {
             if (lz != null) {
-                binding.statusAltitude.setText("Alt: " + Convert.distance(ll.alt - lz.destination.alt, 1, true) + " AGL");
+                binding.statusAltitude.setText(Convert.distance(ll.alt - lz.destination.alt, 0, true) + "AGL");
             } else {
-                binding.statusAltitude.setText("Alt: " + Convert.distance(ll.alt, 1, true) + " MSL");
+                binding.statusAltitude.setText(Convert.distance(ll.alt, 1, true) + "MSL");
             }
+        }
+
+        // Ground speed
+        if (ll != null && !Double.isNaN(ll.groundSpeed())) {
+            final double vel = ll.groundSpeed();
+            binding.statusSpeed.setText(String.format(Locale.getDefault(), "%.0f mph", vel / Convert.MPH));
         } else {
-            binding.statusAltitude.setText("Alt:");
+            binding.statusSpeed.setText("");
         }
 
         // GPS last fix
@@ -122,11 +129,17 @@ public class ApScreenFragment extends Fragment {
         if (ll != null && lz != null) {
             final double distance = Geo.distance(ll.lat, ll.lng, lz.destination.lat, lz.destination.lng);
             final double bearing = Geo.bearing(ll.lat, ll.lng, lz.destination.lat, lz.destination.lng);
-            binding.statusLandingZone.setText("LZ: " + Convert.distance3(distance) + " " + Convert.bearing3(bearing));
+            binding.statusLandingZone.setText("LZ " + Convert.distance3(distance) + " " + Convert.bearing3(bearing));
         } else if (lz != null) {
-            binding.statusLandingZone.setText(String.format(Locale.getDefault(), "LZ: %.2f, %.2f %.0fm", lz.destination.lat, lz.destination.lng, lz.destination.alt));
+            binding.statusLandingZone.setText(String.format(Locale.getDefault(), "LZ %.1f, %.1f, %.0fm", lz.destination.lat, lz.destination.lng, lz.destination.alt));
+        }
+
+        // Flight mode
+        final Path plan = Services.flightComputer.plan;
+        if (plan != null) {
+            binding.statusFlightMode.setText(plan.name);
         } else {
-            binding.statusLandingZone.setText("LZ:");
+            binding.statusFlightMode.setText("");
         }
 
         // BT

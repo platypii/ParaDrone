@@ -68,9 +68,9 @@ public class Convert {
             return Double.toString(m);
         } else {
             if (metric) {
-                if (m >= 10000) {
+                if (m >= 100000) {
                     return String.format(Locale.getDefault(), "%.0f km", m * 0.001);
-                } else if (m >= 1000) {
+                } else if (m >= 10000) {
                         return String.format(Locale.getDefault(), "%.1f km", m * 0.001);
                 } else {
                     return Math.round(m) + " m";

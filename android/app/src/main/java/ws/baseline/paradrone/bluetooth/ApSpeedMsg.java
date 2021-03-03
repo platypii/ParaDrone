@@ -16,7 +16,7 @@ public class ApSpeedMsg implements ApEvent {
     public final double climb;
 
     static void parse(@NonNull byte[] value) {
-        // 'S', lat, lng, alt, vN, vE, climb
+        // 'D', lat, lng, alt, vN, vE, climb
         final ByteBuffer buf = ByteBuffer.wrap(value).order(ByteOrder.LITTLE_ENDIAN);
         final double lat = buf.getInt(1) * 1e-6; // microdegrees
         final double lng = buf.getInt(5) * 1e-6; // microdegrees
@@ -41,6 +41,6 @@ public class ApSpeedMsg implements ApEvent {
     @NonNull
     @Override
     public String toString() {
-        return String.format(Locale.getDefault(), "S %f, %f, %f, %f, %f, %.1f", lat, lng, alt, vN, vE, climb);
+        return String.format(Locale.getDefault(), "D %f, %f, %f, %f, %f, %.1f", lat, lng, alt, vN, vE, climb);
     }
 }

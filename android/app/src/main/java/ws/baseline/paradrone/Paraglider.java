@@ -57,7 +57,7 @@ public class Paraglider {
             // Adjust altitude
             final double alt = loc.alt + loc.climb * dt;
             final double climb = loc.climb + (climbRate - loc.climb) * alpha;
-            return new GeoPoint(prewind.lat, prewind.lng, alt, climb, vN, vE);
+            return new GeoPoint(prewind.lat, prewind.lng, alt, vN, vE, climb);
         } else {
             return null;
         }

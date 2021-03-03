@@ -37,6 +37,10 @@ public class Path implements PathLike {
     @NonNull
     @Override
     public Path fly(double distance) {
+        if (!(distance > 0)) {
+            Timber.e("path fly distance must be positive %f", distance);
+            return this;
+        }
         final List<Segment> trimmed = new ArrayList<>();
         double flown = 0;
         int i = 0;

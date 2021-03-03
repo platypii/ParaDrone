@@ -20,4 +20,10 @@
         app:icon="@drawable/frequency"
         app:summary="Frequency, motor direction, and stroke length"/>
 
+    <Preference
+        app:key="start_web"
+        app:title="Logs"
+        app:icon="@drawable/hamburger"
+        app:summary="Start web server"/>
+
 </PreferenceScreen>
