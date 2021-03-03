@@ -76,6 +76,6 @@ class PlannerWaypoints {
             if (path == null) return null; // No shortest path
             segments.addAll(path.segments);
         }
-        return new Path("waypoints", segments);
+        return new Path("Waypoint", segments);
     }
 }

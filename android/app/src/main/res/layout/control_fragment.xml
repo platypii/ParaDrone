@@ -43,7 +43,7 @@
             android:id="@+id/set_mode_ap"
             android:layout_width="80dp"
             android:layout_height="wrap_content"
-            android:text="AP"/>
+            android:text="Auto"/>
 
 
     </LinearLayout>

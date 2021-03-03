@@ -23,7 +23,7 @@ public class PlannerWaypointsTest {
         assertEquals(9, plans.get(1).segments.size());
         assertEquals(6, plans.get(2).segments.size());
         assertEquals(3, plans.get(3).segments.size());
-        assertEquals("waypoints", plans.get(0).name);
+        assertEquals("Waypoint", plans.get(0).name);
         assertEquals(2979.3, plans.get(0).length(), 0.1);
         assertEquals(2793.1, plans.get(1).length(), 0.1);
         assertEquals(2778.8, plans.get(2).length(), 0.1);

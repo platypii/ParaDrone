@@ -14,6 +14,7 @@ public class OptionsFragment extends PreferenceFragmentCompat implements Prefere
         findPreference("device_mode_rc").setOnPreferenceChangeListener(this);
         findPreference("set_lz").setOnPreferenceClickListener(this);
         findPreference("set_config").setOnPreferenceClickListener(this);
+        findPreference("start_web").setOnPreferenceClickListener(this);
     }
 
     @Override
@@ -36,6 +37,12 @@ public class OptionsFragment extends PreferenceFragmentCompat implements Prefere
                 getParentFragmentManager()
                         .beginTransaction()
                         .replace(R.id.control_plane, new ApConfigFragment())
+                        .addToBackStack(null)
+                        .commit();
+            case "start_web":
+                getParentFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.control_plane, new WebServerFragment())
                         .addToBackStack(null)
                         .commit();
                 break;

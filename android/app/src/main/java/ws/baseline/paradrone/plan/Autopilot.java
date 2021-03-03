@@ -49,7 +49,7 @@ public class Autopilot {
 
         if (loc.vx == 0 && loc.vy == 0) {
             // No velocity, just go straight to lz
-            return new Path("default", new SegmentLine(loc, lz.dest));
+            return new Path("Default", new SegmentLine(loc, lz.dest));
         }
 
         // Construct flight paths

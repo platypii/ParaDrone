@@ -15,7 +15,7 @@ public class PlannerNaiveTest {
         final PointV end = new PointV(0, 0, 10, 0);
         final Path plan = PlannerNaive.naive(start, end, 100);
         assertNotNull(plan);
-        assertEquals("naive", plan.name);
+        assertEquals("NaiveR", plan.name);
         assertEquals(2, plan.segments.size());
         assertEquals(1590, plan.length(), 0.1);
     }
