@@ -50,6 +50,7 @@
             <div id="toggle-right"></div>
           </div>
         </div>
+
         <div class="sidebar-section">
           <div class="sidebar-header plan-header">
             Plan
@@ -64,6 +65,7 @@
             <div id="plan-error"></div>
           </div>
         </div>
+
         <div class="sidebar-section">
           <div class="sidebar-header sim-header">
             Sim
@@ -73,7 +75,18 @@
             <div class="text-faded">error</div>
             <div id="sim-error"></div>
           </div>
-          <svg id="sim-error-chart"></svg> <!-- TODO -->
+          <svg id="sim-error-chart"></svg>
+        </div>
+
+        <div class="sidebar-section">
+          <div class="sidebar-header device-header">
+            Device
+            <input type="checkbox" id="device-enabled" title="Send simulated location to device for testing" checked>
+          </div>
+          <div class="sidebar-parameter">
+            <div class="text-faded">ip</div>
+            <input type="text" id="device-ip" value="192.168.2.61">
+          </div>
         </div>
 
         <div class="sidebar-section">

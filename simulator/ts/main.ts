@@ -1,4 +1,5 @@
 import { Autopilot } from "./autopilot"
+import { sendToDevice } from "./device"
 import { GeoPointV, LatLngAlt } from "./dtypes"
 import * as geo from "./geo/geo"
 import { defaultLz } from "./geo/landingzone"
@@ -30,6 +31,8 @@ const planName = document.getElementById("plan-name") as HTMLElement
 const planError = document.getElementById("plan-error") as HTMLElement
 const simEnabled = document.getElementById("sim-enabled") as HTMLInputElement
 const simError = document.getElementById("sim-error") as HTMLElement
+const deviceEnabled = document.getElementById("device-enabled") as HTMLInputElement
+const deviceIp = document.getElementById("device-ip") as HTMLInputElement
 
 export function init() {
   // Setup map
@@ -46,9 +49,8 @@ export function init() {
   planEnabled.onclick = update
   simEnabled.onclick = update
   test.init(map, wind)
-  para.onLocationUpdate(() => {
-    update()
-  })
+  para.onLocationUpdate(() => update())
+  para.onLocationUpdate(() => updateDevice())
   update()
 
   // Default starting position (watertower)
@@ -109,6 +111,12 @@ function update() {
   })
   apScreen.update(para, lz)
   toggleView.update(para)
+}
+
+function updateDevice() {
+  if (deviceEnabled.checked && deviceIp.value && para.loc) {
+    sendToDevice(deviceIp.value, para.loc)
+  }
 }
 
 function updateToggles() {

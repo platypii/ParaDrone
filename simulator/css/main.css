@@ -189,6 +189,9 @@ label {
 .sim-header {
   border-right: 5px solid #a3c;
 }
+.device-header {
+  border-right: 5px solid #d39;
+}
 
 /* Wind */
 svg#windgram {
