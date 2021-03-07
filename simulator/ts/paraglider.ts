@@ -86,11 +86,6 @@ export class Paraglider {
 
       // Update motor position
       this.toggles.tick(dt)
-
-      // Notify listeners
-      for (const listener of this.locationListeners) {
-        listener(this.loc)
-      }
     }
   }
 

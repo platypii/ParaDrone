@@ -14,9 +14,9 @@ export interface GeoPointV {
   lat: number
   lng: number
   alt: number
-  climb: number
   vN: number
   vE: number
+  climb: number
 }
 
 export interface GeoPoint {

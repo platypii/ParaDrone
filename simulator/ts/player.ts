@@ -6,8 +6,8 @@ import { Paraglider } from "./paraglider"
  * Control playback of the simulation
  */
 export class Player {
-  private readonly interval = 50
-  private readonly dt = 0.5 // seconds
+  private readonly interval = 1000 // milliseconds
+  private readonly dt = 1 // seconds
 
   private readonly para: Paraglider
   private readonly lz: LandingZone

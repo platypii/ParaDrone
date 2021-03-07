@@ -26,6 +26,7 @@
   "scripts": {
     "start": "./node_modules/http-server/bin/http-server -p 8080 -c-1",
     "lint": "./node_modules/tslint/bin/tslint --project .",
+    "lint-fix": "./node_modules/tslint/bin/tslint --project . --fix",
     "test": "./node_modules/mocha/bin/mocha -r ts-node/register test/*.ts"
   }
 }
