@@ -49,5 +49,6 @@ Path *naive(PointV loc, PointV dest, double r) {
     (Segment *) arc1,
     (Segment *) line
   };
-  return new_path("naive", 2, segments);
+  const char *name = turn1 == TURN_LEFT ? "NaiveL" : "NaiveR";
+  return new_path(name, 2, segments);
 }

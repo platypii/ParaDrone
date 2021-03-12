@@ -70,5 +70,6 @@ Path *dubins(PointV loc, PointV dest, double r, int turn1, int turn2) {
     (Segment *) line,
     (Segment *) arc2
   };
-  return new_path("dubins", 3, segments);
+  const char *name = turn1 == TURN_LEFT ? "DubinL" : "DubinR";
+  return new_path(name, 3, segments);
 }

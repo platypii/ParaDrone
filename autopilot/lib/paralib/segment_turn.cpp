@@ -9,7 +9,9 @@ static double angle2(Turn *turn);
 static double arcs(Turn *turn);
 
 // If turn is less than minimum_turn, then don't bury a toggle
-const float minimum_turn = to_radians(10);
+const float minimum_turn = to_radians(8);
+// If turn is at least maximum_turn, then do bury a toggle
+const float maximum_turn = to_radians(30);
 
 PointV turn_start(Turn *turn) {
   const double dx = turn->start.x - turn->circle.x;
@@ -97,7 +99,14 @@ Path *turn_fly(Turn *turn, const double distance) {
  * If the turn is short, don't crank a hard toggle turn.
  */
 ParaControls turn_controls(Turn *turn) {
-  const uint8_t deflect = fmin(arcs(turn) / minimum_turn, 1) * 255;
+  const float x = arcs(turn);
+  float activation = 1;
+  if (x < minimum_turn) {
+    activation = 0.01f * x / minimum_turn;
+  } else if (x < maximum_turn) {
+    activation = 0.01f + 0.99f * (x - minimum_turn) / (maximum_turn - minimum_turn);
+  }
+  const uint8_t deflect = activation * 255;
   ParaControls ctrl = {};
   if (turn->turn == TURN_RIGHT) {
     ctrl.right = deflect;

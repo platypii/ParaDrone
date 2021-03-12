@@ -39,7 +39,7 @@ Path *search(Point3V loc3, LandingZone *lz, const double turn_radius) {
 
   if (loc.vx == 0 && loc.vy == 0) {
     Line *default_line = new Line {'L', {loc.x, loc.y}, lz->dest};
-    Path *default_path = new_path("default", 1, (Segment**) &default_line);
+    Path *default_path = new_path("Default", 1, (Segment**) &default_line);
     return default_path;
   }
 

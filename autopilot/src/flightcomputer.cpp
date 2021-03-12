@@ -9,16 +9,19 @@
 // After 60 seconds of no GPS, revert to slow spiral
 #define GPS_EXPIRATION 60000
 
-// last_fix_millis
-static long last_rc_millis = -10000; // Don't wait on reboot when millis = 0
-static Path *current_plan;
+// Last RC command received time
+static long last_rc_millis = -RC_OVERRIDE_MILLIS; // Don't override on reboot
 
-String current_plan_name = "";
+Path *current_plan;
+const char *current_plan_name;
+
+const char *land = "Final";
+const char *flare = "Flare";
 
 /**
  * Return true if R/C input was made in the last few seconds
  */
-static bool rc_override() {
+bool rc_override() {
   return millis() - last_rc_millis <= RC_OVERRIDE_MILLIS;
 }
 
@@ -65,31 +68,37 @@ void rc_set_position(uint8_t new_left, uint8_t new_right) {
  * Called when a new location arrives to begin planning
  */
 void planner_update_location(GeoPointV *point) {
+  // TODO: Also check for rc_override()?
   if (config_landing_zone && autopilot_enabled()) {
     const double alt_agl = point->alt - config_landing_zone->destination.alt;
 
     if (isnan(alt_agl)) {
       // No alt, do nothing
+      current_plan_name = NULL;
     } else if (alt_agl < ALT_FLARE) {
       // Flare!!
       set_motor_position(255, 255);
+      current_plan_name = flare;
     } else if (alt_agl < ALT_NO_TURNS_BELOW) {
       // Hands up for landing
       set_motor_position(0, 0);
       // set_motor_speed(-255, -255); // TODO: Full speed up?
+      current_plan_name = land;
     } else if (valid_point(point)) {
       // Compute plan
       Path *new_plan = search3(point, config_landing_zone, get_turn_speed(), get_turn_balance());
       if (current_plan) free_path(current_plan);
       current_plan = new_plan;
+      current_plan_name = new_plan->name;
       ParaControls ctrl = path_controls(current_plan);
       set_motor_position(ctrl.left, ctrl.right);
       const double error_x = current_plan->end.x;
       const double error_y = current_plan->end.y;
       const double landing_error = sqrt(error_x * error_x + error_y * error_y);
-      Serial.printf("Plan %s length %.1fm error %.2f\n", current_plan->name, path_length(current_plan), landing_error);
+      Serial.printf("%.1fs plan %s len %.1fm error %.1f\n", millis() * 1e-3, current_plan->name, path_length(current_plan), landing_error);
     } else {
       // Do nothing
+      current_plan_name = NULL;
     }
   }
 }

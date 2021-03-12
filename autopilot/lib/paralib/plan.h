@@ -11,7 +11,6 @@
 #define PARAMOTOR_GLIDE (-PARAMOTOR_GROUNDSPEED / PARAMOTOR_CLIMBRATE)
 
 #define ALT_NO_TURNS_BELOW 30 // meters
-#define ALT_HANDS_UP 12 // meters
 #define ALT_FLARE 6 // meters
 
 Path *search(Point3V loc3, LandingZone *lz, const double r);

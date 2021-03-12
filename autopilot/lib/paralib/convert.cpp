@@ -1,5 +1,5 @@
 #include <math.h>
-#include <stdio.h>
+#include <string.h>
 
 /**
  * Print human readable bearing into str
@@ -11,20 +11,20 @@ void bearing2(char *str, double degrees) {
     degrees = fmod(degrees, 360);
     if (degrees < 0) degrees += 360;
     if (337.5 <= degrees || degrees < 22.5)
-      sprintf(str, "%.0f° N", degrees);
+      strncpy(str, "N", 2);
     else if (degrees < 67.5)
-      sprintf(str, "%.0f° NE", degrees);
+      strncpy(str, "NE", 3);
     else if (degrees < 112.5)
-      sprintf(str, "%.0f° E", degrees);
+      strncpy(str, "E", 2);
     else if (degrees < 157.5)
-      sprintf(str, "%.0f° SE", degrees);
+      strncpy(str, "SE", 3);
     else if (degrees < 202.5)
-      sprintf(str, "%.0f° S", degrees);
+      strncpy(str, "S", 2);
     else if (degrees < 247.5)
-      sprintf(str, "%.0f° SW", degrees);
+      strncpy(str, "SW", 3);
     else if (degrees < 292.5)
-      sprintf(str, "%.0f° W", degrees);
+      strncpy(str, "W", 2);
     else
-      sprintf(str, "%.0f° NW", degrees);
+      strncpy(str, "NW", 3);
   }
 }

@@ -126,6 +126,8 @@ static void send_header(WiFiClient client, int status, const char *contentType) 
 }
 
 static void send_landing_page(WiFiClient client) {
+  const size_t used = SPIFFS.usedBytes();
+  const size_t total = SPIFFS.totalBytes();
   send_header(client, 200, "text/html");
   client.println("<!DOCTYPE html><html>");
   client.println("<head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">");
@@ -137,12 +139,15 @@ static void send_landing_page(WiFiClient client) {
   client.println("<title>ParaDrone Device</title>");
   client.println("</head><body>");
   client.println("<h1>ParaDrone Logs</h1>");
-  client.printf("<div>%d / %d kb used</div>\n", SPIFFS.usedBytes() >> 10, SPIFFS.totalBytes() >> 10);
+  client.printf("<div>%d / %d bytes (%d%%)</div>\n", used, total, (int) (100.0f * used / total));
 
   // List files
   File root = SPIFFS.open("/");
   File file = root.openNextFile();
   client.println("<ul>");
+  if (!file) {
+    client.println("<li><em>no logs</em></li>");
+  }
   while (file) {
     client.println("<li>");
     client.printf("<a href=\"/log%s\">%s</a> (%d kb)\n", file.name(), file.name() + 1, file.size() >> 10);

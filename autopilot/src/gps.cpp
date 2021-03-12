@@ -34,23 +34,25 @@ void gps_init() {
 }
 
 void gps_loop() {
-  // Read lines
+  // Read characters
   while (Serial2.available())  {
-    // Read characters
-    while (Serial2.available() && buffer_index < 255) {
-      const char ch = Serial2.read();
-      buffer[buffer_index] = ch;
-      if (ch == '\r' || ch == '\n') {
-        if (buffer_index) { // len > 0
-          buffer[buffer_index] = '\0';
-          // Serial.println(buffer);
-          // Parse NMEA sentence
-          parse_nmea(buffer);
-        }
+    if (buffer_index == 255) {
+      // End of buffer reset
+      buffer_index = 0;
+    }
+    const char ch = Serial2.read();
+    buffer[buffer_index] = ch;
+    if (ch == '\r' || ch == '\n') {
+      if (buffer_index) { // len > 0
+        buffer[buffer_index] = '\0';
+        // Serial.printf("%ld nmea %s\n", millis(), buffer);
+        // Parse NMEA sentence
+        parse_nmea(buffer);
         buffer_index = 0;
-      } else {
-        buffer_index++;
       }
+      break; // Break loop to allow other tasks to complete
+    } else {
+      buffer_index++;
     }
   }
 }

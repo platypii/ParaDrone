@@ -18,9 +18,9 @@ vector<Path*> via_waypoints(Point3V loc, LandingZone *lz, double radius) {
     .x = loc.x + 10 * loc.vx,
     .y = loc.y + 10 * loc.vy,
     .alt = loc.alt + 10 * loc.climb,
-    .climb = loc.climb,
     .vx = loc.vx,
-    .vy = loc.vy
+    .vy = loc.vy,
+    .climb = loc.climb
   };
   vector<Point3V> left_pattern = {straight, lz->start_of_downwind(TURN_LEFT), lz->start_of_base(TURN_LEFT), lz->start_of_final()};
   vector<Point3V> right_pattern = {straight, lz->start_of_downwind(TURN_RIGHT), lz->start_of_base(TURN_RIGHT), lz->start_of_final()};
@@ -79,5 +79,5 @@ static Path *cat_paths(Path *first, vector<Path*> paths) {
       segments.push_back(segment_copy(path->segments[i]));
     }
   }
-  return new_path("waypoints", segments.size(), &segments[0]);
+  return new_path("Waypoint", segments.size(), &segments[0]);
 }

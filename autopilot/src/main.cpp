@@ -3,9 +3,7 @@
 #include "paradrone.h"
 
 #define TIME_START long start_time = millis()
-#define TIME_END long time_delta = millis() - start_time; if (time_delta >= 100) Serial.printf("Slow loop %ld %ldms thread %d\n", millis(), time_delta, xPortGetCoreID())
-
-void blink(int count);
+#define TIME_STEP(name) if (millis() - start_time >= 100) Serial.printf("%.1fs slow %s %ldms thread %d\n", millis() * 1e-3, name, millis() - start_time, xPortGetCoreID()); start_time = millis()
 
 void setup() {
   Heltec.begin(
@@ -24,18 +22,22 @@ void setup() {
   bt_init(); // 680ms
   lora_init(); // 70ms
   // web_init("ssid", "password");
-  // blink(4); // 350ms
 }
 
 void loop() {
   TIME_START;
   gps_loop();
+  TIME_STEP("gps");
   planner_loop();
+  TIME_STEP("plan");
   motor_loop();
+  TIME_STEP("motor");
   screen_loop();
+  TIME_STEP("screen");
   lora_loop();
+  TIME_STEP("lora");
   web_loop();
-  TIME_END;
+  TIME_STEP("web");
   // TODO: Sleep exactly enough to be ready for next gps
   delay(80);
 }
@@ -45,32 +47,16 @@ void loop() {
  * This orchestrates the services that depend on location updates.
  */
 void update_location(GeoPointV *point) {
-  Serial.printf("GPS %.1fs %f, %f, %.1f, %.1f m/s\n", millis() * 1e-3, point->lat, point->lng, point->alt, hypot(point->vE, point->vN));
+  Serial.printf("%.1fs gps %f, %f, %.1f, %.1f m/s\n", millis() * 1e-3, point->lat, point->lng, point->alt, hypot(point->vE, point->vN));
   if (last_location) free(last_location);
   last_location = point;
   last_fix_millis = millis();
-  motor_loop();
   screen_update();
-  // blink(1);
   // Plan and update controls
   planner_update_location(point);
-  log_point(point);
+  motor_loop();
   // Notify listeners
   bt_send_location(point);
   lora_send_location(point);
-}
-
-/**
- * Blink LED
- */
-void blink(int count) {
-  digitalWrite(LED, HIGH); // LED on
-  delay(50);
-  digitalWrite(LED, LOW); // LED off
-  for (int i = 1; i < count; i++) {
-    delay(50);
-    digitalWrite(LED, HIGH); // LED on
-    delay(50);
-    digitalWrite(LED, LOW); // LED off
-  }
+  // log_point(point); // TODO: Logging causing constant crashing. Move to core 1?
 }

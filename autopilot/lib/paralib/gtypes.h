@@ -43,9 +43,9 @@ struct Point3V {
   double x;
   double y;
   double alt;
-  double climb;
   double vx;
   double vy;
+  double climb;
 
   operator Point() {
     return Point {x, y};

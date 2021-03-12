@@ -42,8 +42,8 @@ Path *new_path(const char *name, uint8_t segment_count, Segment *segments[]) {
  */
 Path *path_fly_free(Path *path, double distance) {
   if (!path) return NULL;
-  if (isnan(distance)) {
-    PRINTF("path_fly distance nan %f\n", distance);
+  if (!(distance > 0)) {
+    PRINTF("path fly distance must be positive %f\n", distance);
     return path;
   }
 
@@ -83,7 +83,10 @@ Path *path_fly_free(Path *path, double distance) {
   // Construct new path
   Path *flight = new_path(path->name, i, trimmed);
 
-  // Free previous path, segments have been consumed
+  // Free remaining segments of previous path
+  for (; i < path->segment_count; i++) {
+    delete path->segments[i];
+  }
   free(path);
 
   return flight;

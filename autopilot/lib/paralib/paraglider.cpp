@@ -39,8 +39,9 @@ GeoPointV *para_predict(GeoPointV *loc, double dt, double turn_speed, double tur
   const double vN = ground_speed * cos(end_bearing);
 
   // Adjust altitude
-  const double alt = loc->alt + loc->climb * dt;
-  const double climb = loc->climb + (PARAMOTOR_CLIMBRATE - loc->climb) * alpha;
+  double climb = isnan(loc->climb) ? 0 : loc->climb;
+  climb += (PARAMOTOR_CLIMBRATE - climb) * alpha;
+  const double alt = loc->alt + climb * dt;
 
   return new GeoPointV {
     .millis = loc->millis + (uint64_t)(1000 * dt),

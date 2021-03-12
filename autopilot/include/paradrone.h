@@ -25,7 +25,10 @@ extern GeoPointV *last_location;
 extern long last_fix_millis;
 extern bool bt_connected;
 extern bool lora_enabled;
-extern uint8_t flight_mode; // TODO: Persist
+extern uint8_t flight_mode;
+extern Path *current_plan;
+extern const char *current_plan_name;
+bool rc_override();
 
 // Current motor position
 extern float motor_position_left;
