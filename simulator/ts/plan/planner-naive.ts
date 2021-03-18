@@ -52,7 +52,7 @@ export function naive(loc: PointV, dest: Point, r: number): Path | undefined {
   }
   const turn = new SegmentTurn(c1, loc, comm1, turn1)
   const line = new SegmentLine(comm1, dest)
-  const name = turn1 === Turn.Left ? "naive (L)" : "naive (R)"
+  const name = turn1 === Turn.Left ? "NaiveL" : "NaiveR"
   return new Path(name, turn, line)
 }
 

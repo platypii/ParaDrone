@@ -81,7 +81,7 @@
         <div class="sidebar-section">
           <div class="sidebar-header device-header">
             Device
-            <input type="checkbox" id="device-enabled" title="Send simulated location to device for testing" checked>
+            <input type="checkbox" id="device-enabled" title="Send simulated location to device for testing">
           </div>
           <div class="sidebar-parameter">
             <div class="text-faded">ip</div>
@@ -107,15 +107,21 @@
         <div class="map-overlay">
           <div class="ap-status">
             <div id="ap-latlng"></div>
-            <div id="ap-alt"></div>
-            <div id="ap-speed"></div>
-            <div id="ap-landingzone"></div>
+            <div>
+              <div id="ap-alt"></div>
+              <div id="ap-speed"></div>
+            </div>
+            <div>
+              <div id="ap-flightmode"></div>
+              <div id="ap-landingzone"></div>
+            </div>
           </div>
         </div>
         <div class="playback-controls map-overlay">
           <div>
             <button class="map-overlay-button icon-stop" id="map-stop" title="Stop"></button>
-            <button class="map-overlay-button icon-play" id="map-play" title="Play/Pause"></button>
+            <button class="map-overlay-button icon-step" id="map-step" title="Step"></button>
+            <button class="map-overlay-button icon-play" id="map-play" title="Play"></button>
           </div>
         </div>
       </div>

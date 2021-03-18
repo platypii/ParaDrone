@@ -66,8 +66,9 @@ export function dubins(loc: PointV, dest: PointV, r: number, turn1: Turn, turn2:
     x: c2.x - turn2 * r * Math.cos(commute_angle),
     y: c2.y + turn2 * r * Math.sin(commute_angle)
   }
+  const name = turn1 === Turn.Left ? "DubinL" : "DubinR"
   return new Path(
-    "dubins",
+    name,
     new SegmentTurn(c1, loc, comm1, turn1),
     new SegmentLine(comm1, comm2),
     new SegmentTurn(c2, comm2, dest, turn2)

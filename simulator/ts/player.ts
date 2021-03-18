@@ -6,7 +6,7 @@ import { Paraglider } from "./paraglider"
  * Control playback of the simulation
  */
 export class Player {
-  private readonly interval = 1000 // milliseconds
+  private readonly interval = 300 // milliseconds
   private readonly dt = 1 // seconds
 
   private readonly para: Paraglider
@@ -19,12 +19,9 @@ export class Player {
     this.para = para
     this.lz = lz
     this.wind = wind
-    document.getElementById("map-play")!.addEventListener("click", () => {
-      this.start()
-    })
-    document.getElementById("map-stop")!.addEventListener("click", () => {
-      this.stop()
-    })
+    document.getElementById("map-play")!.addEventListener("click", () => this.start())
+    document.getElementById("map-step")!.addEventListener("click", () => this.step())
+    document.getElementById("map-stop")!.addEventListener("click", () => this.stop())
   }
 
   public start(): void {
@@ -35,6 +32,12 @@ export class Player {
           this.stop()
         }
       }, this.interval)
+    }
+  }
+
+  public step(): void {
+    if (!this.para.landed(this.lz)) {
+      this.para.tick(this.dt, this.wind)
     }
   }
 

@@ -11,5 +11,5 @@ export function straight(loc: PointV): Path {
     x: loc.x + loc.vx,
     y: loc.y + loc.vy
   }
-  return new Path("straight", new SegmentLine(loc, dest))
+  return new Path("Str", new SegmentLine(loc, dest))
 }
