@@ -157,6 +157,9 @@ label {
 .icon-play {
   background-image: url('../img/play.svg');
 }
+.icon-step {
+  background-image: url('../img/plause.svg');
+}
 .icon-stop {
   background-image: url('../img/stop.svg');
 }
@@ -181,6 +184,13 @@ label {
 }
 #ap-speed {
   display: inline-block;
+}
+#ap-flightmode {
+  display: inline-block;
+}
+#ap-landingzone {
+  display: inline-block;
+  float: right;
 }
 
 .plan-header {

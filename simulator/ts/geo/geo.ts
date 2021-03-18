@@ -68,3 +68,35 @@ export function moveBearing(lat_degrees: number, lng_degrees: number, bear: numb
 
   return {lat: lat3, lng: lng3}
 }
+
+/**
+ * Convert the bearing to a human readable format
+ *
+ * @param degrees bearing in degrees
+ * @return "NE"
+ */
+export function bearing2(degrees: number): string {
+  if (isNaN(degrees)) {
+    return ""
+  } else {
+    degrees %= 360
+    if (degrees < 0) degrees += 360
+    if (337.5 <= degrees || degrees < 22.5) {
+      return "N"
+    } else if (degrees < 67.5) {
+      return "NE"
+    } else if (degrees < 112.5) {
+      return "E"
+    } else if (degrees < 157.5) {
+      return "SE"
+    } else if (degrees < 202.5) {
+      return "S"
+    } else if (degrees < 247.5) {
+      return "SW"
+    } else if (degrees < 292.5) {
+      return "W"
+    } else {
+      return "NW"
+    }
+  }
+}

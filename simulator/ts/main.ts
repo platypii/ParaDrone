@@ -109,7 +109,7 @@ function update() {
     lz,
     actual
   })
-  apScreen.update(para, lz)
+  apScreen.update(para, lz, autopilot.plan)
   toggleView.update(para)
 }
 

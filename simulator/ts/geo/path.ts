@@ -38,8 +38,9 @@ export class Path {
    * If the end of the path is reached, extend a straight line out to infinity.
    */
   public fly(distance: number): Path {
-    if (distance <= 0) {
-      console.error("path flight distance must be positive", distance)
+    if (!(distance > 0)) {
+      console.error("path fly distance must be positive", distance)
+      return this
     }
     const trimmed: Segment[] = []
     let flown = 0

@@ -2,10 +2,12 @@ import { Circle, Point, PointV, Turn } from "../dtypes"
 import { MotorPosition } from "../paracontrols"
 import { Path } from "./path"
 import { SegmentLine } from "./segment-line"
-import { toRadians } from "./trig"
+import { toDegrees, toRadians } from "./trig"
 
 // If turn is less than minimum_turn, then don't bury a toggle
-const minimum_turn = toRadians(10)
+const minimum_turn = toRadians(8)
+// If turn is at least maximum_turn, then do bury a toggle
+const maximum_turn = toRadians(30)
 
 /**
  * 2D curved segment with fixed turn radius.
@@ -36,7 +38,21 @@ export class SegmentTurn {
   }
 
   public controls(): MotorPosition {
-    const deflect = Math.min(this.arcs() / minimum_turn, 1) * 255
+    // Sigmoid-ish activation function.
+    const x = this.arcs()
+    let activation = 1
+    if (x < minimum_turn) {
+      // 0..min_turn
+      activation = 0.01 * x / minimum_turn
+    } else if (x <= maximum_turn) {
+      // min_turn..max_turn
+      activation = 0.01 + 0.99 * (x - minimum_turn) / (maximum_turn - minimum_turn)
+    }
+    // Normalized and ranged to match AP protocol
+    const deflect = Math.round(activation * 255)
+    if (deflect < 0 || deflect > 255) {
+      throw new Error("Invalid deflection")
+    }
     if (this.turn === Turn.Right) {
       return {left: 0, right: deflect}
     } else {
@@ -95,6 +111,7 @@ export class SegmentTurn {
 
   /**
    * The arc angle in radians
+   * Always positive
    */
   private arcs(): number {
     let arcs = this.turn * (this.angle2() - this.angle1())
@@ -104,6 +121,7 @@ export class SegmentTurn {
 
   /**
    * Angle from center of circle to start
+   * @returns the angle in radians [-\pi, \pi] between the positive x-axis and the start point
    */
   private angle1(): number {
     return Math.atan2(this.start.x - this.circle.x, this.start.y - this.circle.y)
@@ -111,6 +129,7 @@ export class SegmentTurn {
 
   /**
    * Angle from center of circle to end
+   * @returns the angle in radians [-\pi, \pi] between the positive x-axis and the end point
    */
   private angle2(): number {
     return Math.atan2(this.end.x - this.circle.x, this.end.y - this.circle.y)

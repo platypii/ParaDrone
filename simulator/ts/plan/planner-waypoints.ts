@@ -54,5 +54,5 @@ function catPaths(...paths: Array<Path | undefined>): Path | undefined {
     if (!path) return undefined // No shortest path
     segments.push(...path.segments)
   }
-  return new Path("waypoints", ...segments)
+  return new Path("Waypoint", ...segments)
 }

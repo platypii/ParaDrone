@@ -2,18 +2,18 @@ import { viaWaypoints } from "../ts/plan/planner-waypoints"
 import { Paraglider } from "../ts/paraglider"
 import { kpow } from "../ts/geo/landingzone"
 import { LandingPattern } from "../ts/plan/pattern"
-import { assert } from 'chai'
+import { assert } from "chai"
 
 const r = 100
 
-describe('Waypoint planner', () => {
-  it('should find 8 plans', () => {
+describe("Waypoint planner", () => {
+  it("should find 8 plans", () => {
     const para = new Paraglider()
     const pattern = new LandingPattern(para, kpow)
     const loc = {x: 1000, y: 1000, alt: 800, climb: -3, vx: 10, vy: 0}
     const paths = viaWaypoints(loc, pattern, r)
     assert.equal(paths.length, 8)
-    assert.equal(paths[0].name, "waypoints")
+    assert.equal(paths[0].name, "Waypoint")
     assert.equal(paths[0].segments.length, 12)
     assert.equal(paths[1].segments.length, 9)
     assert.equal(paths[2].segments.length, 6)
