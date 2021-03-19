@@ -5,14 +5,14 @@
         app:key="device_mode_rc"
         app:title="R/C Mode"
         app:icon="@drawable/bluetooth"
-        app:summaryOn="Connecting to remote control"
-        app:summaryOff="Connecting to autopilot"/>
+        app:summaryOn="Connect to remote control"
+        app:summaryOff="Connect to autopilot"/>
 
     <Preference
-        app:key="set_lz"
-        app:title="Set LZ"
-        app:icon="@drawable/target"
-        app:summary="Set target landing zone"/>
+        app:key="start_web"
+        app:title="Logs"
+        app:icon="@drawable/hamburger"
+        app:summary="Start web server"/>
 
     <Preference
         app:key="set_config"
@@ -21,9 +21,9 @@
         app:summary="Frequency, motor direction, and stroke length"/>
 
     <Preference
-        app:key="start_web"
-        app:title="Logs"
-        app:icon="@drawable/hamburger"
-        app:summary="Start web server"/>
+        app:key="set_lz"
+        app:title="Set LZ"
+        app:icon="@drawable/target"
+        app:summary="Set target landing zone"/>
 
 </PreferenceScreen>

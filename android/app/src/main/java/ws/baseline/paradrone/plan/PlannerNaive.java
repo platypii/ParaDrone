@@ -6,7 +6,6 @@ import ws.baseline.paradrone.geo.Point;
 import ws.baseline.paradrone.geo.PointV;
 import ws.baseline.paradrone.geo.SegmentLine;
 import ws.baseline.paradrone.geo.SegmentTurn;
-import ws.baseline.paradrone.util.Numbers;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -48,7 +47,9 @@ class PlannerNaive {
         // Angle from circle center to target
         final double center_angle = Math.atan2(dest.x - c1.x, dest.y - c1.y);
         // Commute
-        final double cdest = Numbers.hypot(c1.x - dest.x, c1.y - dest.y);
+        final double cdx = c1.x - dest.x;
+        final double cdy = c1.y - dest.y;
+        final double cdest = Math.sqrt(cdx * cdx + cdy * cdy);
         final double offset = turn1 * Math.asin(turnRadius / cdest);
         final double commute_angle = center_angle + offset;
         // const commute_length = Math.sqrt(cdest * cdest - r * r);

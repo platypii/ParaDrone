@@ -15,13 +15,16 @@
             android:layout_width="180dp"
             android:layout_height="wrap_content"
             android:inputType="numberDecimal"
-            android:textSize="20pt"/>
+            android:paddingTop="2dp"
+            android:textSize="18pt"/>
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:textSize="16pt"
+            android:layout_gravity="bottom"
+            android:layout_marginBottom="4dp"
+            android:textSize="12pt"
             android:text="m MSL"/>
 
         <ImageButton
@@ -30,7 +33,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="end"
             android:contentDescription="Get Elevation"
-            android:src="@drawable/ic_floor"
+            android:src="@drawable/elevation"
             style="?android:attr/buttonBarButtonStyle"/>
 
     </LinearLayout>
@@ -41,27 +44,16 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"/>
 
-    <LinearLayout
-        android:layout_width="match_parent"
+    <Button
+        android:id="@+id/set_landing_zone"
+        android:layout_width="180dp"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:orientation="horizontal"
-        android:gravity="bottom">
-
-        <Button
-            android:id="@+id/lz_cancel"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@android:string/cancel"/>
-
-        <Button
-            android:id="@+id/set_landing_zone"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Set LZ"/>
-
-    </LinearLayout>
+        android:layout_gravity="bottom|end"
+        android:gravity="center_vertical|end"
+        android:padding="24dp"
+        android:drawablePadding="20dp"
+        android:drawableEnd="@drawable/sendit"
+        android:text="Set LZ"
+        style="@style/Widget.AppCompat.Button.Borderless"/>
 
 </FrameLayout>

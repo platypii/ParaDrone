@@ -39,7 +39,6 @@ public class WebServerFragment extends Fragment {
             }
         });
         binding.startWeb.setOnClickListener((e) -> send());
-        binding.webCancel.setOnClickListener((e) -> getParentFragmentManager().popBackStack());
         loadForm();
 
         // Use cached url if available

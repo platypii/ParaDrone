@@ -1,7 +1,9 @@
 package ws.baseline.paradrone;
 
 import ws.baseline.paradrone.bluetooth.ApConfigMsg;
+import ws.baseline.paradrone.bluetooth.BluetoothState;
 import ws.baseline.paradrone.databinding.ConfigFragmentBinding;
+import ws.baseline.paradrone.util.Numbers;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -14,13 +16,14 @@ import androidx.fragment.app.Fragment;
 import java.util.Locale;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+import timber.log.Timber;
 
 import static androidx.core.content.ContextCompat.getDrawable;
 
 /**
  * Autopilot configuration. Frequency, stroke length, motor direction.
  */
-public class ApConfigFragment extends Fragment {
+public class ConfigFragment extends Fragment {
     private ConfigFragmentBinding binding;
 
     private boolean left = false;
@@ -38,7 +41,6 @@ public class ApConfigFragment extends Fragment {
             updateLeftRight();
         });
         binding.cfgSend.setOnClickListener((e) -> send());
-        binding.cfgCancel.setOnClickListener((e) -> getParentFragmentManager().popBackStack());
 
         // Initiate request for current status
         Services.bluetooth.actions.fetchConfig();
@@ -51,6 +53,7 @@ public class ApConfigFragment extends Fragment {
         super.onStart();
         ViewState.setMode(ViewState.ViewMode.CFG);
         EventBus.getDefault().register(this);
+        onBluetoothState(null);
     }
 
     @Override
@@ -70,6 +73,15 @@ public class ApConfigFragment extends Fragment {
         updateLeftRight();
     }
 
+    @Subscribe
+    public void onBluetoothState(@Nullable BluetoothState bt) {
+        if (Services.bluetooth.isConnected()) {
+            binding.cfgSend.setEnabled(true);
+        } else {
+            binding.cfgSend.setEnabled(false);
+        }
+    }
+
     private void updateLeftRight() {
         final Context ctx = getContext();
         if (ctx != null) {
@@ -80,13 +92,38 @@ public class ApConfigFragment extends Fragment {
         }
     }
 
+    /**
+     * Validate, parse form, and send to device
+     */
     private void send() {
-        // Load from form
-        final int frequency = Integer.parseInt(binding.cfgFreq.getText().toString());
-        final short top = Short.parseShort(binding.cfgTop.getText().toString());
-        final short stall = Short.parseShort(binding.cfgStall.getText().toString());
-        final byte dir = (byte) ((left ? 1 : 0) + (right ? 2 : 0));
-        final ApConfigMsg msg = new ApConfigMsg(frequency, top, stall, dir);
-        Services.bluetooth.actions.setConfig(msg);
+        try {
+            // Load form
+            final int frequency = Numbers.parseInt(binding.cfgFreq.getText().toString(), -1);
+            final int top = Numbers.parseInt(binding.cfgTop.getText().toString(), -1);
+            final int stall = Numbers.parseInt(binding.cfgStall.getText().toString(), -1);
+            final byte dir = (byte) ((left ? 1 : 0) + (right ? 2 : 0));
+
+            // Validate
+            if (frequency < 100000000 || frequency > 999000000) {
+                binding.cfgFreq.setError("100000000 to 999000000 Hz");
+                binding.cfgFreq.requestFocus();
+                return;
+            }
+            if (top < 0 || top > 4000) {
+                binding.cfgTop.setError("0 to 4000 mm");
+                binding.cfgTop.requestFocus();
+                return;
+            }
+            if (stall < 0 || stall > 4000) {
+                binding.cfgStall.setError("0 to 4000 mm");
+                binding.cfgStall.requestFocus();
+                return;
+            }
+
+            final ApConfigMsg msg = new ApConfigMsg(frequency, (short) top, (short) stall, dir);
+            Services.bluetooth.actions.setConfig(msg);
+        } catch (NumberFormatException e) {
+            Timber.e(e);
+        }
     }
 }
