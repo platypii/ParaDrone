@@ -75,7 +75,7 @@ public class SegmentTurn implements Segment {
     public List<Point> render() {
         final List<Point> points = new ArrayList<>();
         final double angle1 = angle1();
-        final double step = 0.1; // ~5 degrees
+        final double step = 0.1; // ~6 degrees
         final double arcs = arcs();
         for (double delta = 0; delta < arcs; delta += step) {
             final double theta = angle1 + turn * delta;

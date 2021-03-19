@@ -24,11 +24,6 @@ public class NumbersTest {
     }
 
     @Test
-    public void hypot() {
-        assertEquals(5, Numbers.hypot(3, 4), 0.001);
-    }
-
-    @Test
     public void interpolate() {
         assertEquals(0, Numbers.interpolate(0, 100, 0), 0.001);
         assertEquals(40, Numbers.interpolate(0, 100, 0.4), 0.001);
@@ -42,6 +37,19 @@ public class NumbersTest {
         assertEquals(0, Numbers.parseDistance("0"), 0.001);
         assertEquals(0.1, Numbers.parseDistance("0.1"), 0.001);
         assertEquals(100, Numbers.parseDistance("100"), 0.001);
+    }
+
+    public void parseInt() {
+        assertEquals(-2, Numbers.parseInt("-2", -1));
+        assertEquals(-1, Numbers.parseInt("-1", -1));
+        assertEquals(0, Numbers.parseInt("0", -1));
+        assertEquals(1, Numbers.parseInt("1", -1));
+        assertEquals(2, Numbers.parseInt("2", -1));
+        assertEquals(-1, Numbers.parseInt("", -1));
+//        assertEquals(-1, Numbers.parseInt("0.0", -1));
+//        assertEquals(-1, Numbers.parseInt("0.1", -1));
+        assertEquals(-1, Numbers.parseInt("X", -1));
+        assertEquals(-1, Numbers.parseInt(null, -1));
     }
 
 }

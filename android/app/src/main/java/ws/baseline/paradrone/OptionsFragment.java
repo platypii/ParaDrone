@@ -36,9 +36,10 @@ public class OptionsFragment extends PreferenceFragmentCompat implements Prefere
             case "set_config":
                 getParentFragmentManager()
                         .beginTransaction()
-                        .replace(R.id.control_plane, new ApConfigFragment())
+                        .replace(R.id.control_plane, new ConfigFragment())
                         .addToBackStack(null)
                         .commit();
+                break;
             case "start_web":
                 getParentFragmentManager()
                         .beginTransaction()

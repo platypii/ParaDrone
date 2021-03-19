@@ -20,10 +20,11 @@
 
         <EditText
             android:id="@+id/cfg_freq"
-            android:layout_width="120dp"
+            android:layout_width="130dp"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
             android:gravity="end"
+            android:hint="915000000"
             android:inputType="numberDecimal"/>
 
     </FrameLayout>
@@ -41,10 +42,11 @@
 
         <EditText
             android:id="@+id/cfg_top"
-            android:layout_width="70dp"
+            android:layout_width="80dp"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
             android:gravity="end"
+            android:hint="1200"
             android:inputType="numberDecimal"/>
 
     </FrameLayout>
@@ -62,10 +64,11 @@
 
         <EditText
             android:id="@+id/cfg_stall"
-            android:layout_width="70dp"
+            android:layout_width="80dp"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
             android:gravity="end"
+            android:hint="0"
             android:inputType="numberDecimal"/>
 
     </FrameLayout>
@@ -86,7 +89,8 @@
             android:layout_width="70dp"
             android:layout_height="46dp"
             android:layout_gravity="end"
-            android:src="@drawable/clockwise"/>
+            android:src="@drawable/clockwise"
+            style="@style/Widget.AppCompat.Button.Borderless"/>
 
     </FrameLayout>
 
@@ -106,7 +110,8 @@
             android:layout_width="70dp"
             android:layout_height="46dp"
             android:layout_gravity="end"
-            android:src="@drawable/clockwise"/>
+            android:src="@drawable/clockwise"
+            style="@style/Widget.AppCompat.Button.Borderless"/>
 
     </FrameLayout>
 
@@ -115,24 +120,16 @@
         android:layout_height="0dp"
         android:layout_weight="1"/>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <Button
-            android:id="@+id/cfg_cancel"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@android:string/cancel"/>
-
-        <Button
-            android:id="@+id/cfg_send"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Set Config"/>
-
-    </LinearLayout>
+    <Button
+        android:id="@+id/cfg_send"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:gravity="center_vertical|end"
+        android:padding="24dp"
+        android:drawablePadding="20dp"
+        android:drawableEnd="@drawable/sendit"
+        android:text="Set Config"
+        style="@style/Widget.AppCompat.Button.Borderless"/>
 
 </LinearLayout>

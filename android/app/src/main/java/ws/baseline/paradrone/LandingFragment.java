@@ -43,7 +43,6 @@ public class LandingFragment extends Fragment {
                 save();
             }
         });
-        binding.lzCancel.setOnClickListener((e) -> getParentFragmentManager().popBackStack());
 
         return binding.getRoot();
     }
