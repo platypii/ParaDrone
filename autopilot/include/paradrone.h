@@ -10,15 +10,25 @@
 
 // Flight modes
 #define MODE_IDLE 0
-#define MODE_AP 1
+#define MODE_AUTO 1
+
+// Revert manual control to autopilot after 10 seconds of no RC
+#define RC_OVERRIDE_MILLIS 10000
+
+// After 60 seconds of no GPS, revert to slow spiral
+#define GPS_EXPIRATION 60000
 
 // Persisted config
 extern uint8_t config_flight_mode;
 extern LandingZone *config_landing_zone;
 extern MotorConfigMessage motor_config;
 
-extern short config_left_invert;
-extern short config_right_invert;
+// Motor direction
+extern short config_left_direction;
+extern short config_right_direction;
+
+// Last R/C message received
+extern long last_rc_millis;
 
 // AP state
 extern GeoPointV *last_location;
@@ -36,9 +46,9 @@ extern float motor_position_right;
 // Target motor position
 extern short motor_target_left;
 extern short motor_target_right;
-// Motor current
-extern float motor_current_left;
-extern float motor_current_right;
+// Motor speed
+extern short motor_speed_left;
+extern short motor_speed_right;
 
 // Toggle speed and left/right balance
 float get_turn_speed();
@@ -79,8 +89,6 @@ void motor_init();
 void motor_loop();
 void set_motor_speed(const short left, const short right);
 void set_motor_position(uint8_t new_left, uint8_t new_right);
-int get_motor_switch_left();
-int get_motor_switch_right();
 
 // Planner
 void planner_loop();

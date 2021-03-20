@@ -31,6 +31,9 @@ void screen_loop() {
   }
 }
 
+/**
+ * Notify that screen should redraw on next loop. Non-blocking
+ */
 void screen_update() {
   should_redraw = true;
 }
@@ -82,9 +85,9 @@ static void screen_draw() {
   // LZ
   if (config_landing_zone != NULL && last_location != NULL) {
     const double distance = geo_distance(last_location->lat, last_location->lng, config_landing_zone->destination.lat, config_landing_zone->destination.lng);
-    if (distance >= 100000) {
+    if (distance >= 10000) {
       sprintf(buf, "LZ %.0f km ", distance * 1e-3);
-    } else if (distance >= 10000) {
+    } else if (distance >= 1000) {
       sprintf(buf, "LZ %.1f km ", distance * 1e-3);
     } else {
       sprintf(buf, "LZ %.0f m ", distance);
@@ -104,7 +107,7 @@ static void screen_draw() {
     Heltec.display->drawString(0, 22, "RC");
   } else if (config_flight_mode == MODE_IDLE) {
     Heltec.display->drawString(0, 22, "Idle");
-  } else if (config_flight_mode == MODE_AP) {
+  } else if (config_flight_mode == MODE_AUTO) {
     if (current_plan_name) {
       Heltec.display->drawString(0, 22, current_plan_name);
     } else {
@@ -112,31 +115,18 @@ static void screen_draw() {
     }
   }
 
-  // Limit switch state
-  if (get_motor_switch_left() > 64) {
-    Heltec.display->drawString(0, -8, "_");
-  }
-  if (get_motor_switch_right() > 64) {
-    Heltec.display->drawString(122, -8, "_");
-  }
-
   // Current motor position
   sprintf(buf, "%d ", (short) motor_position_left);
   int prewidth = Heltec.display->getStringWidth(buf);
   sprintf(buf, "%d | %d", (short) motor_position_left, (short) motor_position_right);
   Heltec.display->drawString(DISPLAY_WIDTH / 2 - prewidth, 54, buf);
-  // // Target position
-  // if (motor_position_left != motor_target_left || motor_position_right != motor_target_right) {
-  //   sprintf(buf, "%d ", motor_target_left);
-  //   prewidth = Heltec.display->getStringWidth(buf);
-  //   sprintf(buf, "%d | %d", motor_target_left, motor_target_right);
-  //   Heltec.display->drawString(DISPLAY_WIDTH / 2 - prewidth, 44, buf);
-  // }
-  // Motor current
-  sprintf(buf, "%.2fA ", motor_current_left);
-  prewidth = Heltec.display->getStringWidth(buf);
-  sprintf(buf, "%.2fA | %.2fA", motor_current_left, motor_current_right);
-  Heltec.display->drawString(DISPLAY_WIDTH / 2 - prewidth, 44, buf);
+  // Target position
+  if (motor_position_left != motor_target_left || motor_position_right != motor_target_right) {
+    sprintf(buf, "%d ", motor_target_left);
+    prewidth = Heltec.display->getStringWidth(buf);
+    sprintf(buf, "%d | %d", motor_target_left, motor_target_right);
+    Heltec.display->drawString(DISPLAY_WIDTH / 2 - prewidth, 44, buf);
+  }
 
   // LoRa enabled?
   if (lora_enabled) {

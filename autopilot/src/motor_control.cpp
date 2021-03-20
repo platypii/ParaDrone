@@ -8,17 +8,11 @@
 #define PIN_M2_IN1 17
 #define PIN_M2_IN2 2
 
-// Current sense
-#define PIN_M1_FB 39
-#define PIN_M2_FB 35
-
-// Status flag
-#define PIN_M1_SF 38
-#define PIN_M2_SF 34
-
-// Limit switch
-#define PIN_M1_LIMIT 37
-#define PIN_M2_LIMIT 36
+// Hall sensors
+#define PIN_M1_HALL_A 37
+#define PIN_M1_HALL_B 36
+#define PIN_M2_HALL_A 33
+#define PIN_M2_HALL_B 32
 
 // ESP32 PWM channels
 #define CHANNEL_M1_IN1 0
@@ -38,6 +32,24 @@
 static void set_motor_left(const int drive, uint8_t speed);
 static void set_motor_right(const int drive, uint8_t speed);
 
+int m1_ticks = 0;
+int m2_ticks = 0;
+
+static void IRAM_ATTR hall_isr_m1() {
+  if (digitalRead(PIN_M1_HALL_B)) {
+    m1_ticks++;
+  } else {
+    m1_ticks--;
+  }
+}
+static void IRAM_ATTR hall_isr_m2() {
+  if (digitalRead(PIN_M2_HALL_B)) {
+    m2_ticks++;
+  } else {
+    m2_ticks--;
+  }
+}
+
 void motor_init() {
   ledcAttachPin(PIN_M1_IN1, CHANNEL_M1_IN1);
   ledcAttachPin(PIN_M1_IN2, CHANNEL_M1_IN2);
@@ -47,8 +59,14 @@ void motor_init() {
   ledcSetup(CHANNEL_M1_IN2, 20000, 8);
   ledcSetup(CHANNEL_M2_IN1, 20000, 8);
   ledcSetup(CHANNEL_M2_IN2, 20000, 8);
-  pinMode(PIN_M1_LIMIT, INPUT_PULLDOWN);
-  pinMode(PIN_M2_LIMIT, INPUT_PULLDOWN);
+  pinMode(PIN_M1_HALL_A, INPUT);
+  pinMode(PIN_M1_HALL_B, INPUT);
+  pinMode(PIN_M2_HALL_A, INPUT);
+  pinMode(PIN_M2_HALL_B, INPUT);
+
+  // Listen for rising hall sensors
+  attachInterrupt(PIN_M1_HALL_A, hall_isr_m1, RISING);
+  attachInterrupt(PIN_M2_HALL_A, hall_isr_m2, RISING);
 }
 
 /**
@@ -57,8 +75,8 @@ void motor_init() {
  */
 void set_motor_speed_raw(short left, short right) {
   // Serial.printf("Set ctrl %d %d\n", left, right);
-  left *= config_left_invert;
-  right *= config_right_invert;
+  left *= config_left_direction;
+  right *= config_right_direction;
   if (left < 0) {
     set_motor_left(DRIVE_FORWARD, -left);
   } else if (left > 0) {
@@ -76,7 +94,7 @@ void set_motor_speed_raw(short left, short right) {
 }
 
 static void set_motor_left(const int drive, uint8_t speed) {
-  // Serial.printf("Set motor1 %d %d\n", drive, speed);
+  // Serial.printf("motor speed left %d %d\n", drive, speed);
   if (drive == DRIVE_FORWARD) {
     ledcWrite(CHANNEL_M1_IN1, 0);
     ledcWrite(CHANNEL_M1_IN2, speed);
@@ -93,7 +111,7 @@ static void set_motor_left(const int drive, uint8_t speed) {
 }
 
 static void set_motor_right(const int drive, uint8_t speed) {
-  // Serial.printf("Set motor2 %d %d\n", drive, speed);
+  // Serial.printf("motor speed right %d %d\n", drive, speed);
   if (drive == DRIVE_FORWARD) {
     ledcWrite(CHANNEL_M2_IN1, speed);
     ledcWrite(CHANNEL_M2_IN2, 0);
@@ -107,44 +125,4 @@ static void set_motor_right(const int drive, uint8_t speed) {
     ledcWrite(CHANNEL_M2_IN1, 0);
     ledcWrite(CHANNEL_M2_IN2, 0);
   }
-}
-
-/**
- * The current in amps for motor 1
- * @returns current in amps
- */
-float get_motor_current_left() {
-  // 0..4096 => 0..3.3V @ 525 mV per amp
-  const uint16_t analog = analogRead(PIN_M1_FB);
-  const float volts = analog * 3.3f / 4096.0f;
-  return volts / 0.525f; // amps
-}
-
-/**
- * The current in amps for motor 2
- * @returns current in amps
- */
-float get_motor_current_right() {
-  // 0..4096 => 0..3.3V @ 525 mV per amp
-  const uint16_t analog = analogRead(PIN_M2_FB);
-  const float volts = analog * 3.3f / 4096.0f;
-  return volts / 0.525f; // amps
-}
-
-/**
- * Limit switch state for motor 1
- * @returns pin voltage 0..4096
- */
-int get_motor_switch_left() {
-  const uint16_t analog = analogRead(PIN_M1_LIMIT);
-  return analog;
-}
-
-/**
- * Limit switch state for motor 2
- * @returns pin voltage 0..4096
- */
-int get_motor_switch_right() {
-  const uint16_t analog = analogRead(PIN_M2_LIMIT);
-  return analog;
 }

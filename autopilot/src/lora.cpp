@@ -52,8 +52,15 @@ static void lora_read(int parse_len) {
   }
 
   if (buffer[0] == 'M' && buffer_len == 2) {
-    Serial.printf("%.1fs lora mode %d\n", millis() * 1e-3, buffer[1]);
-    set_flight_mode(buffer[1]);
+    const uint8_t mode = buffer[1];
+    if (mode == MODE_IDLE) {
+      Serial.printf("%.1fs lora mode idle\n", millis() * 1e-3);
+    } else if (mode == MODE_AUTO) {
+      Serial.printf("%.1fs lora mode auto\n", millis() * 1e-3);
+    } else {
+      Serial.printf("%.1fs lora bad mode %d\n", millis() * 1e-3, mode);
+    }
+    set_flight_mode(mode);
   } else if (buffer[0] == 'P' && buffer_len == 1) {
     Serial.printf("%.1fs lora ping\n", millis() * 1e-3);
   } else if (buffer[0] == 'Q' && buffer_len == 2) {

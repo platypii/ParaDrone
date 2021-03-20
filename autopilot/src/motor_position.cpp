@@ -10,8 +10,6 @@ static short speed(const float delta);
 static float normalize_position(float position);
 
 void set_motor_speed_raw(const short left, const short right);
-float get_motor_current_left();
-float get_motor_current_right();
 
 // Use shorts to avoid signed/unsigned overflow
 
@@ -31,13 +29,6 @@ short motor_target_right = 10;
 short motor_speed_left = 0;
 short motor_speed_right = 0;
 
-// Motor current
-float motor_current_left = 0;
-float motor_current_right = 0;
-
-int motor_switch_left = 0;
-int motor_switch_right = 0;
-
 long last_update = -1;
 long last_speed_override = -1;
 
@@ -46,32 +37,6 @@ long last_speed_override = -1;
  */
 void motor_loop() {
   update_position_estimate();
-
-  // Check motor feedback
-  motor_current_left = get_motor_current_left();
-  motor_current_right = get_motor_current_right();
-
-  // Limit switch engaged = toggles up
-  motor_switch_left = get_motor_switch_left();
-  motor_switch_right = get_motor_switch_right();
-  if (motor_switch_left > 64 && motor_position_left != 0) {
-    motor_position_left = 0;
-    if (motor_speed_left < 0) {
-      Serial.println("Left stop");
-      motor_speed_left = 0;
-    }
-    screen_update();
-  }
-  if (motor_switch_right > 64 && motor_position_right != 0) {
-    motor_position_right = 0;
-    if (motor_speed_right < 0) {
-      Serial.println("Right stop");
-      motor_speed_right = 0;
-    }
-    screen_update();
-  }
-  // Stop motor at the top
-  set_motor_speed_raw(motor_speed_left, motor_speed_right);
 
   // Only update speed if it hasn't been overridden
   if (last_speed_override < 0 || millis() - last_speed_override > RC_SPEED_OVERRIDE_DURATION) {
@@ -127,7 +92,7 @@ static void update_position_estimate() {
     motor_position_right = normalize_position(motor_position_right);
 
     // Close enough
-    const float epsilon = 0.2;
+    const float epsilon = 0.8;
     if (fabs(motor_position_right - motor_target_right) <= epsilon) {
       motor_position_right = motor_target_right;
     }
@@ -146,9 +111,9 @@ static void update_position_estimate() {
 static short speed(const float delta) {
   // Start slowing down when delta < 23
   short speed = delta * 10;
-  // Minimum speed 32
-  if (speed < 0) speed -= 32;
-  if (speed > 0) speed += 32;
+  // Minimum speed 64
+  if (speed < 0) speed -= 64;
+  if (speed > 0) speed += 64;
   // Max speed 255
   if (speed < -255) return -255;
   else if (speed > 255) return 255;

@@ -43,7 +43,13 @@ class AutopilotCharacteristic : public BLECharacteristicCallbacks {
         update_location(point);
       } else if (value[0] == 'M' && value.length() == 2) {
         const uint8_t mode = value[1];
-        Serial.printf("%.1fs bt mode %d\n", millis() * 1e-3, mode);
+        if (mode == MODE_IDLE) {
+          Serial.printf("%.1fs bt mode idle\n", millis() * 1e-3);
+        } else if (mode == MODE_AUTO) {
+          Serial.printf("%.1fs bt mode auto\n", millis() * 1e-3);
+        } else {
+          Serial.printf("%.1fs bt bad mode %d\n", millis() * 1e-3, mode);
+        }
         set_flight_mode(mode);
       } else if (value[0] == 'Q' && value.length() == 2) {
         Serial.printf("%.1fs bt query %c\n", millis() * 1e-3, value[1]);

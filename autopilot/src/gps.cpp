@@ -1,8 +1,8 @@
 #include <Arduino.h>
 #include "paradrone.h"
 
-#define GPS_TX 32 // white output
-#define GPS_RX 13 // green input
+#define GPS_TX 13 // white output
+#define GPS_RX 12 // green input
 
 const uint8_t UBLOX_INIT[] PROGMEM = {
   // UBX-CFG-RATE

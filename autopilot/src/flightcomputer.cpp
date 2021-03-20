@@ -3,14 +3,8 @@
 #include "path.h"
 #include "plan.h"
 
-// Revert manual control to autopilot after 10 seconds of no RC
-#define RC_OVERRIDE_MILLIS 10000
-
-// After 60 seconds of no GPS, revert to slow spiral
-#define GPS_EXPIRATION 60000
-
 // Last RC command received time
-static long last_rc_millis = -RC_OVERRIDE_MILLIS; // Don't override on reboot
+long last_rc_millis = -RC_OVERRIDE_MILLIS; // Don't override on reboot
 
 Path *current_plan;
 const char *current_plan_name;
@@ -29,7 +23,7 @@ bool rc_override() {
  * Return true autopilot should be flying
  */
 static bool autopilot_enabled() {
-  return config_flight_mode == MODE_AP && !rc_override();
+  return config_flight_mode == MODE_AUTO && !rc_override();
 }
 
 /**
