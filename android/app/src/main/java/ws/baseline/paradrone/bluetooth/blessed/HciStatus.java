@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2020 Martijn van Welie
+ *   Copyright (c) 2021 Martijn van Welie
  *
  *   Permission is hereby granted, free of charge, to any person obtaining a copy
  *   of this software and associated documentation files (the "Software"), to deal
@@ -269,12 +269,12 @@ public enum HciStatus {
     /**
      * The HCI command or LMP PDU sent is only possible on an encrypted link.
      */
-    INSUFFCIENT_SECURITY(0x2F),
+    INSUFFICIENT_SECURITY(0x2F),
 
     /**
      * A parameter value requested is outside the mandatory range of parameters for the given HCI command or LMP PDU and the recipient does not accept that value.
      */
-    PARAMAMETER_OUT_OF_RANGE(0x30),
+    PARAMETER_OUT_OF_RANGE(0x30),
 
     /**
      * Undefined error
@@ -339,7 +339,7 @@ public enum HciStatus {
     /**
      * The connection was terminated because the Message Integrity Check (MIC) failed on a received packet.
      */
-    CONNECTION_TERMINATIED_MIC_FAILURE(0x3D),
+    CONNECTION_TERMINATED_MIC_FAILURE(0x3D),
 
     /**
      * The LL initiated a connection but the connection has failed to be established.
@@ -389,20 +389,16 @@ public enum HciStatus {
      */
     UNKNOWN_STATUS_CODE(0xFFFF);
 
-    HciStatus(int value) {
+    HciStatus(final int value) {
         this.value = value;
     }
 
-    private final int value;
-
-    public int getValue() {
-        return value;
-    }
+    public final int value;
 
     @NonNull
-    public static HciStatus fromValue(int value) {
+    public static HciStatus fromValue(final int value) {
         for (HciStatus type : values()) {
-            if (type.getValue() == value)
+            if (type.value == value)
                 return type;
         }
         return UNKNOWN_STATUS_CODE;

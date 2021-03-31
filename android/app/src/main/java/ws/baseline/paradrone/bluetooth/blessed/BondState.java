@@ -23,37 +23,48 @@
 
 package ws.baseline.paradrone.bluetooth.blessed;
 
-import static android.bluetooth.BluetoothGattCharacteristic.PROPERTY_SIGNED_WRITE;
-import static android.bluetooth.BluetoothGattCharacteristic.PROPERTY_WRITE;
-import static android.bluetooth.BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE;
-import static android.bluetooth.BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT;
-import static android.bluetooth.BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE;
-import static android.bluetooth.BluetoothGattCharacteristic.WRITE_TYPE_SIGNED;
+import androidx.annotation.NonNull;
+
+import static android.bluetooth.BluetoothDevice.BOND_BONDED;
+import static android.bluetooth.BluetoothDevice.BOND_BONDING;
+import static android.bluetooth.BluetoothDevice.BOND_NONE;
 
 /**
- * WriteType describes the type of write that can be done
+ * The class represents the various possible bond states
  */
-public enum WriteType {
+public enum BondState {
     /**
-     * Write characteristic and requesting acknowledgement by the remote peripheral
+     * Indicates the remote peripheral is not bonded.
+     * There is no shared link key with the remote peripheral, so communication
+     * (if it is allowed at all) will be unauthenticated and unencrypted.
      */
-    WITH_RESPONSE(WRITE_TYPE_DEFAULT, PROPERTY_WRITE),
-
-    /**
-     * Write characteristic without requiring a response by the remote peripheral
-     */
-    WITHOUT_RESPONSE(WRITE_TYPE_NO_RESPONSE, PROPERTY_WRITE_NO_RESPONSE),
+    NONE(BOND_NONE),
 
     /**
-     * Write characteristic including authentication signature
+     * Indicates bonding is in progress with the remote peripheral.
      */
-    SIGNED(WRITE_TYPE_SIGNED, PROPERTY_SIGNED_WRITE);
+    BONDING(BOND_BONDING),
 
-    public final int writeType;
-    public final int property;
+    /**
+     * Indicates the remote peripheral is bonded.
+     * A shared link keys exists locally for the remote peripheral, so
+     * communication can be authenticated and encrypted.
+     */
+    BONDED(BOND_BONDED);
 
-    WriteType(final int writeType, final int property) {
-        this.writeType = writeType;
-        this.property = property;
+    BondState(final int value) {
+        this.value = value;
+    }
+
+    public final int value;
+
+    @NonNull
+    public static BondState fromValue(final int value) {
+        for (BondState type : values()) {
+            if (type.value == value) {
+                return type;
+            }
+        }
+        return NONE;
     }
 }

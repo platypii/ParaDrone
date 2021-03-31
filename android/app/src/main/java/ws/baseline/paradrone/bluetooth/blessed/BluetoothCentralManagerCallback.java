@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2020 Martijn van Welie
+ *   Copyright (c) 2021 Martijn van Welie
  *
  *   Permission is hereby granted, free of charge, to any person obtaining a copy
  *   of this software and associated documentation files (the "Software"), to deal
@@ -24,16 +24,20 @@
 package ws.baseline.paradrone.bluetooth.blessed;
 
 import android.bluetooth.le.ScanResult;
-import androidx.annotation.NonNull;
 
-public abstract class BluetoothCentralCallback {
+import org.jetbrains.annotations.NotNull;
+
+/**
+ * Callbacks for the BluetoothCentralManager class
+ */
+public abstract class BluetoothCentralManagerCallback {
 
     /**
      * Successfully connected with a peripheral.
      *
      * @param peripheral the peripheral that was connected.
      */
-    public void onConnectedPeripheral(@NonNull final BluetoothPeripheral peripheral) {}
+    public void onConnectedPeripheral(@NotNull BluetoothPeripheral peripheral) {}
 
     /**
      * Connecting with the peripheral has failed.
@@ -41,7 +45,7 @@ public abstract class BluetoothCentralCallback {
      * @param peripheral the peripheral for which the connection was attempted
      * @param status the status code for the connection failure
      */
-    public void onConnectionFailed(@NonNull final BluetoothPeripheral peripheral, @NonNull final HciStatus status) {}
+    public void onConnectionFailed(@NotNull BluetoothPeripheral peripheral, @NotNull HciStatus status) {}
 
     /**
      * Peripheral disconnected
@@ -49,7 +53,7 @@ public abstract class BluetoothCentralCallback {
      * @param peripheral the peripheral that disconnected.
      * @param status the status code for the disconnection
      */
-    public void onDisconnectedPeripheral(@NonNull final BluetoothPeripheral peripheral, @NonNull final HciStatus status) {}
+    public void onDisconnectedPeripheral(@NotNull BluetoothPeripheral peripheral, @NotNull HciStatus status) {}
 
     /**
      * Discovered a peripheral
@@ -57,19 +61,19 @@ public abstract class BluetoothCentralCallback {
      * @param peripheral the peripheral that was found
      * @param scanResult the scanResult describing the peripheral
      */
-    public void onDiscoveredPeripheral(@NonNull final BluetoothPeripheral peripheral, @NonNull final ScanResult scanResult) {}
+    public void onDiscoveredPeripheral(@NotNull BluetoothPeripheral peripheral, @NotNull ScanResult scanResult) {}
 
     /**
      * Scanning failed
      *
-     * @param errorCode the status code for the scanning failure
+     * @param scanFailure the status code for the scanning failure
      */
-    public void onScanFailed(final int errorCode) {}
+    public void onScanFailed(@NotNull ScanFailure scanFailure) {}
 
     /**
      * Bluetooth adapter status changed
      *
      * @param state the current status code for the adapter
      */
-    public void onBluetoothAdapterStateChanged(final int state) {}
+    public void onBluetoothAdapterStateChanged(int state) {}
 }

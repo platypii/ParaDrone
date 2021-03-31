@@ -24,9 +24,13 @@ public class ApSpeedMsg implements ApEvent {
         final double vN = buf.getShort(11) * 0.01; // cm/s
         final double vE = buf.getShort(13) * 0.01; // cm/s
         final double climb = buf.getShort(15) * 0.01; // cm/s
-        final ApSpeedMsg lastSpeed = new ApSpeedMsg(lat, lng, alt, vN, vE, climb);
-        Timber.d("ap -> phone: speed %s", lastSpeed);
-        EventBus.getDefault().post(lastSpeed);
+        if (LocationCheck.validate(lat, lng) == 0) {
+            final ApSpeedMsg lastSpeed = new ApSpeedMsg(lat, lng, alt, vN, vE, climb);
+            Timber.d("ap -> phone: speed %s", lastSpeed);
+            EventBus.getDefault().post(lastSpeed);
+        } else {
+            Timber.w("ap -> phone: invalid location %f, %f", lat, lng);
+        }
     }
 
     private ApSpeedMsg(double lat, double lng, double alt, double vN, double vE, double climb) {

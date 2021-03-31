@@ -23,37 +23,34 @@
 
 package ws.baseline.paradrone.bluetooth.blessed;
 
-import static android.bluetooth.BluetoothGattCharacteristic.PROPERTY_SIGNED_WRITE;
-import static android.bluetooth.BluetoothGattCharacteristic.PROPERTY_WRITE;
-import static android.bluetooth.BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE;
-import static android.bluetooth.BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT;
-import static android.bluetooth.BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE;
-import static android.bluetooth.BluetoothGattCharacteristic.WRITE_TYPE_SIGNED;
+import static android.bluetooth.BluetoothGatt.CONNECTION_PRIORITY_BALANCED;
+import static android.bluetooth.BluetoothGatt.CONNECTION_PRIORITY_HIGH;
+import static android.bluetooth.BluetoothGatt.CONNECTION_PRIORITY_LOW_POWER;
 
-/**
- * WriteType describes the type of write that can be done
- */
-public enum WriteType {
+public enum ConnectionPriority {
     /**
-     * Write characteristic and requesting acknowledgement by the remote peripheral
+     * Use the connection parameters recommended by the Bluetooth SIG.
+     * This is the default value if no connection parameter update
+     * is requested.
      */
-    WITH_RESPONSE(WRITE_TYPE_DEFAULT, PROPERTY_WRITE),
+    BALANCED(CONNECTION_PRIORITY_BALANCED),
 
     /**
-     * Write characteristic without requiring a response by the remote peripheral
+     * Request a high priority, low latency connection.
+     * An application should only request high priority connection parameters to transfer large
+     * amounts of data over LE quickly. Once the transfer is complete, the application should
+     * request BALANCED connection parameters to reduce energy use.
      */
-    WITHOUT_RESPONSE(WRITE_TYPE_NO_RESPONSE, PROPERTY_WRITE_NO_RESPONSE),
+    HIGH(CONNECTION_PRIORITY_HIGH),
 
     /**
-     * Write characteristic including authentication signature
+     * Request low power, reduced data rate connection parameters.
      */
-    SIGNED(WRITE_TYPE_SIGNED, PROPERTY_SIGNED_WRITE);
+    LOW_POWER(CONNECTION_PRIORITY_LOW_POWER);
 
-    public final int writeType;
-    public final int property;
-
-    WriteType(final int writeType, final int property) {
-        this.writeType = writeType;
-        this.property = property;
+    ConnectionPriority(final int value) {
+        this.value = value;
     }
+
+    public final int value;
 }

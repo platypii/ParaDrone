@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2020 Martijn van Welie
+ *   Copyright (c) 2021 Martijn van Welie
  *
  *   Permission is hereby granted, free of charge, to any person obtaining a copy
  *   of this software and associated documentation files (the "Software"), to deal
@@ -50,6 +50,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Queue;
 import java.util.Set;
@@ -58,18 +59,14 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import timber.log.Timber;
 
+import static android.bluetooth.BluetoothDevice.BOND_BONDED;
+import static android.bluetooth.BluetoothDevice.BOND_BONDING;
+import static android.bluetooth.BluetoothDevice.BOND_NONE;
 import static android.bluetooth.BluetoothDevice.TRANSPORT_LE;
-import static android.bluetooth.BluetoothGatt.CONNECTION_PRIORITY_BALANCED;
-import static android.bluetooth.BluetoothGatt.CONNECTION_PRIORITY_LOW_POWER;
 import static android.bluetooth.BluetoothGattCharacteristic.PROPERTY_INDICATE;
 import static android.bluetooth.BluetoothGattCharacteristic.PROPERTY_NOTIFY;
 import static android.bluetooth.BluetoothGattCharacteristic.PROPERTY_READ;
-import static android.bluetooth.BluetoothGattCharacteristic.PROPERTY_SIGNED_WRITE;
-import static android.bluetooth.BluetoothGattCharacteristic.PROPERTY_WRITE;
-import static android.bluetooth.BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE;
-import static android.bluetooth.BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT;
-import static android.bluetooth.BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE;
-import static android.bluetooth.BluetoothGattCharacteristic.WRITE_TYPE_SIGNED;
+import static ws.baseline.paradrone.bluetooth.blessed.BluetoothBytesParser.bytes2String;
 
 /**
  * Represents a remote Bluetooth peripheral and replaces BluetoothDevice and BluetoothGatt
@@ -83,85 +80,12 @@ public class BluetoothPeripheral {
     private static final UUID CCC_DESCRIPTOR_UUID = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");
 
     /**
-     * Bluetooth device type, Unknown
+     * Max MTU that Android can handle
      */
-    @SuppressWarnings("WeakerAccess")
-    public static final int DEVICE_TYPE_UNKNOWN = 0;
-
-    /**
-     * Bluetooth device type, Classic - BR/EDR devices
-     */
-    @SuppressWarnings("WeakerAccess")
-    public static final int DEVICE_TYPE_CLASSIC = 1;
-
-    /**
-     * Bluetooth device type, Low Energy - LE-only
-     */
-    @SuppressWarnings("WeakerAccess")
-    public static final int DEVICE_TYPE_LE = 2;
-
-    /**
-     * Bluetooth device type, Dual Mode - BR/EDR/LE
-     */
-    @SuppressWarnings("WeakerAccess")
-    public static final int DEVICE_TYPE_DUAL = 3;
-
-    /**
-     * Indicates the remote device is not bonded (paired).
-     * <p>There is no shared link key with the remote device, so communication
-     * (if it is allowed at all) will be unauthenticated and unencrypted.
-     */
-    @SuppressWarnings("WeakerAccess")
-    public static final int BOND_NONE = 10;
-
-    /**
-     * Indicates bonding (pairing) is in progress with the remote device.
-     */
-    @SuppressWarnings("WeakerAccess")
-    public static final int BOND_BONDING = 11;
-
-    /**
-     * Indicates the remote device is bonded (paired).
-     * <p>A shared link keys exists locally for the remote device, so
-     * communication can be authenticated and encrypted.
-     * <p><i>Being bonded (paired) with a remote device does not necessarily
-     * mean the device is currently connected. It just means that the pending
-     * procedure was completed at some earlier time, and the link key is still
-     * stored locally, ready to use on the next connection.
-     * </i>
-     */
-    @SuppressWarnings("WeakerAccess")
-    public static final int BOND_BONDED = 12;
-
-    /**
-     * The profile is in disconnected state
-     */
-    @SuppressWarnings("WeakerAccess")
-    public static final int STATE_DISCONNECTED = 0;
-
-    /**
-     * The profile is in connecting state
-     */
-    @SuppressWarnings("WeakerAccess")
-    public static final int STATE_CONNECTING = 1;
-
-    /**
-     * The profile is in connected state
-     */
-    @SuppressWarnings("WeakerAccess")
-    public static final int STATE_CONNECTED = 2;
-
-    /**
-     * The profile is in disconnecting state
-     */
-    @SuppressWarnings("WeakerAccess")
-    public static final int STATE_DISCONNECTING = 3;
+    public static final int MAX_MTU = 517;
 
     // Minimal and default MTU
     private static final int DEFAULT_MTU = 23;
-
-    // Max MTU according to Bluetooth standard
-    private static final int MAX_MTU = 512;
 
     // Maximum number of retries of commands
     private static final int MAX_TRIES = 2;
@@ -181,54 +105,32 @@ public class BluetoothPeripheral {
     // When a bond is lost, the bluetooth stack needs some time to update its internal state
     private static final long DELAY_AFTER_BOND_LOST = 1000L;
 
-    // The maximum number of enabled notifications Android supports (BTA_GATTC_NOTIF_REG_MAX)
-    private static final int MAX_NOTIFYING_CHARACTERISTICS = 15;
-
     private static final String NO_VALID_SERVICE_UUID_PROVIDED = "no valid service UUID provided";
     private static final String NO_VALID_CHARACTERISTIC_UUID_PROVIDED = "no valid characteristic UUID provided";
     private static final String NO_VALID_CHARACTERISTIC_PROVIDED = "no valid characteristic provided";
     private static final String NO_VALID_WRITE_TYPE_PROVIDED = "no valid writeType provided";
     private static final String NO_VALID_VALUE_PROVIDED = "no valid value provided";
     private static final String NO_VALID_DESCRIPTOR_PROVIDED = "no valid descriptor provided";
+    private static final String NO_VALID_PERIPHERAL_CALLBACK_PROVIDED = "no valid peripheral callback provided";
+    private static final String NO_VALID_DEVICE_PROVIDED = "no valid device provided";
+    private static final String NO_VALID_PRIORITY_PROVIDED = "no valid priority provided";
+    private static final String PERIPHERAL_NOT_CONNECTED = "peripheral not connected";
+    private static final String VALUE_BYTE_ARRAY_IS_EMPTY = "value byte array is empty";
+    private static final String VALUE_BYTE_ARRAY_IS_TOO_LONG = "value byte array is too long";
 
-    @NonNull
-    private final Context context;
-
-    @NonNull
-    private final Handler callbackHandler;
-
-    @NonNull
-    private BluetoothDevice device;
-
-    @NonNull
-    private final InternalCallback listener;
-
-    @Nullable
-    private BluetoothPeripheralCallback peripheralCallback;
-
-    @NonNull
-    private final Queue<Runnable> commandQueue = new ConcurrentLinkedQueue<>();
-
-    @Nullable
-    private volatile BluetoothGatt bluetoothGatt;
-
-    @Nullable
-    private String cachedName;
-
-    @Nullable
-    private byte[] currentWriteBytes;
-
-    @NonNull
-    private final Set<UUID> notifyingCharacteristics = new HashSet<>();
-
-    @NonNull
-    private final Handler mainHandler = new Handler(Looper.getMainLooper());
-
-    @Nullable
-    private Runnable timeoutRunnable;
-
-    @Nullable
-    private Runnable discoverServicesRunnable;
+    private @NonNull final Context context;
+    private @NonNull final Handler callbackHandler;
+    private @NonNull BluetoothDevice device;
+    private @NonNull final InternalCallback listener;
+    protected @NonNull BluetoothPeripheralCallback peripheralCallback;
+    private @NonNull final Queue<Runnable> commandQueue = new ConcurrentLinkedQueue<>();
+    private @Nullable volatile BluetoothGatt bluetoothGatt;
+    private @NonNull String cachedName = "";
+    private @NonNull byte[] currentWriteBytes = new byte[0];
+    private @NonNull final Set<BluetoothGattCharacteristic> notifyingCharacteristics = new HashSet<>();
+    private @NonNull final Handler mainHandler = new Handler(Looper.getMainLooper());
+    private @Nullable Runnable timeoutRunnable;
+    private @Nullable Runnable discoverServicesRunnable;
 
     private volatile boolean commandQueueBusy = false;
     private boolean isRetrying;
@@ -245,7 +147,7 @@ public class BluetoothPeripheral {
      */
     private final BluetoothGattCallback bluetoothGattCallback = new BluetoothGattCallback() {
         @Override
-        public void onConnectionStateChange(final BluetoothGatt gatt, final int status, final int newState) {
+        public void onConnectionStateChange(@NonNull final BluetoothGatt gatt, final int status, final int newState) {
             cancelConnectionTimer();
             final int previousState = state;
             state = newState;
@@ -275,7 +177,7 @@ public class BluetoothPeripheral {
         }
 
         @Override
-        public void onServicesDiscovered(BluetoothGatt gatt, int status) {
+        public void onServicesDiscovered(@NonNull final BluetoothGatt gatt, final int status) {
             final GattStatus gattStatus = GattStatus.fromValue(status);
             if (gattStatus != GattStatus.SUCCESS) {
                 Timber.e("service discovery failed due to internal error '%s', disconnecting", gattStatus);
@@ -292,53 +194,43 @@ public class BluetoothPeripheral {
             callbackHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    if (peripheralCallback != null) {
-                        peripheralCallback.onServicesDiscovered(BluetoothPeripheral.this);
-                    }
+                    peripheralCallback.onServicesDiscovered(BluetoothPeripheral.this);
                 }
             });
         }
 
         @Override
-        public void onDescriptorWrite(BluetoothGatt gatt, final BluetoothGattDescriptor descriptor, final int status) {
+        public void onDescriptorWrite(@NonNull final BluetoothGatt gatt, @NonNull final BluetoothGattDescriptor descriptor, final int status) {
             final GattStatus gattStatus = GattStatus.fromValue(status);
             final BluetoothGattCharacteristic parentCharacteristic = descriptor.getCharacteristic();
             if (gattStatus != GattStatus.SUCCESS) {
                 Timber.e("failed to write <%s> to descriptor of characteristic <%s> for device: '%s', status '%s' ", bytes2String(currentWriteBytes), parentCharacteristic.getUuid(), getAddress(), gattStatus);
+                if (failureThatShouldTriggerBonding(gattStatus)) return;
             }
 
-            // Check if this was the Client Configuration Descriptor
+            // Check if this was the Client Characteristic Configuration Descriptor
             if (descriptor.getUuid().equals(CCC_DESCRIPTOR_UUID)) {
                 if (gattStatus == GattStatus.SUCCESS) {
-                    final byte[] value = copyOf(descriptor.getValue());
+                    final byte[] value = nonnullOf(descriptor.getValue());
                     if (Arrays.equals(value, BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE) ||
                             Arrays.equals(value, BluetoothGattDescriptor.ENABLE_INDICATION_VALUE)) {
-                        notifyingCharacteristics.add(parentCharacteristic.getUuid());
-                        if (notifyingCharacteristics.size() > MAX_NOTIFYING_CHARACTERISTICS) {
-                            Timber.e("too many (%d) notifying characteristics. The maximum Android can handle is %d", notifyingCharacteristics.size(), MAX_NOTIFYING_CHARACTERISTICS);
-                        }
+                        notifyingCharacteristics.add(parentCharacteristic);
                     } else if (Arrays.equals(value, BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE)) {
-                        notifyingCharacteristics.remove(parentCharacteristic.getUuid());
-                    } else {
-                        Timber.e("unexpected CCC descriptor value");
+                        notifyingCharacteristics.remove(parentCharacteristic);
                     }
                 }
 
                 callbackHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        if (peripheralCallback != null) {
-                            peripheralCallback.onNotificationStateUpdate(BluetoothPeripheral.this, parentCharacteristic, gattStatus);
-                        }
+                        peripheralCallback.onNotificationStateUpdate(BluetoothPeripheral.this, parentCharacteristic, gattStatus);
                     }
                 });
             } else {
                 callbackHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        if (peripheralCallback != null) {
-                            peripheralCallback.onDescriptorWrite(BluetoothPeripheral.this, currentWriteBytes, descriptor, gattStatus);
-                        }
+                        peripheralCallback.onDescriptorWrite(BluetoothPeripheral.this, currentWriteBytes, descriptor, gattStatus);
                     }
                 });
             }
@@ -346,139 +238,184 @@ public class BluetoothPeripheral {
         }
 
         @Override
-        public void onDescriptorRead(BluetoothGatt gatt, final BluetoothGattDescriptor descriptor, final int status) {
+        public void onDescriptorRead(@NonNull final BluetoothGatt gatt, @NonNull final BluetoothGattDescriptor descriptor, final int status) {
             final GattStatus gattStatus = GattStatus.fromValue(status);
             if (gattStatus != GattStatus.SUCCESS) {
                 Timber.e("reading descriptor <%s> failed for device '%s, status '%s'", descriptor.getUuid(), getAddress(), gattStatus);
+                if (failureThatShouldTriggerBonding(gattStatus)) return;
             }
 
-            final byte[] value = copyOf(descriptor.getValue());
+            final byte[] value = nonnullOf(descriptor.getValue());
             callbackHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    if (peripheralCallback != null) {
-                        peripheralCallback.onDescriptorRead(BluetoothPeripheral.this, value, descriptor, gattStatus);
-                    }
+                    peripheralCallback.onDescriptorRead(BluetoothPeripheral.this, value, descriptor, gattStatus);
                 }
             });
             completedCommand();
         }
 
         @Override
-        public void onCharacteristicChanged(BluetoothGatt gatt, final BluetoothGattCharacteristic characteristic) {
-            final byte[] value = copyOf(characteristic.getValue());
+        public void onCharacteristicChanged(@NonNull final BluetoothGatt gatt, @NonNull final BluetoothGattCharacteristic characteristic) {
+            final byte[] value = nonnullOf(characteristic.getValue());
             callbackHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    if (peripheralCallback != null) {
-                        peripheralCallback.onCharacteristicUpdate(BluetoothPeripheral.this, value, characteristic, GattStatus.SUCCESS);
-                    }
+                    peripheralCallback.onCharacteristicUpdate(BluetoothPeripheral.this, value, characteristic, GattStatus.SUCCESS);
                 }
             });
         }
 
         @Override
-        public void onCharacteristicRead(BluetoothGatt gatt, final BluetoothGattCharacteristic characteristic, final int status) {
+        public void onCharacteristicRead(@NonNull final BluetoothGatt gatt, @NonNull final BluetoothGattCharacteristic characteristic, final int status) {
             final GattStatus gattStatus = GattStatus.fromValue(status);
             if (gattStatus != GattStatus.SUCCESS) {
-                if (gattStatus == GattStatus.AUTHORIZATION_FAILED || gattStatus == GattStatus.INSUFFICIENT_AUTHENTICATION) {
-                    // Characteristic encrypted and needs bonding,
-                    // So retry operation after bonding completes
-                    // This only seems to happen on Android 5/6/7
-                    Timber.w("read failed with status '%s', needs bonding, bonding should be in progress", gattStatus);
-                } else {
-                    Timber.e("read failed for characteristic: %s, status '%s'", characteristic.getUuid(), gattStatus);
-                    completedCommand();
-                }
-                return;
+                Timber.e("read failed for characteristic <%s>, status '%s'", characteristic.getUuid(), gattStatus);
+                if (failureThatShouldTriggerBonding(gattStatus)) return;
             }
 
-            final byte[] value = copyOf(characteristic.getValue());
+            final byte[] value = nonnullOf(characteristic.getValue());
             callbackHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    if (peripheralCallback != null) {
-                        peripheralCallback.onCharacteristicUpdate(BluetoothPeripheral.this, value, characteristic, gattStatus);
-                    }
+                    peripheralCallback.onCharacteristicUpdate(BluetoothPeripheral.this, value, characteristic, gattStatus);
                 }
             });
             completedCommand();
         }
 
         @Override
-        public void onCharacteristicWrite(BluetoothGatt gatt, final BluetoothGattCharacteristic characteristic, final int status) {
+        public void onCharacteristicWrite(@NonNull final BluetoothGatt gatt, @NonNull final BluetoothGattCharacteristic characteristic, final int status) {
             final GattStatus gattStatus = GattStatus.fromValue(status);
             if (gattStatus != GattStatus.SUCCESS) {
-                if (gattStatus == GattStatus.AUTHORIZATION_FAILED || gattStatus == GattStatus.INSUFFICIENT_AUTHENTICATION) {
-                    // Characteristic encrypted and needs bonding,
-                    // So retry operation after bonding completes
-                    // This only seems to happen on Android 5/6/7
-                    Timber.i("write filed with status '%s', needs bonding, bonding should be in progress", gattStatus);
-                    return;
-                } else {
-                    Timber.e("writing <%s> to characteristic <%s> failed, status '%s'", bytes2String(currentWriteBytes), characteristic.getUuid(), gattStatus);
-                }
+                Timber.e("writing <%s> to characteristic <%s> failed, status '%s'", bytes2String(currentWriteBytes), characteristic.getUuid(), gattStatus);
+                if (failureThatShouldTriggerBonding(gattStatus)) return;
             }
 
-            final byte[] value = copyOf(currentWriteBytes);
-            currentWriteBytes = null;
+            final byte[] value = currentWriteBytes;
+            currentWriteBytes = new byte[0];
             callbackHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    if (peripheralCallback != null) {
-                        peripheralCallback.onCharacteristicWrite(BluetoothPeripheral.this, value, characteristic, gattStatus);
-                    }
+                    peripheralCallback.onCharacteristicWrite(BluetoothPeripheral.this, value, characteristic, gattStatus);
+                }
+            });
+            completedCommand();
+        }
+
+        private boolean failureThatShouldTriggerBonding(@NonNull final GattStatus gattStatus) {
+            if (gattStatus == GattStatus.AUTHORIZATION_FAILED
+                    || gattStatus == GattStatus.INSUFFICIENT_AUTHENTICATION
+                    || gattStatus == GattStatus.INSUFFICIENT_ENCRYPTION) {
+                // Characteristic/descriptor is encrypted and needs bonding, bonding should be in progress already
+                // Operation must be retried after bonding is completed.
+                // This only seems to happen on Android 5/6/7.
+                // On newer versions Android will do retry internally
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+                    Timber.i("operation will be retried after bonding, bonding should be in progress");
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        @Override
+        public void onReadRemoteRssi(@NonNull final BluetoothGatt gatt, final int rssi, final int status) {
+            final GattStatus gattStatus = GattStatus.fromValue(status);
+            if (gattStatus != GattStatus.SUCCESS) {
+                Timber.e("reading RSSI failed, status '%s'", gattStatus);
+            }
+
+            callbackHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    peripheralCallback.onReadRemoteRssi(BluetoothPeripheral.this, rssi, gattStatus);
                 }
             });
             completedCommand();
         }
 
         @Override
-        public void onReadRemoteRssi(BluetoothGatt gatt, final int rssi, final int status) {
+        public void onMtuChanged(@NonNull final BluetoothGatt gatt, final int mtu, final int status) {
             final GattStatus gattStatus = GattStatus.fromValue(status);
             if (gattStatus != GattStatus.SUCCESS) {
-                Timber.e("reading RSSI failed, status '%s'", GattStatus.fromValue(status));
-            }
-
-            callbackHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    if (peripheralCallback != null) {
-                        peripheralCallback.onReadRemoteRssi(BluetoothPeripheral.this, rssi, gattStatus);
-                    }
-                }
-            });
-            completedCommand();
-        }
-
-        @Override
-        public void onMtuChanged(BluetoothGatt gatt, final int mtu, final int status) {
-            final GattStatus gattStatus = GattStatus.fromValue(status);
-            if (gattStatus != GattStatus.SUCCESS) {
-                Timber.e("change MTU failed, status '%s'", GattStatus.fromValue(status));
+                Timber.e("change MTU failed, status '%s'", gattStatus);
             }
 
             currentMtu = mtu;
             callbackHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    if (peripheralCallback != null) {
-                        peripheralCallback.onMtuChanged(BluetoothPeripheral.this, mtu, gattStatus);
-                    }
+                    peripheralCallback.onMtuChanged(BluetoothPeripheral.this, mtu, gattStatus);
                 }
             });
             completedCommand();
         }
+
+        @Override
+        public void onPhyRead(@NonNull final BluetoothGatt gatt, final int txPhy, final int rxPhy, final int status) {
+            final GattStatus gattStatus = GattStatus.fromValue(status);
+            if (gattStatus != GattStatus.SUCCESS) {
+                Timber.e("read Phy failed, status '%s'", gattStatus);
+            } else {
+                Timber.i("updated Phy: tx = %s, rx = %s", PhyType.fromValue(txPhy), PhyType.fromValue(rxPhy));
+            }
+
+            callbackHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    peripheralCallback.onPhyUpdate(BluetoothPeripheral.this, PhyType.fromValue(txPhy), PhyType.fromValue(rxPhy), gattStatus);
+                }
+            });
+            completedCommand();
+        }
+
+        @Override
+        public void onPhyUpdate(@NonNull final BluetoothGatt gatt, final int txPhy, final int rxPhy, final int status) {
+            final GattStatus gattStatus = GattStatus.fromValue(status);
+            if (gattStatus != GattStatus.SUCCESS) {
+                Timber.e("update Phy failed, status '%s'", gattStatus);
+            } else {
+                Timber.i("updated Phy: tx = %s, rx = %s", PhyType.fromValue(txPhy), PhyType.fromValue(rxPhy));
+            }
+
+            callbackHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    peripheralCallback.onPhyUpdate(BluetoothPeripheral.this, PhyType.fromValue(txPhy), PhyType.fromValue(rxPhy), gattStatus);
+                }
+            });
+        }
+
+        /**
+         * This callback is only called from Android 8 (Oreo) or higher
+         */
+        public void onConnectionUpdated(@NonNull final BluetoothGatt gatt, final int interval, final int latency, final int timeout, final int status) {
+            final GattStatus gattStatus = GattStatus.fromValue(status);
+            if (gattStatus == GattStatus.SUCCESS) {
+                String msg = String.format(Locale.ENGLISH, "connection parameters: interval=%.1fms latency=%d timeout=%ds", interval * 1.25f, latency, timeout / 100);
+                Timber.d(msg);
+            } else {
+                Timber.e("connection parameters update failed with status '%s'", gattStatus);
+            }
+
+            callbackHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    peripheralCallback.onConnectionUpdated(BluetoothPeripheral.this, interval, latency, timeout, gattStatus);
+                }
+            });
+        }
     };
 
     private void successfullyConnected() {
-        int bondstate = device.getBondState();
-        long timePassed = SystemClock.elapsedRealtime() - connectTimestamp;
-        Timber.i("connected to '%s' (%s) in %.1fs", getName(), bondStateToString(bondstate), timePassed / 1000.0f);
+        final BondState bondstate = getBondState();
+        final long timePassed = SystemClock.elapsedRealtime() - connectTimestamp;
+        Timber.i("connected to '%s' (%s) in %.1fs", getName(), bondstate, timePassed / 1000.0f);
 
-        if (bondstate == BOND_NONE || bondstate == BOND_BONDED) {
+        if (bondstate == BondState.NONE || bondstate == BondState.BONDED) {
             delayedDiscoverServices(getServiceDiscoveryDelay(bondstate));
-        } else if (bondstate == BOND_BONDING) {
+        } else if (bondstate == BondState.BONDING) {
             // Apparently the bonding process has already started, so let it complete. We'll do discoverServices once bonding finished
             Timber.i("waiting for bonding to complete");
         }
@@ -500,7 +437,7 @@ public class BluetoothPeripheral {
         mainHandler.postDelayed(discoverServicesRunnable, delay);
     }
 
-    private long getServiceDiscoveryDelay(int bondstate) {
+    private long getServiceDiscoveryDelay(@NonNull BondState bondstate) {
         long delayWhenBonded = 0;
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N) {
             // It seems delays when bonded are only needed in versions Nougat or lower
@@ -509,10 +446,10 @@ public class BluetoothPeripheral {
             // If they don't have it the delay isn't needed but we do it anyway to keep code simple
             delayWhenBonded = 1000L;
         }
-        return bondstate == BOND_BONDED ? delayWhenBonded : 0;
+        return bondstate == BondState.BONDED ? delayWhenBonded : 0;
     }
 
-    private void successfullyDisconnected(int previousState) {
+    private void successfullyDisconnected(final int previousState) {
         if (previousState == BluetoothProfile.STATE_CONNECTED || previousState == BluetoothProfile.STATE_DISCONNECTING) {
             Timber.i("disconnected '%s' on request", getName());
         } else if (previousState == BluetoothProfile.STATE_CONNECTING) {
@@ -534,37 +471,38 @@ public class BluetoothPeripheral {
         }
     }
 
-    private void connectionStateChangeUnsuccessful(HciStatus status, int previousState, int newState) {
-        long timePassed = SystemClock.elapsedRealtime() - connectTimestamp;
-
-        // Check if service discovery completed
-        if (discoverServicesRunnable != null) {
-            // Service discovery is still pending so cancel it
-            mainHandler.removeCallbacks(discoverServicesRunnable);
-            discoverServicesRunnable = null;
-        }
-        boolean servicesDiscovered = !getServices().isEmpty();
+    private void connectionStateChangeUnsuccessful(@NonNull final HciStatus status, final int previousState, final int newState) {
+        cancelPendingServiceDiscovery();
+        final boolean servicesDiscovered = !getServices().isEmpty();
 
         // See if the initial connection failed
         if (previousState == BluetoothProfile.STATE_CONNECTING) {
-            boolean isTimeout = timePassed > getTimoutThreshold();
+            final long timePassed = SystemClock.elapsedRealtime() - connectTimestamp;
+            final boolean isTimeout = timePassed > getTimoutThreshold();
             final HciStatus adjustedStatus = (status == HciStatus.ERROR && isTimeout) ? HciStatus.CONNECTION_FAILED_ESTABLISHMENT : status;
             Timber.i("connection failed with status '%s'", adjustedStatus);
             completeDisconnect(false, adjustedStatus);
             listener.connectFailed(BluetoothPeripheral.this, adjustedStatus);
         } else if (previousState == BluetoothProfile.STATE_CONNECTED && newState == BluetoothProfile.STATE_DISCONNECTED && !servicesDiscovered) {
             // We got a disconnection before the services were even discovered
-            Timber.i("peripheral '%s' disconnected with status '%s' (%d) before completing service discovery", getName(), status, status.getValue());
+            Timber.i("peripheral '%s' disconnected with status '%s' (%d) before completing service discovery", getName(), status, status.value);
             completeDisconnect(false, status);
             listener.connectFailed(BluetoothPeripheral.this, status);
         } else {
             // See if we got connection drop
             if (newState == BluetoothProfile.STATE_DISCONNECTED) {
-                Timber.i("peripheral '%s' disconnected with status '%s' (%d)", getName(), status, status.getValue());
+                Timber.i("peripheral '%s' disconnected with status '%s' (%d)", getName(), status, status.value);
             } else {
-                Timber.i("unexpected connection state change for '%s' status '%s' (%d)", getName(), status, status.getValue());
+                Timber.i("unexpected connection state change for '%s' status '%s' (%d)", getName(), status, status.value);
             }
             completeDisconnect(true, status);
+        }
+    }
+
+    private void cancelPendingServiceDiscovery() {
+        if (discoverServicesRunnable != null) {
+            mainHandler.removeCallbacks(discoverServicesRunnable);
+            discoverServicesRunnable = null;
         }
     }
 
@@ -587,34 +525,29 @@ public class BluetoothPeripheral {
         }
     };
 
-    private void handleBondStateChange(int bondState, int previousBondState) {
+    private void handleBondStateChange(final int bondState, final int previousBondState) {
         switch (bondState) {
             case BOND_BONDING:
                 Timber.d("starting bonding with '%s' (%s)", getName(), getAddress());
                 callbackHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        if (peripheralCallback != null) {
-                            peripheralCallback.onBondingStarted(BluetoothPeripheral.this);
-                        }
+                        peripheralCallback.onBondingStarted(BluetoothPeripheral.this);
                     }
                 });
                 break;
             case BOND_BONDED:
-                // Bonding succeeded
                 Timber.d("bonded with '%s' (%s)", getName(), getAddress());
                 callbackHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        if (peripheralCallback != null) {
-                            peripheralCallback.onBondingSucceeded(BluetoothPeripheral.this);
-                        }
+                        peripheralCallback.onBondingSucceeded(BluetoothPeripheral.this);
                     }
                 });
 
                 // If bonding was started at connection time, we may still have to discover the services
                 // Also make sure we are not starting a discovery while another one is already in progress
-                if (bluetoothGatt.getServices().isEmpty() && !discoveryStarted) {
+                if (getServices().isEmpty() && !discoveryStarted) {
                     delayedDiscoverServices(0);
                 }
 
@@ -643,9 +576,7 @@ public class BluetoothPeripheral {
                     callbackHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            if (peripheralCallback != null) {
-                                peripheralCallback.onBondingFailed(BluetoothPeripheral.this);
-                            }
+                            peripheralCallback.onBondingFailed(BluetoothPeripheral.this);
                         }
                     });
                 } else {
@@ -653,17 +584,12 @@ public class BluetoothPeripheral {
                     bondLost = true;
 
                     // Cancel the discoverServiceRunnable if it is still pending
-                    if (discoverServicesRunnable != null) {
-                        mainHandler.removeCallbacks(discoverServicesRunnable);
-                        discoverServicesRunnable = null;
-                    }
+                    cancelPendingServiceDiscovery();
 
                     callbackHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            if (peripheralCallback != null) {
-                                peripheralCallback.onBondLost(BluetoothPeripheral.this);
-                            }
+                            peripheralCallback.onBondLost(BluetoothPeripheral.this);
                         }
                     });
                 }
@@ -675,11 +601,11 @@ public class BluetoothPeripheral {
     private final BroadcastReceiver pairingRequestBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(final Context context, final Intent intent) {
-            final BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-            if (device == null) return;
+            final BluetoothDevice receivedDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+            if (receivedDevice == null) return;
 
             // Skip other devices
-            if (!device.getAddress().equalsIgnoreCase(getAddress())) return;
+            if (!receivedDevice.getAddress().equalsIgnoreCase(getAddress())) return;
 
             final int variant = intent.getIntExtra(BluetoothDevice.EXTRA_PAIRING_VARIANT, BluetoothDevice.ERROR);
             Timber.d("pairing request received: " + pairingVariantToString(variant) + " (" + variant + ")");
@@ -688,7 +614,7 @@ public class BluetoothPeripheral {
                 String pin = listener.getPincode(BluetoothPeripheral.this);
                 if (pin != null) {
                     Timber.d("setting PIN code for this peripheral using '%s'", pin);
-                    device.setPin(pin.getBytes());
+                    receivedDevice.setPin(pin.getBytes());
                     abortBroadcast();
                 }
             }
@@ -700,22 +626,22 @@ public class BluetoothPeripheral {
      *
      * @param context  Android application environment.
      * @param device   Wrapped Android bluetooth device.
-     * @param listener Callback to {@link BluetoothCentral}.
+     * @param listener Callback to {@link BluetoothCentralManager}.
      */
-    BluetoothPeripheral(@NonNull Context context, @NonNull BluetoothDevice device, @NonNull InternalCallback listener, @Nullable BluetoothPeripheralCallback peripheralCallback, @Nullable Handler callbackHandler) {
+    BluetoothPeripheral(@NonNull final Context context, @NonNull final BluetoothDevice device, @NonNull final InternalCallback listener, @NonNull final BluetoothPeripheralCallback peripheralCallback, @NonNull final Handler callbackHandler) {
         this.context = Objects.requireNonNull(context, "no valid context provided");
-        this.device = Objects.requireNonNull(device, "no valid device provided");
+        this.device = Objects.requireNonNull(device, NO_VALID_DEVICE_PROVIDED);
         this.listener = Objects.requireNonNull(listener, "no valid listener provided");
-        this.peripheralCallback = peripheralCallback;
-        this.callbackHandler = (callbackHandler != null) ? callbackHandler : new Handler(Looper.getMainLooper());
+        this.peripheralCallback = Objects.requireNonNull(peripheralCallback, NO_VALID_PERIPHERAL_CALLBACK_PROVIDED);
+        this.callbackHandler = Objects.requireNonNull(callbackHandler, "no valid callback handler provided");
     }
 
-    void setPeripheralCallback(@NonNull BluetoothPeripheralCallback peripheralCallback) {
-        this.peripheralCallback = Objects.requireNonNull(peripheralCallback, "no valid peripheral callback provided");
+    void setPeripheralCallback(@NonNull final BluetoothPeripheralCallback peripheralCallback) {
+        this.peripheralCallback = Objects.requireNonNull(peripheralCallback, NO_VALID_PERIPHERAL_CALLBACK_PROVIDED);
     }
 
-    void setDevice(@NonNull BluetoothDevice bluetoothDevice) {
-        this.device = Objects.requireNonNull(bluetoothDevice, "bluetoothdevice is not valid");
+    void setDevice(@NonNull final BluetoothDevice bluetoothDevice) {
+        this.device = Objects.requireNonNull(bluetoothDevice, NO_VALID_DEVICE_PROVIDED);
     }
 
     /**
@@ -789,7 +715,7 @@ public class BluetoothPeripheral {
         }
 
         // Enqueue the bond command because a connection has been issued or we are already connected
-        boolean result = commandQueue.add(new Runnable() {
+        final boolean result = commandQueue.add(new Runnable() {
             @Override
             public void run() {
                 manuallyBonding = true;
@@ -807,24 +733,6 @@ public class BluetoothPeripheral {
             nextCommand();
         } else {
             Timber.e("could not enqueue bonding command");
-        }
-        return result;
-    }
-
-    /**
-     * Version of createBond with transport parameter.
-     * May use in the future if needed as I never encountered an issue
-     */
-    private boolean createBond(int transport) {
-        Timber.d("bonding using TRANSPORT_LE");
-        boolean result = false;
-        try {
-            Method bondMethod = device.getClass().getMethod("createBond", int.class);
-            if (bondMethod != null) {
-                result = (boolean) bondMethod.invoke(device, transport);
-            }
-        } catch (Exception e) {
-            Timber.e("could not invoke createBond method");
         }
         return result;
     }
@@ -858,7 +766,7 @@ public class BluetoothPeripheral {
             mainHandler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    bluetoothGattCallback.onConnectionStateChange(bluetoothGatt, HciStatus.SUCCESS.getValue(), BluetoothProfile.STATE_DISCONNECTED);
+                    bluetoothGattCallback.onConnectionStateChange(bluetoothGatt, HciStatus.SUCCESS.value, BluetoothProfile.STATE_DISCONNECTED);
                 }
             }, 50);
         } else {
@@ -870,7 +778,7 @@ public class BluetoothPeripheral {
     /**
      * Disconnect the bluetooth peripheral.
      *
-     * <p>When the disconnection has been completed {@link BluetoothCentralCallback#onDisconnectedPeripheral(BluetoothPeripheral, HciStatus)} will be called.
+     * <p>When the disconnection has been completed {@link BluetoothCentralManagerCallback#onDisconnectedPeripheral(BluetoothPeripheral, HciStatus)} will be called.
      */
     private void disconnect() {
         if (state == BluetoothProfile.STATE_CONNECTED || state == BluetoothProfile.STATE_CONNECTING) {
@@ -897,13 +805,14 @@ public class BluetoothPeripheral {
     /**
      * Complete the disconnect after getting connectionstate == disconnected
      */
-    private void completeDisconnect(boolean notify, final HciStatus status) {
+    private void completeDisconnect(final boolean notify, @NonNull final HciStatus status) {
         if (bluetoothGatt != null) {
             bluetoothGatt.close();
             bluetoothGatt = null;
         }
         commandQueue.clear();
         commandQueueBusy = false;
+        notifyingCharacteristics.clear();
         try {
             context.unregisterReceiver(bondStateReceiver);
             context.unregisterReceiver(pairingRequestBroadcastReceiver);
@@ -921,17 +830,19 @@ public class BluetoothPeripheral {
      *
      * @return Address of the bluetooth peripheral
      */
-    public @NonNull String getAddress() {
+    @NonNull
+    public String getAddress() {
         return device.getAddress();
     }
 
     /**
      * Get the type of the peripheral.
      *
-     * @return the device type {@link #DEVICE_TYPE_CLASSIC}, {@link #DEVICE_TYPE_LE} {@link #DEVICE_TYPE_DUAL}. {@link #DEVICE_TYPE_UNKNOWN} if it's not available
+     * @return the PeripheralType
      */
-    public int getType() {
-        return device.getType();
+    @NonNull
+    public PeripheralType getType() {
+        return PeripheralType.fromValue(device.getType());
     }
 
     /**
@@ -939,8 +850,9 @@ public class BluetoothPeripheral {
      *
      * @return name of the bluetooth peripheral
      */
-    public @Nullable String getName() {
-        String name = device.getName();
+    @NonNull
+    public String getName() {
+        final String name = device.getName();
         if (name != null) {
             // Cache the name so that we even know it when bluetooth is switched off
             cachedName = name;
@@ -952,25 +864,22 @@ public class BluetoothPeripheral {
     /**
      * Get the bond state of the bluetooth peripheral.
      *
-     * <p>Possible values for the bond state are:
-     * {@link #BOND_NONE},
-     * {@link #BOND_BONDING},
-     * {@link #BOND_BONDED}.
-     *
-     * @return returns the bond state
+     * @return the bond state
      */
-    public int getBondState() {
-        return device.getBondState();
+    @NonNull
+    public BondState getBondState() {
+        return BondState.fromValue(device.getBondState());
     }
 
     /**
      * Get the services supported by the connected bluetooth peripheral.
-     * Only services that are also supported by {@link BluetoothCentral} are included.
+     * Only services that are also supported by {@link BluetoothCentralManager} are included.
      *
      * @return Supported services.
      */
     @SuppressWarnings("WeakerAccess")
-    public @NonNull List<BluetoothGattService> getServices() {
+    @NonNull
+    public List<BluetoothGattService> getServices() {
         if (bluetoothGatt != null) {
             return bluetoothGatt.getServices();
         }
@@ -983,7 +892,8 @@ public class BluetoothPeripheral {
      * @param serviceUUID the UUID of the service
      * @return the BluetoothGattService object for the service UUID or null if the peripheral does not have a service with the specified UUID
      */
-    public @Nullable BluetoothGattService getService(@NonNull UUID serviceUUID) {
+    @Nullable
+    public BluetoothGattService getService(@NonNull final UUID serviceUUID) {
         Objects.requireNonNull(serviceUUID, NO_VALID_SERVICE_UUID_PROVIDED);
 
         if (bluetoothGatt != null) {
@@ -1000,11 +910,12 @@ public class BluetoothPeripheral {
      * @param characteristicUUID the UUID of the chararacteristic
      * @return the BluetoothGattCharacteristic object for the characteristic UUID or null if the peripheral does not have a characteristic with the specified UUID
      */
-    public @Nullable BluetoothGattCharacteristic getCharacteristic(@NonNull UUID serviceUUID, @NonNull UUID characteristicUUID) {
+    @Nullable
+    public BluetoothGattCharacteristic getCharacteristic(@NonNull final UUID serviceUUID, @NonNull final UUID characteristicUUID) {
         Objects.requireNonNull(serviceUUID, NO_VALID_SERVICE_UUID_PROVIDED);
         Objects.requireNonNull(characteristicUUID, NO_VALID_CHARACTERISTIC_UUID_PROVIDED);
 
-        BluetoothGattService service = getService(serviceUUID);
+        final BluetoothGattService service = getService(serviceUUID);
         if (service != null) {
             return service.getCharacteristic(characteristicUUID);
         } else {
@@ -1015,16 +926,11 @@ public class BluetoothPeripheral {
     /**
      * Returns the connection state of the peripheral.
      *
-     * <p>Possible values for the connection state are:
-     * {@link #STATE_CONNECTED},
-     * {@link #STATE_CONNECTING},
-     * {@link #STATE_DISCONNECTED},
-     * {@link #STATE_DISCONNECTING}.
-     *
      * @return the connection state.
      */
-    public int getState() {
-        return state;
+    @NonNull
+    public ConnectionState getState() {
+        return ConnectionState.fromValue(state);
     }
 
     /**
@@ -1037,18 +943,50 @@ public class BluetoothPeripheral {
     }
 
     /**
+     * Get maximum length of byte array that can be written depending on WriteType
+     *
+     * <p>
+     * This value is derived from the current negotiated MTU or the maximum characteristic length (512)
+     */
+    public int getMaximumWriteValueLength(@NonNull final WriteType writeType) {
+        Objects.requireNonNull(writeType, "writetype is null");
+
+        switch (writeType) {
+            case WITH_RESPONSE:
+                return 512;
+            case SIGNED:
+                return currentMtu - 15;
+            default:
+                return currentMtu - 3;
+        }
+    }
+
+    /**
      * Boolean to indicate if the specified characteristic is currently notifying or indicating.
      *
      * @param characteristic the characteristic to check
      * @return true if the characteristic is notifying or indicating, false if it is not
      */
-    public boolean isNotifying(@NonNull BluetoothGattCharacteristic characteristic) {
-        Objects.requireNonNull(characteristic, "no valid characteristic provided");
-        return notifyingCharacteristics.contains(characteristic.getUuid());
+    public boolean isNotifying(@NonNull final BluetoothGattCharacteristic characteristic) {
+        Objects.requireNonNull(characteristic, NO_VALID_CHARACTERISTIC_PROVIDED);
+        return notifyingCharacteristics.contains(characteristic);
+    }
+
+    /**
+     * Get all notifying/indicating characteristics
+     *
+     * @return Set of characteristics or empty set
+     */
+    public @NonNull Set<BluetoothGattCharacteristic> getNotifyingCharacteristics() {
+        return Collections.unmodifiableSet(notifyingCharacteristics);
     }
 
     private boolean isConnected() {
         return bluetoothGatt != null && state == BluetoothProfile.STATE_CONNECTED;
+    }
+
+    private boolean notConnected() {
+        return !isConnected();
     }
 
     /**
@@ -1060,9 +998,14 @@ public class BluetoothPeripheral {
      * @param characteristicUUID the characteristic's UUID
      * @return true if the operation was enqueued, false if the characteristic does not support reading or the characteristic was not found
      */
-    public boolean readCharacteristic(@NonNull UUID serviceUUID, @NonNull UUID characteristicUUID) {
+    public boolean readCharacteristic(@NonNull final UUID serviceUUID, @NonNull final UUID characteristicUUID) {
         Objects.requireNonNull(serviceUUID, NO_VALID_SERVICE_UUID_PROVIDED);
         Objects.requireNonNull(characteristicUUID, NO_VALID_CHARACTERISTIC_UUID_PROVIDED);
+
+        if (notConnected()) {
+            Timber.e(PERIPHERAL_NOT_CONNECTED);
+            return false;
+        }
 
         BluetoothGattCharacteristic characteristic = getCharacteristic(serviceUUID, characteristicUUID);
         if (characteristic != null) {
@@ -1084,20 +1027,17 @@ public class BluetoothPeripheral {
     public boolean readCharacteristic(@NonNull final BluetoothGattCharacteristic characteristic) {
         Objects.requireNonNull(characteristic, NO_VALID_CHARACTERISTIC_PROVIDED);
 
-        // Check if gatt object is valid
-        if (bluetoothGatt == null) {
-            Timber.e("gatt is 'null', ignoring read request");
+        if (notConnected()) {
+            Timber.e(PERIPHERAL_NOT_CONNECTED);
             return false;
         }
 
-        // Check if this characteristic actually has READ property
-        if ((characteristic.getProperties() & PROPERTY_READ) == 0) {
+        if (doesNotSupportReading(characteristic)) {
             Timber.e("characteristic does not have read property");
             return false;
         }
 
-        // Enqueue the read command now that all checks have been passed
-        boolean result = commandQueue.add(new Runnable() {
+        final boolean result = commandQueue.add(new Runnable() {
             @Override
             public void run() {
                 if (isConnected()) {
@@ -1122,6 +1062,10 @@ public class BluetoothPeripheral {
         return result;
     }
 
+    private boolean doesNotSupportReading(@NonNull final BluetoothGattCharacteristic characteristic) {
+        return (characteristic.getProperties() & PROPERTY_READ) == 0;
+    }
+
     /**
      * Write a value to a characteristic using the specified write type.
      *
@@ -1134,11 +1078,16 @@ public class BluetoothPeripheral {
      * @param writeType          the write type to use when writing. Must be WRITE_TYPE_DEFAULT, WRITE_TYPE_NO_RESPONSE or WRITE_TYPE_SIGNED
      * @return true if the operation was enqueued, false if the characteristic does not support reading or the characteristic was not found
      */
-    public boolean writeCharacteristic(@NonNull UUID serviceUUID, @NonNull UUID characteristicUUID, @NonNull final byte[] value, @NonNull final WriteType writeType) {
+    public boolean writeCharacteristic(@NonNull final UUID serviceUUID, @NonNull final UUID characteristicUUID, @NonNull final byte[] value, @NonNull final WriteType writeType) {
         Objects.requireNonNull(serviceUUID, NO_VALID_SERVICE_UUID_PROVIDED);
         Objects.requireNonNull(characteristicUUID, NO_VALID_CHARACTERISTIC_UUID_PROVIDED);
         Objects.requireNonNull(value, NO_VALID_VALUE_PROVIDED);
         Objects.requireNonNull(writeType, NO_VALID_WRITE_TYPE_PROVIDED);
+
+        if (notConnected()) {
+            Timber.e(PERIPHERAL_NOT_CONNECTED);
+            return false;
+        }
 
         BluetoothGattCharacteristic characteristic = getCharacteristic(serviceUUID, characteristicUUID);
         if (characteristic != null) {
@@ -1152,12 +1101,13 @@ public class BluetoothPeripheral {
      *
      * <p>All parameters must have a valid value in order for the operation
      * to be enqueued. If the characteristic does not support writing with the specified writeType, the operation will not be enqueued.
+     * The length of the byte array to write must be between 1 and getMaximumWriteValueLength(writeType).
      *
      * <p>{@link BluetoothPeripheralCallback#onCharacteristicWrite(BluetoothPeripheral, byte[], BluetoothGattCharacteristic, GattStatus)} will be triggered as a result of this call.
      *
      * @param characteristic the characteristic to write to
      * @param value          the byte array to write
-     * @param writeType      the write type to use when writing. Must be WRITE_TYPE_DEFAULT, WRITE_TYPE_NO_RESPONSE or WRITE_TYPE_SIGNED
+     * @param writeType      the write type to use when writing.
      * @return true if a write operation was succesfully enqueued, otherwise false
      */
     public boolean writeCharacteristic(@NonNull final BluetoothGattCharacteristic characteristic, @NonNull final byte[] value, @NonNull final WriteType writeType) {
@@ -1165,52 +1115,43 @@ public class BluetoothPeripheral {
         Objects.requireNonNull(value, NO_VALID_VALUE_PROVIDED);
         Objects.requireNonNull(writeType, NO_VALID_WRITE_TYPE_PROVIDED);
 
-        // Check if gatt object is valid
-        if (bluetoothGatt == null) {
-            Timber.e("gatt is 'null', ignoring write request");
+        if (notConnected()) {
+            Timber.e(PERIPHERAL_NOT_CONNECTED);
+            return false;
+        }
+
+        if (value.length == 0) {
+            throw new IllegalArgumentException(VALUE_BYTE_ARRAY_IS_EMPTY);
+        }
+
+        if (value.length > getMaximumWriteValueLength(writeType)) {
+            throw new IllegalArgumentException(VALUE_BYTE_ARRAY_IS_TOO_LONG);
+        }
+
+        if (doesNotSupportWriteType(characteristic, writeType)) {
+            Timber.e("characteristic <%s> does not support writeType '%s'", characteristic.getUuid(), writeType);
             return false;
         }
 
         // Copy the value to avoid race conditions
         final byte[] bytesToWrite = copyOf(value);
-        if (bytesToWrite.length == 0) {
-            Timber.e("value byte array is empty, ignoring write request");
-            return false;
-        }
 
-        // Check if this characteristic actually supports this writeType
-        int writeProperty;
-        final int writeTypeInternal;
-        switch (writeType) {
-            case WITH_RESPONSE:
-                writeProperty = PROPERTY_WRITE;
-                writeTypeInternal = WRITE_TYPE_DEFAULT;
-                break;
-            case WITHOUT_RESPONSE:
-                writeProperty = PROPERTY_WRITE_NO_RESPONSE;
-                writeTypeInternal = WRITE_TYPE_NO_RESPONSE;
-                break;
-            case SIGNED:
-                writeProperty = PROPERTY_SIGNED_WRITE;
-                writeTypeInternal = WRITE_TYPE_SIGNED;
-                break;
-            default:
-                writeProperty = 0;
-                writeTypeInternal = 0;
-                break;
-        }
-        if ((characteristic.getProperties() & writeProperty) == 0) {
-            Timber.e("characteristic <%s> does not support writeType '%s'", characteristic.getUuid(), writeType);
-            return false;
-        }
-
-        // Enqueue the write command now that all checks have been passed
-        boolean result = commandQueue.add(new Runnable() {
+        final boolean result = commandQueue.add(new Runnable() {
             @Override
             public void run() {
                 if (isConnected()) {
                     currentWriteBytes = bytesToWrite;
-                    characteristic.setWriteType(writeTypeInternal);
+                    characteristic.setWriteType(writeType.writeType);
+
+                    if (willCauseLongWrite(bytesToWrite, writeType)) {
+                        // Android will turn this into a Long Write because it is larger than the MTU - 3.
+                        // When doing a Long Write the byte array will be automatically split in chunks of size MTU - 3.
+                        // However, the peripheral's firmware must also support it, so it is not guaranteed to work.
+                        // Long writes are also very inefficient because of the confirmation of each write operation.
+                        // So it is better to increase MTU if possible. Hence a warning if this write becomes a long write...
+                        // See https://stackoverflow.com/questions/48216517/rxandroidble-write-only-sends-the-first-20b
+                        Timber.w("value byte array is longer than allowed by MTU, write will fail if peripheral does not support long writes");
+                    }
                     characteristic.setValue(bytesToWrite);
                     if (!bluetoothGatt.writeCharacteristic(characteristic)) {
                         Timber.e("writeCharacteristic failed for characteristic: %s", characteristic.getUuid());
@@ -1233,6 +1174,14 @@ public class BluetoothPeripheral {
         return result;
     }
 
+    private boolean willCauseLongWrite(@NonNull final byte[] value, @NonNull final WriteType writeType) {
+        return value.length > currentMtu - 3 && writeType == WriteType.WITH_RESPONSE;
+    }
+
+    private boolean doesNotSupportWriteType(@NonNull final BluetoothGattCharacteristic characteristic, @NonNull final WriteType writeType) {
+        return (characteristic.getProperties() & writeType.property) == 0;
+    }
+
     /**
      * Read the value of a descriptor.
      *
@@ -1242,14 +1191,12 @@ public class BluetoothPeripheral {
     public boolean readDescriptor(@NonNull final BluetoothGattDescriptor descriptor) {
         Objects.requireNonNull(descriptor, NO_VALID_DESCRIPTOR_PROVIDED);
 
-        // Check if gatt object is valid
-        if (bluetoothGatt == null) {
-            Timber.e("gatt is 'null', ignoring read request");
+        if (notConnected()) {
+            Timber.e(PERIPHERAL_NOT_CONNECTED);
             return false;
         }
 
-        // Enqueue the read command now that all checks have been passed
-        boolean result = commandQueue.add(new Runnable() {
+        final boolean result = commandQueue.add(new Runnable() {
             @Override
             public void run() {
                 if (isConnected()) {
@@ -1257,6 +1204,7 @@ public class BluetoothPeripheral {
                         Timber.e("readDescriptor failed for characteristic: %s", descriptor.getUuid());
                         completedCommand();
                     } else {
+                        Timber.d("reading descriptor <%s>", descriptor.getUuid());
                         nrTries++;
                     }
                 } else {
@@ -1286,21 +1234,23 @@ public class BluetoothPeripheral {
         Objects.requireNonNull(descriptor, NO_VALID_DESCRIPTOR_PROVIDED);
         Objects.requireNonNull(value, NO_VALID_VALUE_PROVIDED);
 
-        // Check if gatt object is valid
-        if (bluetoothGatt == null) {
-            Timber.e("gatt is 'null', ignoring write descriptor request");
+        if (notConnected()) {
+            Timber.e(PERIPHERAL_NOT_CONNECTED);
             return false;
+        }
+
+        if (value.length == 0) {
+            throw new IllegalArgumentException(VALUE_BYTE_ARRAY_IS_EMPTY);
+        }
+
+        if (value.length > getMaximumWriteValueLength(WriteType.WITH_RESPONSE)) {
+            throw new IllegalArgumentException(VALUE_BYTE_ARRAY_IS_TOO_LONG);
         }
 
         // Copy the value to avoid race conditions
         final byte[] bytesToWrite = copyOf(value);
-        if (bytesToWrite.length == 0) {
-            Timber.e("value byte array is empty, ignoring write request");
-            return false;
-        }
 
-        // Enqueue the write command now that all checks have been passed
-        boolean result = commandQueue.add(new Runnable() {
+        final boolean result = commandQueue.add(new Runnable() {
             @Override
             public void run() {
                 if (isConnected()) {
@@ -1335,11 +1285,16 @@ public class BluetoothPeripheral {
      * @param enable             true for setting notification on, false for turning it off
      * @return true if the operation was enqueued, false the characteristic could not be found or does not support notifications
      */
-    public boolean setNotify(@NonNull UUID serviceUUID, @NonNull UUID characteristicUUID, boolean enable) {
+    public boolean setNotify(@NonNull final UUID serviceUUID, @NonNull final UUID characteristicUUID, final boolean enable) {
         Objects.requireNonNull(serviceUUID, NO_VALID_SERVICE_UUID_PROVIDED);
         Objects.requireNonNull(characteristicUUID, NO_VALID_CHARACTERISTIC_UUID_PROVIDED);
 
-        BluetoothGattCharacteristic characteristic = getCharacteristic(serviceUUID, characteristicUUID);
+        if (notConnected()) {
+            Timber.e(PERIPHERAL_NOT_CONNECTED);
+            return false;
+        }
+
+        final BluetoothGattCharacteristic characteristic = getCharacteristic(serviceUUID, characteristicUUID);
         if (characteristic != null) {
             return setNotify(characteristic, enable);
         }
@@ -1358,13 +1313,12 @@ public class BluetoothPeripheral {
     public boolean setNotify(@NonNull final BluetoothGattCharacteristic characteristic, final boolean enable) {
         Objects.requireNonNull(characteristic, NO_VALID_CHARACTERISTIC_PROVIDED);
 
-        // Check if gatt object is valid
-        if (bluetoothGatt == null) {
-            Timber.e("gatt is 'null', ignoring set notify request");
+        if (notConnected()) {
+            Timber.e(PERIPHERAL_NOT_CONNECTED);
             return false;
         }
 
-        // Get the Client Configuration Descriptor for the characteristic
+        // Get the Client Characteristic Configuration Descriptor for the characteristic
         final BluetoothGattDescriptor descriptor = characteristic.getDescriptor(CCC_DESCRIPTOR_UUID);
         if (descriptor == null) {
             Timber.e("could not get CCC descriptor for characteristic %s", characteristic.getUuid());
@@ -1372,8 +1326,8 @@ public class BluetoothPeripheral {
         }
 
         // Check if characteristic has NOTIFY or INDICATE properties and set the correct byte value to be written
-        byte[] value;
-        int properties = characteristic.getProperties();
+        final byte[] value;
+        final int properties = characteristic.getProperties();
         if ((properties & PROPERTY_NOTIFY) > 0) {
             value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE;
         } else if ((properties & PROPERTY_INDICATE) > 0) {
@@ -1384,29 +1338,25 @@ public class BluetoothPeripheral {
         }
         final byte[] finalValue = enable ? value : BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE;
 
-        // Queue Runnable to turn on/off the notification now that all checks have been passed
-        boolean result = commandQueue.add(new Runnable() {
+        final boolean result = commandQueue.add(new Runnable() {
             @Override
             public void run() {
-                if (!isConnected()) {
+                if (notConnected()) {
                     completedCommand();
                     return;
                 }
 
-                // First set notification for Gatt object
+                // First try to set notification for Gatt object
                 if (!bluetoothGatt.setCharacteristicNotification(characteristic, enable)) {
                     Timber.e("setCharacteristicNotification failed for characteristic: %s", characteristic.getUuid());
+                    completedCommand();
+                    return;
                 }
 
-                // Then write to descriptor
+                // Then write to CCC descriptor
+                adjustWriteTypeIfNeeded(characteristic);
                 currentWriteBytes = finalValue;
                 descriptor.setValue(finalValue);
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
-                    // Up to Android 6 there is a bug where Android takes the writeType of the parent characteristic instead of always WRITE_TYPE_DEFAULT
-                    // See: https://android.googlesource.com/platform/frameworks/base/+/942aebc95924ab1e7ea1e92aaf4e7fc45f695a6c%5E%21/#F0
-                    final BluetoothGattCharacteristic parentCharacteristic = descriptor.getCharacteristic();
-                    parentCharacteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
-                }
                 if (!bluetoothGatt.writeDescriptor(descriptor)) {
                     Timber.e("writeDescriptor failed for descriptor: %s", descriptor.getUuid());
                     completedCommand();
@@ -1424,24 +1374,12 @@ public class BluetoothPeripheral {
         return result;
     }
 
-    /**
-     * Asynchronous method to clear the services cache. Make sure to add a delay when using this!
-     *
-     * @return true if the method was executed, false if not executed
-     */
-    public boolean clearServicesCache() {
-        if (bluetoothGatt == null) return false;
-
-        boolean result = false;
-        try {
-            Method refreshMethod = bluetoothGatt.getClass().getMethod("refresh");
-            if (refreshMethod != null) {
-                result = (boolean) refreshMethod.invoke(bluetoothGatt);
-            }
-        } catch (Exception e) {
-            Timber.e("could not invoke refresh method");
+    private void adjustWriteTypeIfNeeded(@NonNull final BluetoothGattCharacteristic characteristic) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+            // Up to Android 6 there is a bug where Android takes the writeType of the parent characteristic instead of always WRITE_TYPE_DEFAULT
+            // See: https://android.googlesource.com/platform/frameworks/base/+/942aebc95924ab1e7ea1e92aaf4e7fc45f695a6c%5E%21/#F0
+            characteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
         }
-        return result;
     }
 
     /**
@@ -1452,7 +1390,12 @@ public class BluetoothPeripheral {
      * @return true if the operation was enqueued, false otherwise
      */
     public boolean readRemoteRssi() {
-        boolean result = commandQueue.add(new Runnable() {
+        if (notConnected()) {
+            Timber.e(PERIPHERAL_NOT_CONNECTED);
+            return false;
+        }
+
+        final boolean result = commandQueue.add(new Runnable() {
             @Override
             public void run() {
                 if (isConnected()) {
@@ -1461,7 +1404,6 @@ public class BluetoothPeripheral {
                         completedCommand();
                     }
                 } else {
-                    Timber.e("cannot get rssi, peripheral not connected");
                     completedCommand();
                 }
             }
@@ -1488,21 +1430,26 @@ public class BluetoothPeripheral {
      * @return true if the operation was enqueued, false otherwise
      */
     public boolean requestMtu(final int mtu) {
-        // Make sure mtu is valid
         if (mtu < DEFAULT_MTU || mtu > MAX_MTU) {
-            throw new IllegalArgumentException("mtu must be between 23 and 512");
+            throw new IllegalArgumentException("mtu must be between 23 and 517");
         }
 
-        boolean result = commandQueue.add(new Runnable() {
+        if (notConnected()) {
+            Timber.e(PERIPHERAL_NOT_CONNECTED);
+            return false;
+        }
+
+        final boolean result = commandQueue.add(new Runnable() {
             @Override
             public void run() {
                 if (isConnected()) {
                     if (!bluetoothGatt.requestMtu(mtu)) {
                         Timber.e("requestMtu failed");
                         completedCommand();
+                    } else {
+                        Timber.i("requesting MTU of %d", mtu);
                     }
                 } else {
-                    Timber.e("cannot request MTU, peripheral not connected");
                     completedCommand();
                 }
             }
@@ -1519,30 +1466,32 @@ public class BluetoothPeripheral {
 
     /**
      * Request a different connection priority.
-     * <p>
-     * Use the standard parameters for Android: CONNECTION_PRIORITY_BALANCED, CONNECTION_PRIORITY_HIGH, or CONNECTION_PRIORITY_LOW_POWER. There is no callback for this function.
      *
      * @param priority the requested connection priority
      * @return true if request was enqueued, false if not
      */
-    public boolean requestConnectionPriority(final int priority) {
-        // Make sure priority is valid
-        if (priority < CONNECTION_PRIORITY_BALANCED || priority > CONNECTION_PRIORITY_LOW_POWER) {
-            throw new IllegalArgumentException("connection priority not valid");
+    public boolean requestConnectionPriority(@NonNull final ConnectionPriority priority) {
+        Objects.requireNonNull(priority, NO_VALID_PRIORITY_PROVIDED);
+
+        if (notConnected()) {
+            Timber.e(PERIPHERAL_NOT_CONNECTED);
+            return false;
         }
 
-        // Enqueue the request connection priority command and complete is immediately as there is no callback for it
-        boolean result = commandQueue.add(new Runnable() {
+        final boolean result = commandQueue.add(new Runnable() {
             @Override
             public void run() {
                 if (isConnected()) {
-                    if (!bluetoothGatt.requestConnectionPriority(priority)) {
-                        Timber.e("could not set connection priority");
+                    if (!bluetoothGatt.requestConnectionPriority(priority.value)) {
+                        Timber.e("could not request connection priority");
                     } else {
-                        Timber.d("requesting connection priority %d", priority);
+                        Timber.d("requesting connection priority %s", priority);
                     }
-                    completedCommand();
                 }
+
+                // complete command immediately as this command is not blocking
+                completedCommand();
+
             }
         });
 
@@ -1550,6 +1499,116 @@ public class BluetoothPeripheral {
             nextCommand();
         } else {
             Timber.e("could not enqueue request connection priority command");
+        }
+        return result;
+    }
+
+    /**
+     * Set the preferred connection PHY for this app. Please note that this is just a
+     * recommendation, whether the PHY change will happen depends on other applications preferences,
+     * local and remote controller capabilities. Controller can override these settings.
+     * <p>
+     * {@link BluetoothPeripheralCallback#onPhyUpdate} will be triggered as a result of this call, even
+     * if no PHY change happens. It is also triggered when remote device updates the PHY.
+     *
+     * @param txPhy      the desired TX PHY
+     * @param rxPhy      the desired RX PHY
+     * @param phyOptions the desired optional sub-type for PHY_LE_CODED
+     * @return true if request was enqueued, false if not
+     */
+    public boolean setPreferredPhy(@NonNull final PhyType txPhy, @NonNull final PhyType rxPhy, @NonNull final PhyOptions phyOptions) {
+        Objects.requireNonNull(txPhy);
+        Objects.requireNonNull(rxPhy);
+        Objects.requireNonNull(phyOptions);
+
+        if (notConnected()) {
+            Timber.e(PERIPHERAL_NOT_CONNECTED);
+            return false;
+        }
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            Timber.e("setPreferredPhy requires Android 8.0 or newer");
+            return false;
+        }
+
+        final boolean result = commandQueue.add(new Runnable() {
+            @Override
+            public void run() {
+                if (isConnected()) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        Timber.i("setting preferred Phy: tx = %s, rx = %s, options = %s", txPhy, rxPhy, phyOptions);
+                        bluetoothGatt.setPreferredPhy(txPhy.mask, rxPhy.mask, phyOptions.value);
+                    }
+                }
+
+                // complete command immediately as this command is not blocking
+                completedCommand();
+            }
+        });
+
+        if (result) {
+            nextCommand();
+        } else {
+            Timber.e("could not enqueue setPreferredPhy command");
+        }
+        return result;
+    }
+
+    /**
+     * Read the current transmitter PHY and receiver PHY of the connection. The values are returned
+     * in {@link BluetoothPeripheralCallback#onPhyUpdate}
+     */
+    public boolean readPhy() {
+        if (notConnected()) {
+            Timber.e(PERIPHERAL_NOT_CONNECTED);
+            return false;
+        }
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            Timber.e("setPreferredPhy requires Android 8.0 or newer");
+            return false;
+        }
+
+        final boolean result = commandQueue.add(new Runnable() {
+            @Override
+            public void run() {
+                if (isConnected()) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        bluetoothGatt.readPhy();
+                        Timber.d("reading Phy");
+                        return;
+                    }
+                }
+
+                // complete command immediately as this command is not blocking
+                completedCommand();
+            }
+        });
+
+        if (result) {
+            nextCommand();
+        } else {
+            Timber.e("could not enqueue readyPhy command");
+        }
+        return result;
+    }
+
+    /**
+     * Asynchronous method to clear the services cache. Make sure to add a delay when using this!
+     *
+     * @return true if the method was executed, false if not executed
+     */
+    public boolean clearServicesCache() {
+        if (bluetoothGatt == null) return false;
+
+        boolean result = false;
+        try {
+            Method refreshMethod = bluetoothGatt.getClass().getMethod("refresh");
+            if (refreshMethod != null) {
+                result = (boolean) refreshMethod.invoke(bluetoothGatt);
+            }
+        } catch (Exception e) {
+            Timber.e("could not invoke refresh method");
         }
         return result;
     }
@@ -1569,7 +1628,7 @@ public class BluetoothPeripheral {
      */
     private void retryCommand() {
         commandQueueBusy = false;
-        Runnable currentCommand = commandQueue.peek();
+        final Runnable currentCommand = commandQueue.peek();
         if (currentCommand != null) {
             if (nrTries >= MAX_TRIES) {
                 // Max retries reached, give up on this one and proceed
@@ -1623,45 +1682,6 @@ public class BluetoothPeripheral {
         }
     }
 
-    private String bondStateToString(final int state) {
-        switch (state) {
-            case BOND_NONE:
-                return "BOND_NONE";
-            case BOND_BONDING:
-                return "BOND_BONDING";
-            case BOND_BONDED:
-                return "BOND_BONDED";
-            default:
-                return "UNKNOWN";
-        }
-    }
-
-    private String stateToString(final int state) {
-        switch (state) {
-            case BluetoothProfile.STATE_CONNECTED:
-                return "CONNECTED";
-            case BluetoothProfile.STATE_CONNECTING:
-                return "CONNECTING";
-            case BluetoothProfile.STATE_DISCONNECTING:
-                return "DISCONNECTING";
-            default:
-                return "DISCONNECTED";
-        }
-    }
-
-    private String writeTypeToString(final int writeType) {
-        switch (writeType) {
-            case WRITE_TYPE_DEFAULT:
-                return "WRITE_TYPE_DEFAULT";
-            case WRITE_TYPE_NO_RESPONSE:
-                return "WRITE_TYPE_NO_RESPONSE";
-            case WRITE_TYPE_SIGNED:
-                return "WRITE_TYPE_SIGNED";
-            default:
-                return "unknown writeType";
-        }
-    }
-
     private static final int PAIRING_VARIANT_PIN = 0;
     private static final int PAIRING_VARIANT_PASSKEY = 1;
     private static final int PAIRING_VARIANT_PASSKEY_CONFIRMATION = 2;
@@ -1691,22 +1711,6 @@ public class BluetoothPeripheral {
         }
     }
 
-    /**
-     * Converts byte array to hex string
-     *
-     * @param bytes the byte array to convert
-     * @return String representing the byte array as a HEX string
-     */
-    @NonNull
-    private static String bytes2String(@Nullable final byte[] bytes) {
-        if (bytes == null) return "";
-        StringBuilder sb = new StringBuilder();
-        for (byte b : bytes) {
-            sb.append(String.format("%02x", b & 0xff));
-        }
-        return sb.toString();
-    }
-
     interface InternalCallback {
 
         /**
@@ -1721,14 +1725,14 @@ public class BluetoothPeripheral {
          *
          * @param device {@link BluetoothPeripheral} of which connect failed.
          */
-        void connectFailed(@NonNull BluetoothPeripheral device, final HciStatus status);
+        void connectFailed(@NonNull BluetoothPeripheral device, @NonNull final HciStatus status);
 
         /**
          * {@link BluetoothPeripheral} has disconnected.
          *
          * @param device {@link BluetoothPeripheral} that disconnected.
          */
-        void disconnected(@NonNull BluetoothPeripheral device, final HciStatus status);
+        void disconnected(@NonNull BluetoothPeripheral device, @NonNull final HciStatus status);
 
         String getPincode(@NonNull BluetoothPeripheral device);
 
@@ -1791,15 +1795,13 @@ public class BluetoothPeripheral {
     private BluetoothGatt connectGattCompat(BluetoothGattCallback bluetoothGattCallback, BluetoothDevice device, boolean autoConnect) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             return device.connectGatt(context, autoConnect, bluetoothGattCallback, TRANSPORT_LE);
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+        } else {
             // Try to call connectGatt with TRANSPORT_LE parameter using reflection
             try {
                 Method connectGattMethod = device.getClass().getMethod("connectGatt", Context.class, boolean.class, BluetoothGattCallback.class, int.class);
                 try {
                     return (BluetoothGatt) connectGattMethod.invoke(device, context, autoConnect, bluetoothGattCallback, TRANSPORT_LE);
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                } catch (InvocationTargetException e) {
+                } catch (IllegalAccessException | InvocationTargetException e) {
                     e.printStackTrace();
                 }
             } catch (NoSuchMethodException e) {
@@ -1865,7 +1867,7 @@ public class BluetoothPeripheral {
         autoConnectField.setBoolean(bluetoothGatt, autoConnect);
     }
 
-    private void startConnectionTimer(final BluetoothPeripheral peripheral) {
+    private void startConnectionTimer(@NonNull final BluetoothPeripheral peripheral) {
         cancelConnectionTimer();
         timeoutRunnable = new Runnable() {
             @Override
@@ -1876,7 +1878,7 @@ public class BluetoothPeripheral {
                 mainHandler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        bluetoothGattCallback.onConnectionStateChange(bluetoothGatt, HciStatus.CONNECTION_FAILED_ESTABLISHMENT.getValue(), BluetoothProfile.STATE_DISCONNECTED);
+                        bluetoothGattCallback.onConnectionStateChange(bluetoothGatt, HciStatus.CONNECTION_FAILED_ESTABLISHMENT.value, BluetoothProfile.STATE_DISCONNECTED);
                     }
                 }, 50);
 
@@ -1896,7 +1898,7 @@ public class BluetoothPeripheral {
 
     private int getTimoutThreshold() {
         String manufacturer = Build.MANUFACTURER;
-        if (manufacturer.equals("samsung")) {
+        if (manufacturer.equalsIgnoreCase("samsung")) {
             return TIMEOUT_THRESHOLD_SAMSUNG;
         } else {
             return TIMEOUT_THRESHOLD_DEFAULT;
@@ -1910,7 +1912,18 @@ public class BluetoothPeripheral {
      * @return non-null copy of the source byte array or an empty array if source was null
      */
     @NonNull
-    byte[] copyOf(@Nullable byte[] source) {
+    byte[] copyOf(@Nullable final byte[] source) {
         return (source == null) ? new byte[0] : Arrays.copyOf(source, source.length);
+    }
+
+    /**
+     * Make a byte array nonnull by either returning the original byte array if non-null or an empty bytearray
+     *
+     * @param source byte array to make nonnull
+     * @return the source byte array or an empty array if source was null
+     */
+    @NonNull
+    byte[] nonnullOf(@Nullable final byte[] source) {
+        return (source == null) ? new byte[0] : source;
     }
 }

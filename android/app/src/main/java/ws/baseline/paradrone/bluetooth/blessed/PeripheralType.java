@@ -23,37 +23,50 @@
 
 package ws.baseline.paradrone.bluetooth.blessed;
 
-import static android.bluetooth.BluetoothGattCharacteristic.PROPERTY_SIGNED_WRITE;
-import static android.bluetooth.BluetoothGattCharacteristic.PROPERTY_WRITE;
-import static android.bluetooth.BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE;
-import static android.bluetooth.BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT;
-import static android.bluetooth.BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE;
-import static android.bluetooth.BluetoothGattCharacteristic.WRITE_TYPE_SIGNED;
+import androidx.annotation.NonNull;
+
+import static android.bluetooth.BluetoothDevice.DEVICE_TYPE_CLASSIC;
+import static android.bluetooth.BluetoothDevice.DEVICE_TYPE_DUAL;
+import static android.bluetooth.BluetoothDevice.DEVICE_TYPE_LE;
+import static android.bluetooth.BluetoothDevice.DEVICE_TYPE_UNKNOWN;
 
 /**
- * WriteType describes the type of write that can be done
+ * This class represents the possible peripheral types
  */
-public enum WriteType {
+public enum PeripheralType {
     /**
-     * Write characteristic and requesting acknowledgement by the remote peripheral
+     * Unknown peripheral type, peripheral is not cached
      */
-    WITH_RESPONSE(WRITE_TYPE_DEFAULT, PROPERTY_WRITE),
-
-    /**
-     * Write characteristic without requiring a response by the remote peripheral
-     */
-    WITHOUT_RESPONSE(WRITE_TYPE_NO_RESPONSE, PROPERTY_WRITE_NO_RESPONSE),
+    UNKNOWN(DEVICE_TYPE_UNKNOWN),
 
     /**
-     * Write characteristic including authentication signature
+     * Classic - BR/EDR peripheral
      */
-    SIGNED(WRITE_TYPE_SIGNED, PROPERTY_SIGNED_WRITE);
+    CLASSIC(DEVICE_TYPE_CLASSIC),
 
-    public final int writeType;
-    public final int property;
+    /**
+     * Bluetooth Low Energy peripheral
+     */
+    LE(DEVICE_TYPE_LE),
 
-    WriteType(final int writeType, final int property) {
-        this.writeType = writeType;
-        this.property = property;
+    /**
+     * Dual Mode - BR/EDR/LE
+     */
+    DUAL(DEVICE_TYPE_DUAL);
+
+    PeripheralType(final int value) {
+        this.value = value;
+    }
+
+    public final int value;
+
+    @NonNull
+    public static PeripheralType fromValue(final int value) {
+        for (PeripheralType type : values()) {
+            if (type.value == value) {
+                return type;
+            }
+        }
+        return UNKNOWN;
     }
 }

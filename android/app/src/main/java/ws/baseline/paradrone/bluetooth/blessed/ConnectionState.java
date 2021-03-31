@@ -23,37 +23,45 @@
 
 package ws.baseline.paradrone.bluetooth.blessed;
 
-import static android.bluetooth.BluetoothGattCharacteristic.PROPERTY_SIGNED_WRITE;
-import static android.bluetooth.BluetoothGattCharacteristic.PROPERTY_WRITE;
-import static android.bluetooth.BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE;
-import static android.bluetooth.BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT;
-import static android.bluetooth.BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE;
-import static android.bluetooth.BluetoothGattCharacteristic.WRITE_TYPE_SIGNED;
+import org.jetbrains.annotations.NotNull;
 
 /**
- * WriteType describes the type of write that can be done
+ * This class represents the possible connection states
  */
-public enum WriteType {
+public enum ConnectionState {
     /**
-     * Write characteristic and requesting acknowledgement by the remote peripheral
+     * The peripheral is disconnected
      */
-    WITH_RESPONSE(WRITE_TYPE_DEFAULT, PROPERTY_WRITE),
-
-    /**
-     * Write characteristic without requiring a response by the remote peripheral
-     */
-    WITHOUT_RESPONSE(WRITE_TYPE_NO_RESPONSE, PROPERTY_WRITE_NO_RESPONSE),
+    DISCONNECTED(0),
 
     /**
-     * Write characteristic including authentication signature
+     * The peripheral is connecting
      */
-    SIGNED(WRITE_TYPE_SIGNED, PROPERTY_SIGNED_WRITE);
+    CONNECTING(1),
 
-    public final int writeType;
-    public final int property;
+    /**
+     * The peripheral is connected
+     */
+    CONNECTED(2),
 
-    WriteType(final int writeType, final int property) {
-        this.writeType = writeType;
-        this.property = property;
+    /**
+     * The peripheral is disconnecting
+     */
+    DISCONNECTING(3);
+
+    ConnectionState(final int value) {
+        this.value = value;
+    }
+
+    public final int value;
+
+    @NotNull
+    public static ConnectionState fromValue(final int value) {
+        for (ConnectionState type : values()) {
+            if (type.value == value) {
+                return type;
+            }
+        }
+        return DISCONNECTED;
     }
 }

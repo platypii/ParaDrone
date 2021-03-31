@@ -23,37 +23,46 @@
 
 package ws.baseline.paradrone.bluetooth.blessed;
 
-import static android.bluetooth.BluetoothGattCharacteristic.PROPERTY_SIGNED_WRITE;
-import static android.bluetooth.BluetoothGattCharacteristic.PROPERTY_WRITE;
-import static android.bluetooth.BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE;
-import static android.bluetooth.BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT;
-import static android.bluetooth.BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE;
-import static android.bluetooth.BluetoothGattCharacteristic.WRITE_TYPE_SIGNED;
+import androidx.annotation.NonNull;
 
 /**
- * WriteType describes the type of write that can be done
+ * This class represents the possible Phy types
  */
-public enum WriteType {
+public enum PhyType {
     /**
-     * Write characteristic and requesting acknowledgement by the remote peripheral
+     * A Physical Layer (PHY) connection of 1 mbit. Compatible with Bluetooth 4.0, 4.1, 4.2 and 5.0
      */
-    WITH_RESPONSE(WRITE_TYPE_DEFAULT, PROPERTY_WRITE),
-
-    /**
-     * Write characteristic without requiring a response by the remote peripheral
-     */
-    WITHOUT_RESPONSE(WRITE_TYPE_NO_RESPONSE, PROPERTY_WRITE_NO_RESPONSE),
+    LE_1M(1,1),
 
     /**
-     * Write characteristic including authentication signature
+     * A Physical Layer (PHY) connection of 2 mbit. Requires Bluetooth 5
      */
-    SIGNED(WRITE_TYPE_SIGNED, PROPERTY_SIGNED_WRITE);
+    LE_2M (2,2),
 
-    public final int writeType;
-    public final int property;
+    /**
+     * A Physical Layer (PHY) connection with long range. Requires Bluetooth 5
+     */
+    LE_CODED(3, 4),
 
-    WriteType(final int writeType, final int property) {
-        this.writeType = writeType;
-        this.property = property;
+    /**
+     * Unknown Phy Type. Not to be used.
+     */
+    UNKNOWN_PHY_TYPE(-1,-1);
+
+    PhyType(final int value, final int mask) {
+        this.value = value;
+        this.mask = mask;
+    }
+
+    public final int value;
+    public final int mask;
+
+    @NonNull
+    public static PhyType fromValue(final int value) {
+        for (PhyType type : values()) {
+            if (type.value == value)
+                return type;
+        }
+        return UNKNOWN_PHY_TYPE;
     }
 }

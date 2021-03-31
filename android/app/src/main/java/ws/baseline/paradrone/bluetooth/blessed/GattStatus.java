@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2020 Martijn van Welie
+ *   Copyright (c) 2021 Martijn van Welie
  *
  *   Permission is hereby granted, free of charge, to any person obtaining a copy
  *   of this software and associated documentation files (the "Software"), to deal
@@ -209,7 +209,7 @@ public enum GattStatus {
     /**
      * No Man-in-the-middle protection
      */
-    ENCRYPED_NO_MITM(0x8d),
+    ENCRYPTED_NO_MITM(0x8d),
 
     /**
      * Not encrypted
@@ -255,20 +255,16 @@ public enum GattStatus {
      */
     UNKNOWN_STATUS_CODE(0xFFFF);
 
-    GattStatus(int value) {
+    GattStatus(final int value) {
         this.value = value;
     }
 
-    private final int value;
-
-    public int getValue() {
-        return value;
-    }
+    public final int value;
 
     @NonNull
-    public static GattStatus fromValue(int value) {
+    public static GattStatus fromValue(final int value) {
         for (GattStatus type : values()) {
-            if (type.getValue() == value)
+            if (type.value == value)
                 return type;
         }
         return UNKNOWN_STATUS_CODE;

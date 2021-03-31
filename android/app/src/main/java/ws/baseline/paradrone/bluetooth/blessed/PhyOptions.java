@@ -23,37 +23,28 @@
 
 package ws.baseline.paradrone.bluetooth.blessed;
 
-import static android.bluetooth.BluetoothGattCharacteristic.PROPERTY_SIGNED_WRITE;
-import static android.bluetooth.BluetoothGattCharacteristic.PROPERTY_WRITE;
-import static android.bluetooth.BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE;
-import static android.bluetooth.BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT;
-import static android.bluetooth.BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE;
-import static android.bluetooth.BluetoothGattCharacteristic.WRITE_TYPE_SIGNED;
-
 /**
- * WriteType describes the type of write that can be done
+ * This class represents the possible Phy options
  */
-public enum WriteType {
+public enum PhyOptions {
     /**
-     * Write characteristic and requesting acknowledgement by the remote peripheral
+     * No preferred option. Use this value in combination with PHY_LE_1M and PHY_LE_2M
      */
-    WITH_RESPONSE(WRITE_TYPE_DEFAULT, PROPERTY_WRITE),
-
-    /**
-     * Write characteristic without requiring a response by the remote peripheral
-     */
-    WITHOUT_RESPONSE(WRITE_TYPE_NO_RESPONSE, PROPERTY_WRITE_NO_RESPONSE),
+    NO_PREFERRED(0),
 
     /**
-     * Write characteristic including authentication signature
+     * Prefer 2x range option with throughput of +/- 500 Kbps
      */
-    SIGNED(WRITE_TYPE_SIGNED, PROPERTY_SIGNED_WRITE);
+    S2(1),
 
-    public final int writeType;
-    public final int property;
+    /**
+     * Prefer 4x range option with throughput of +/- 125 Kbps
+     */
+    S8(2);
 
-    WriteType(final int writeType, final int property) {
-        this.writeType = writeType;
-        this.property = property;
+    PhyOptions(final int value) {
+        this.value = value;
     }
+
+    public final int value;
 }
