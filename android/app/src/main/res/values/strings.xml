@@ -1,4 +1,6 @@
 <resources>
     <string name="app_name">BASEline ParaDrone</string>
     <string name="fetching_elevation">Fetching elevation</string>
+    <string name="bluetooth_searching">Searching for ParaDrone…</string>
+    <string name="bluetooth_disabled">Bluetooth not enabled</string>
 </resources>

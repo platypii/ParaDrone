@@ -17,6 +17,7 @@ import androidx.preference.PreferenceManager;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
+import ws.baseline.paradrone.bluetooth.BluetoothState;
 import ws.baseline.paradrone.bluetooth.UrlMsg;
 import ws.baseline.paradrone.databinding.WebFragmentBinding;
 
@@ -54,12 +55,18 @@ public class WebServerFragment extends Fragment {
         super.onStart();
         ViewState.setMode(ViewState.ViewMode.CFG);
         EventBus.getDefault().register(this);
+        onBluetoothState(null);
     }
 
     @Override
     public void onStop() {
         super.onStop();
         EventBus.getDefault().unregister(this);
+    }
+
+    @Subscribe
+    public void onBluetoothState(@Nullable BluetoothState bt) {
+        binding.startWeb.setEnabled(Services.bluetooth.isConnected());
     }
 
     @Subscribe
@@ -73,6 +80,7 @@ public class WebServerFragment extends Fragment {
         final String ssid = binding.wifiSsid.getText().toString();
         final String password = binding.wifiPassword.getText().toString();
         if (!ssid.isEmpty()) {
+            binding.webServerUrl.setText("");
             Services.bluetooth.actions.webInit(ssid, password);
             saveForm(ssid, password);
         } else {

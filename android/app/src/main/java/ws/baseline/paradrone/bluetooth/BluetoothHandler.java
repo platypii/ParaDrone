@@ -1,13 +1,5 @@
 package ws.baseline.paradrone.bluetooth;
 
-import ws.baseline.paradrone.bluetooth.blessed.BluetoothCentral;
-import ws.baseline.paradrone.bluetooth.blessed.BluetoothCentralCallback;
-import ws.baseline.paradrone.bluetooth.blessed.BluetoothPeripheral;
-import ws.baseline.paradrone.bluetooth.blessed.BluetoothPeripheralCallback;
-import ws.baseline.paradrone.bluetooth.blessed.GattStatus;
-import ws.baseline.paradrone.bluetooth.blessed.HciStatus;
-import ws.baseline.paradrone.bluetooth.blessed.WriteType;
-
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.le.ScanResult;
@@ -15,10 +7,18 @@ import android.content.Context;
 import android.os.Handler;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
+import com.welie.blessed.BluetoothCentralManager;
+import com.welie.blessed.BluetoothCentralManagerCallback;
+import com.welie.blessed.BluetoothPeripheral;
+import com.welie.blessed.BluetoothPeripheralCallback;
+import com.welie.blessed.ConnectionPriority;
+import com.welie.blessed.GattStatus;
+import com.welie.blessed.HciStatus;
+import com.welie.blessed.WriteType;
 import java.util.UUID;
 import timber.log.Timber;
 
-import static android.bluetooth.BluetoothGatt.CONNECTION_PRIORITY_HIGH;
 import static ws.baseline.paradrone.bluetooth.BluetoothPreferences.DeviceMode.AP;
 import static ws.baseline.paradrone.bluetooth.BluetoothPreferences.DeviceMode.RC;
 import static ws.baseline.paradrone.bluetooth.BluetoothState.BT_CONNECTED;
@@ -47,7 +47,7 @@ class BluetoothHandler {
     @NonNull
     private final BluetoothService service;
     @NonNull
-    private final BluetoothCentral central;
+    private final BluetoothCentralManager central;
     @Nullable
     private BluetoothPeripheral currentPeripheral;
     @Nullable
@@ -58,7 +58,7 @@ class BluetoothHandler {
 
     BluetoothHandler(@NonNull BluetoothService service, @NonNull Context context) {
         this.service = service;
-        central = new BluetoothCentral(context, bluetoothCentralCallback, new Handler());
+        central = new BluetoothCentralManager(context, bluetoothCentralManagerCallback, new Handler());
     }
 
     public void start() {
@@ -90,8 +90,11 @@ class BluetoothHandler {
         public void onServicesDiscovered(@NonNull BluetoothPeripheral peripheral) {
             Timber.i("Bluetooth services discovered for '%s'", peripheral.getName());
 
+            // Request a higher MTU, iOS always asks for 185
+            peripheral.requestMtu(185);
+
             // Request a new connection priority
-            peripheral.requestConnectionPriority(CONNECTION_PRIORITY_HIGH);
+            peripheral.requestConnectionPriority(ConnectionPriority.HIGH);
 
             // Turn on notifications for AutoPilot Service
             if (service.deviceMode == AP && peripheral.getService(apServiceId) != null) {
@@ -145,7 +148,7 @@ class BluetoothHandler {
     };
 
     // Callback for central
-    private final BluetoothCentralCallback bluetoothCentralCallback = new BluetoothCentralCallback() {
+    private final BluetoothCentralManagerCallback bluetoothCentralManagerCallback = new BluetoothCentralManagerCallback() {
 
         @Override
         public void onConnectedPeripheral(@NonNull BluetoothPeripheral connectedPeripheral) {

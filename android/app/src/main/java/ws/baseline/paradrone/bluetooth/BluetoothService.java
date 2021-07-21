@@ -62,31 +62,31 @@ public class BluetoothService {
         }
     }
 
-    /**
-     * Get bluetooth adapter, request bluetooth if needed
-     */
-    @Nullable
-    private BluetoothAdapter getAdapter(@NonNull Activity activity) {
-        // TODO: Make sure this doesn't take too long
-        final BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (bluetoothAdapter == null) {
-            // Device not supported
-            Timber.e("Bluetooth not supported");
-        } else if (!bluetoothAdapter.isEnabled()) {
-            // Turn on bluetooth
-            // TODO: Handle result?
-            final Intent enableBluetoothIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            activity.startActivityForResult(enableBluetoothIntent, ENABLE_BLUETOOTH_CODE);
-        }
-        return bluetoothAdapter;
-    }
-
     public int getState() {
         return bluetoothState;
     }
 
     public boolean isConnected() {
         return bluetoothState == BT_CONNECTED;
+    }
+
+    public boolean isEnabled() {
+        // TODO: Make sure this doesn't take too long
+        final BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (bluetoothAdapter == null) {
+            Timber.w("This device has no bluetooth hardware");
+            return false;
+        } else {
+            return bluetoothAdapter.isEnabled();
+        }
+    }
+
+    /**
+     * Request to enable bluetooth
+     */
+    public void enable(@NonNull Activity activity) {
+        final Intent enableBluetoothIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+        activity.startActivityForResult(enableBluetoothIntent, ENABLE_BLUETOOTH_CODE);
     }
 
     void setState(int state) {
