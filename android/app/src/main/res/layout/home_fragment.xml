@@ -1,21 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/control_fragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ControlFragment"
-    tools:ignore="HardcodedText">
+    tools:context=".ControlFragment">
 
     <TextView
+        android:id="@+id/home_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:drawableTop="@drawable/paradrone"
         android:drawablePadding="20dp"
         android:textColor="#777"
         android:textSize="8pt"
-        android:text="Searching for ParaDrone..."/>
+        android:text="@string/bluetooth_searching"
+        app:drawableTopCompat="@drawable/paradrone" />
 
 </FrameLayout>

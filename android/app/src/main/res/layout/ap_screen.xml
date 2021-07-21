@@ -78,6 +78,6 @@
             android:layout_gravity="end"
             android:textColor="#666666"
             android:textSize="13sp"
-            android:text="BT"/>
+            android:text=""/>
 
 </LinearLayout>

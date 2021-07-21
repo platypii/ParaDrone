@@ -90,6 +90,7 @@
             android:layout_height="46dp"
             android:layout_gravity="end"
             android:src="@drawable/clockwise"
+            android:contentDescription="Direction"
             style="@style/Widget.AppCompat.Button.Borderless"/>
 
     </FrameLayout>
@@ -111,6 +112,7 @@
             android:layout_height="46dp"
             android:layout_gravity="end"
             android:src="@drawable/clockwise"
+            android:contentDescription="Direction"
             style="@style/Widget.AppCompat.Button.Borderless"/>
 
     </FrameLayout>

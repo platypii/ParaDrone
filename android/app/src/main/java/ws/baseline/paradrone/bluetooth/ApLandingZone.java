@@ -12,7 +12,7 @@ import timber.log.Timber;
 public class ApLandingZone implements ApEvent {
     @Nullable
     public final LandingZone lz;
-    public boolean pending;
+    public final boolean pending;
 
     @Nullable
     public static ApLandingZone lastLz;
