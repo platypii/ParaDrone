@@ -18,8 +18,8 @@ export class ErrorChart {
 
   constructor() {
     this.svg = d3.select("#sim-error-chart")
-    const width = 240
-    const height = 150
+    const width = 200
+    const height = 120
 
     // X Axis
     this.xAxis.scale.range([0, width])

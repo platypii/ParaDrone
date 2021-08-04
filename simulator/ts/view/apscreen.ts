@@ -21,9 +21,9 @@ export class ApScreen {
       this.speed.innerText = `${vel.toFixed(0)} mph`
 
       // LZ
-      if (dist >= 100000) {
+      if (dist >= 10000) {
         this.lz.innerText = `LZ ${(dist * 1e-3).toFixed(0)} km`
-      } else if (dist >= 10000) {
+      } else if (dist >= 1000) {
         this.lz.innerText = `LZ ${(dist * 1e-3).toFixed(1)} km`
       } else {
         this.lz.innerText = `LZ ${dist.toFixed(0)} m`

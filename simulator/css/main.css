@@ -81,9 +81,10 @@ label {
 
 .sidebar {
   height: 100%;
-  width: 260px;
+  width: 220px;
   padding: 10px;
   margin: 0;
+  overflow-y: auto;
 }
 
 .sidebar-section {
@@ -141,8 +142,8 @@ label {
 }
 .map-overlay-button {
   background-color: transparent;
-  height: 48px;
-  width: 48px;
+  height: 36px;
+  width: 36px;
   border: none;
   border-radius: 5px;
   background-position: center;
@@ -203,6 +204,11 @@ label {
   border-right: 5px solid #d39;
 }
 
+svg#sim-error-chart {
+  width: 100%;
+  height: 120px;
+}
+
 /* Wind */
 svg#windgram {
   cursor: pointer;
@@ -212,4 +218,31 @@ svg#windgram {
   display: inline-block;
   position: relative;
   bottom: 32px;
+}
+
+#welcome {
+  position: absolute;
+  top: 10%;
+  padding: 30px;
+  border-radius: 8px;
+  border: 1px solid #111;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  z-index: 20000;
+}
+#welcome h1 {
+  color: white;
+}
+@media (min-width: 768px) {
+  #welcome {
+    width: 500px;
+    margin-left: -250px;
+    left: 50%;
+  }
+}
+@media (max-width: 767px) {
+  #welcome {
+    width: 80%;
+    left: 10%;
+  }
 }

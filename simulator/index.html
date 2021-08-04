@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#6b00ff">
     <link rel="stylesheet" href="css/main.css">
-    <link rel="stylesheet" href="https://cesium.com/downloads/cesiumjs/releases/1.76/Build/Cesium/Widgets/widgets.css">
+    <link rel="stylesheet" href="https://cesium.com/downloads/cesiumjs/releases/1.84/Build/Cesium/Widgets/widgets.css">
   </head>
 
   <body>
@@ -23,11 +23,7 @@
             Wind
           </div>
           <div>
-            <svg height="100" width="100" id="windgram">
-              <circle cx="50" cy="50" r="22.5" stroke="#333" stroke-width="1" fill="none"/>
-              <circle cx="50" cy="50" r="45" stroke="#333" stroke-width="1" fill="none"/>
-              <line x1="50" y1="50" x2="50" y2="50" stroke="#111" stroke-width="3" id="windgram-line"/>
-            </svg>
+            <svg id="windgram"></svg>
             <div class="wind-labels">
               <div id="wind-speed"></div>
               <div id="wind-direction"></div>
@@ -52,7 +48,7 @@
         </div>
 
         <div class="sidebar-section">
-          <div class="sidebar-header plan-header">
+          <div class="sidebar-header plan-header" title="Short term plan">
             Plan
             <input type="checkbox" id="plan-enabled" title="Show short term plan" checked>
           </div>
@@ -67,7 +63,7 @@
         </div>
 
         <div class="sidebar-section">
-          <div class="sidebar-header sim-header">
+          <div class="sidebar-header sim-header" title="Simulated path">
             Sim
             <input type="checkbox" id="sim-enabled" title="Show simulated path" checked>
           </div>
@@ -79,9 +75,9 @@
         </div>
 
         <div class="sidebar-section">
-          <div class="sidebar-header device-header">
+          <div class="sidebar-header device-header" title="Send simulated location to device for testing">
             Device
-            <input type="checkbox" id="device-enabled" title="Send simulated location to device for testing">
+            <input type="checkbox" id="device-enabled">
           </div>
           <div class="sidebar-parameter">
             <div class="text-faded">ip</div>
@@ -126,13 +122,31 @@
         </div>
       </div>
     </div>
+    <div id="welcome">
+      <h1>ParaDrone Simulator</h1>
+      <p>
+        Runs a simulation of ParaDrone flight.
+        This is a tool to help with developing the flight planning algorithm.
+      </p>
+      <p>
+        Click to place the paraglider above a given spot.
+        Use the playback controls to see how it would fly.
+      </p>
+      <p>
+        Wind can be set using the rose chart (circles).
+        The autopilot software is NOT aware of the windspeed, and has to adapt based on location data.
+      </p>
+      <p>
+        The "test" button will evaluate the landing accuracy for a grid of starting points.
+      </p>
+    </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"></script>
     <script>
       requirejs.config({
         paths: {
-          cesium: "https://cesium.com/downloads/cesiumjs/releases/1.76/Build/Cesium/Cesium",
-          d3: "https://d3js.org/d3.v6.min",
+          cesium: "https://cesium.com/downloads/cesiumjs/releases/1.84/Build/Cesium/Cesium",
+          d3: "https://d3js.org/d3.v7.min",
         }
       })
       // Load javascript modules

@@ -12,6 +12,7 @@ import { distance } from "./util"
 import { ApScreen } from "./view/apscreen"
 import { ErrorChart } from "./view/error-chart"
 import { ToggleView } from "./view/toggleview"
+import * as welcome from "./view/welcome"
 import { Windgram } from "./view/windgram"
 
 const lz = defaultLz
@@ -35,6 +36,7 @@ const deviceEnabled = document.getElementById("device-enabled") as HTMLInputElem
 const deviceIp = document.getElementById("device-ip") as HTMLInputElement
 
 export function init() {
+  welcome.init()
   // Setup map
   map = new DroneMap(lz)
   map.setState({lz})

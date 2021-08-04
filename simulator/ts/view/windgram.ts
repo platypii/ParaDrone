@@ -1,22 +1,59 @@
+import * as d3 from "d3"
 
 const MPH = 0.44704 // m/s
 const windMax = 10 * MPH // m/s
-const outerRing = 45 // pixels
 
 export class Windgram {
   public vE: number = -0
   public vN: number = -0
 
-  private readonly svg = document.getElementById("windgram")!
-  private readonly line = document.getElementById("windgram-line") as any as SVGLineElement
+  private line: d3.Selection<SVGLineElement, any, HTMLElement, any>
   private readonly speedLabel = document.getElementById("wind-speed")!
   private readonly directionLabel = document.getElementById("wind-direction")!
 
   private readonly listeners: Array<() => void> = []
 
+  private readonly radius: number
+
   constructor() {
+    const width = 100
+    const height = 100
+    this.radius = Math.min(width, height) / 2
+
+    const svg: d3.Selection<Element, any, any, any> = d3.select("svg#windgram")
+    svg.attr("width", width)
+    svg.attr("height", height)
+
+    // Add reticle target
+    svg.append("circle")
+      .attr("cx", this.radius)
+      .attr("cy", this.radius)
+      .attr("r", (this.radius - 5) / 2)
+      .style("stroke-width", "1px")
+      .style("stroke", "#333")
+      .style("fill", "none")
+    svg.append("circle")
+      .attr("cx", this.radius)
+      .attr("cy", this.radius)
+      .attr("r", this.radius - 5)
+      .style("stroke-width", "1px")
+      .style("stroke", "#333")
+      .style("fill", "none")
+    this.line = svg.append("line")
+      .attr("id", "windgram-line")
+      .attr("x1", this.radius)
+      .attr("y1", this.radius)
+      .attr("x2", this.radius)
+      .attr("y2", this.radius)
+      .style("stroke-width", "3px")
+      .style("stroke", "#111")
+
+    svg.on("click", (e) => this.onClick(e.offsetX, e.offsetY))
+
+    const dragHandler = d3.drag().on("drag", (e) => this.onClick(e.x, e.y))
+    svg.call(dragHandler)
+
     this.update()
-    this.svg.addEventListener("click", (e) => this.onClick(e))
   }
 
   public vel(): number {
@@ -34,18 +71,18 @@ export class Windgram {
     this.listeners.push(cb)
   }
 
-  private onClick(e: any) {
-    this.vE = windMax * (50 - e.offsetX) / outerRing
-    this.vN = windMax * (e.offsetY - 50) / outerRing
+  private onClick(x: number, y: number) {
+    this.vE = windMax * (this.radius - x) / this.radius
+    this.vN = windMax * (y - this.radius) / this.radius
     this.update()
     this.listeners.forEach((l) => l())
   }
 
   private update() {
     // Update SVGElement
-    const scale = outerRing / windMax
-    this.line.setAttribute("x2", (50 - this.vE * scale).toString())
-    this.line.setAttribute("y2", (50 + this.vN * scale).toString())
+    const scale = this.radius / windMax
+    this.line.attr("x2", (this.radius - this.vE * scale).toString())
+    this.line.attr("y2", (this.radius + this.vN * scale).toString())
     // Update labels
     const speed = Math.sqrt(this.vE * this.vE + this.vN * this.vN) / MPH // mph
     const direction = (Math.atan2(-this.vE, -this.vN) * 180 / Math.PI + 360) % 360 // degrees
