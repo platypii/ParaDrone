@@ -75,11 +75,7 @@ public class ConfigFragment extends Fragment {
 
     @Subscribe
     public void onBluetoothState(@Nullable BluetoothState bt) {
-        if (Services.bluetooth.isConnected()) {
-            binding.cfgSend.setEnabled(true);
-        } else {
-            binding.cfgSend.setEnabled(false);
-        }
+        binding.cfgSend.setEnabled(Services.bluetooth.isConnected());
     }
 
     private void updateLeftRight() {

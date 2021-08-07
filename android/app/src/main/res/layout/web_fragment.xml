@@ -1,18 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:ignore="HardcodedText">
+    android:orientation="vertical">
 
     <EditText
         android:id="@+id/wifi_ssid"
         android:layout_width="280dp"
         android:layout_height="wrap_content"
         android:inputType="text"
-        android:hint="wifi network"
+        android:hint="@string/wifi_network"
         android:textSize="14pt"/>
 
     <EditText
@@ -20,7 +18,7 @@
         android:layout_width="280dp"
         android:layout_height="wrap_content"
         android:inputType="textPassword"
-        android:hint="wifi password"
+        android:hint="@string/wifi_password"
         android:textSize="14pt"/>
 
     <TextView
@@ -46,7 +44,7 @@
         android:padding="24dp"
         android:drawablePadding="20dp"
         android:drawableEnd="@drawable/sendit"
-        android:text="Start Web Server"
+        android:text="@string/start_web_server"
         style="@style/Widget.AppCompat.Button.Borderless"/>
 
 </LinearLayout>

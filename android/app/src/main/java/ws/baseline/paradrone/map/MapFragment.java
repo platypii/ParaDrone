@@ -24,7 +24,7 @@ public class MapFragment extends SupportMapFragment implements OnMapReadyCallbac
 
     // Null if Google Play services APK is not available
     @Nullable
-    GoogleMap map;
+    public GoogleMap map;
 
     private final List<MapLayer> layers = new ArrayList<>();
 

@@ -1,6 +1,5 @@
 package ws.baseline.paradrone.geo;
 
-import ws.baseline.paradrone.GeoPoint;
 import ws.baseline.paradrone.util.Convert;
 
 import androidx.annotation.NonNull;

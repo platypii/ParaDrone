@@ -1,6 +1,6 @@
 package ws.baseline.paradrone.plan;
 
-import ws.baseline.paradrone.GeoPoint;
+import ws.baseline.paradrone.geo.GeoPoint;
 import ws.baseline.paradrone.Paraglider;
 import ws.baseline.paradrone.bluetooth.ApLandingZone;
 import ws.baseline.paradrone.bluetooth.ApLocationMsg;

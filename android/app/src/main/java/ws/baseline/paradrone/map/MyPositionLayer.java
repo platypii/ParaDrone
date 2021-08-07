@@ -1,6 +1,6 @@
 package ws.baseline.paradrone.map;
 
-import ws.baseline.paradrone.GeoPoint;
+import ws.baseline.paradrone.geo.GeoPoint;
 import ws.baseline.paradrone.R;
 import ws.baseline.paradrone.Services;
 import ws.baseline.paradrone.util.Numbers;

@@ -1,9 +1,11 @@
 package ws.baseline.paradrone;
 
+import android.content.Intent;
+import androidx.annotation.Nullable;
+import ws.baseline.paradrone.bluetooth.BluetoothService;
 import ws.baseline.paradrone.databinding.ActivityMainBinding;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.View;
@@ -20,7 +22,6 @@ public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
 
-    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
         Timber.plant(new Timber.DebugTree());
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // Permission is not granted, request
+            // Location is needed for map location and bluetooth
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_REQUEST_LOCATION);
         }
 
@@ -57,6 +58,15 @@ public class MainActivity extends AppCompatActivity {
         } else {
             binding.landingArrow.setVisibility(View.GONE);
             binding.setConfig.setVisibility(View.VISIBLE);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK && requestCode == BluetoothService.ENABLE_BLUETOOTH_CODE) {
+            Timber.i("Bluetooth enabled");
+            Services.bluetooth.start(this);
         }
     }
 

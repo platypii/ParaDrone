@@ -1,10 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:ignore="HardcodedText">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="@android:style/TextAppearance.Material"
+        android:text="@string/landing_location" />
+
+    <TextView
+        android:id="@+id/landing_location"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:textAppearance="@android:style/TextAppearance.Material"
+        android:text="@string/altitude" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -32,7 +52,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
-            android:contentDescription="Get Elevation"
+            android:contentDescription="@string/get_elevation"
             android:src="@drawable/elevation"
             style="?android:attr/buttonBarButtonStyle"/>
 
@@ -43,6 +63,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"/>
+
+    <View
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
 
     <Button
         android:id="@+id/set_landing_zone"
@@ -56,4 +81,4 @@
         android:text="Set LZ"
         style="@style/Widget.AppCompat.Button.Borderless"/>
 
-</FrameLayout>
+</LinearLayout>

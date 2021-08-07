@@ -1,6 +1,25 @@
 <resources>
     <string name="app_name">BASEline ParaDrone</string>
-    <string name="fetching_elevation">Fetching elevation</string>
     <string name="bluetooth_searching">Searching for ParaDrone…</string>
     <string name="bluetooth_disabled">Bluetooth not enabled</string>
+    <string name="location_disabled">Location not enabled</string>
+    <string name="options_menu">Options menu</string>
+    <string name="landing_arrow">Landing arrow</string>
+
+    <!-- Config -->
+    <string name="direction">Direction</string>
+    <string name="right">Right</string>
+    <string name="left">Left</string>
+    <string name="set_config">Set Config</string>
+
+    <!-- Landing zone -->
+    <string name="landing_location">Latitude, Longitude, Direction</string>
+    <string name="altitude">Altitude</string>
+    <string name="get_elevation">Get Elevation</string>
+    <string name="fetching_elevation">Fetching elevation</string>
+
+    <!-- Web server -->
+    <string name="wifi_network">wifi network</string>
+    <string name="wifi_password">wifi password</string>
+    <string name="start_web_server">Start Web Server</string>
 </resources>
