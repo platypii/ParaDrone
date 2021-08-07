@@ -1,5 +1,9 @@
 package ws.baseline.paradrone;
 
+import android.content.Context;
+import android.content.Intent;
+import android.location.LocationManager;
+import android.os.Build;
 import ws.baseline.paradrone.bluetooth.BluetoothState;
 import ws.baseline.paradrone.databinding.HomeFragmentBinding;
 
@@ -21,8 +25,10 @@ public class HomeFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = HomeFragmentBinding.inflate(inflater, container, false);
         binding.homeText.setOnClickListener(view -> {
-            // Enable bluetooth if needed
-            if (!Services.bluetooth.isEnabled()) {
+            if (!locationEnabled()) {
+                startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+            } else if (!Services.bluetooth.isEnabled()) {
+                // Enable bluetooth if needed
                 final Activity activity = this.getActivity();
                 if (activity != null) {
                     Services.bluetooth.enable(activity);
@@ -60,7 +66,9 @@ public class HomeFragment extends Fragment {
      * If connected, change to CTRL fragment
      */
     private void checkConnected() {
-        if (Services.bluetooth.isEnabled()) {
+        if (!locationEnabled()) {
+            binding.homeText.setText(R.string.location_disabled);
+        } else if (Services.bluetooth.isEnabled()) {
             binding.homeText.setText(R.string.bluetooth_searching);
         } else {
             binding.homeText.setText(R.string.bluetooth_disabled);
@@ -70,6 +78,22 @@ public class HomeFragment extends Fragment {
                     .beginTransaction()
                     .replace(R.id.control_plane, new ControlFragment())
                     .commit();
+        }
+    }
+
+    private boolean locationEnabled() {
+        final Context context = getContext();
+        if (context != null) {
+            final LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                return locationManager.isLocationEnabled();
+            } else {
+                final boolean isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+                final boolean isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+                return isGpsEnabled || isNetworkEnabled;
+            }
+        } else {
+            return false;
         }
     }
 }

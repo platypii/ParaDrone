@@ -5,6 +5,7 @@ import ws.baseline.paradrone.bluetooth.BluetoothPreferences;
 import ws.baseline.paradrone.bluetooth.BluetoothState;
 import ws.baseline.paradrone.databinding.ApScreenBinding;
 import ws.baseline.paradrone.geo.Geo;
+import ws.baseline.paradrone.geo.GeoPoint;
 import ws.baseline.paradrone.geo.LandingZone;
 import ws.baseline.paradrone.geo.Path;
 import ws.baseline.paradrone.util.Convert;

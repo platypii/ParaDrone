@@ -5,8 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".MainActivity"
-    tools:ignore="HardcodedText">
+    tools:context=".MainActivity">
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -31,7 +30,7 @@
             android:layout_height="wrap_content"
             android:padding="10dp"
             android:src="@drawable/gear"
-            android:contentDescription="Options menu"
+            android:contentDescription="@string/options_menu"
             android:background="#88000000"
             android:layout_gravity="bottom|end"/>
 
@@ -40,10 +39,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_arrow"
+            android:contentDescription="@string/landing_arrow"
             android:layout_marginTop="200dp"
             android:layout_gravity="center_horizontal"
-            android:visibility="gone"
-            tools:ignore="ContentDescription" />
+            android:visibility="gone" />
 
     </FrameLayout>
 

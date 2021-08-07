@@ -2,6 +2,7 @@ package ws.baseline.paradrone;
 
 import ws.baseline.paradrone.bluetooth.ApLocationMsg;
 import ws.baseline.paradrone.bluetooth.ApSpeedMsg;
+import ws.baseline.paradrone.geo.GeoPoint;
 import ws.baseline.paradrone.util.RefreshRateEstimator;
 
 import androidx.annotation.NonNull;

@@ -1,8 +1,11 @@
-package ws.baseline.paradrone;
+package ws.baseline.paradrone.geo;
 
 import androidx.annotation.NonNull;
 import com.google.android.gms.maps.model.LatLng;
 
+/**
+ * Represents a location with velocity
+ */
 public class GeoPoint {
     public final double lat;
     public final double lng;

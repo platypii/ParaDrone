@@ -1,6 +1,6 @@
 package ws.baseline.paradrone.plan;
 
-import ws.baseline.paradrone.GeoPoint;
+import ws.baseline.paradrone.geo.GeoPoint;
 import ws.baseline.paradrone.Paraglider;
 import ws.baseline.paradrone.geo.LandingZone;
 import ws.baseline.paradrone.geo.Path;

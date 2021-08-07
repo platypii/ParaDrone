@@ -1,6 +1,7 @@
 package ws.baseline.paradrone;
 
 import ws.baseline.paradrone.geo.Geo;
+import ws.baseline.paradrone.geo.GeoPoint;
 import ws.baseline.paradrone.geo.LatLng;
 
 import androidx.annotation.NonNull;

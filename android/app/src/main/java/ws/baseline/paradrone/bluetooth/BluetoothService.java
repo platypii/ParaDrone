@@ -22,8 +22,7 @@ import static ws.baseline.paradrone.bluetooth.BluetoothState.BT_STOPPING;
  * Note: instantiating this class will not automatically start bluetooth. Call startAsync to connect.
  */
 public class BluetoothService {
-
-    private static final int ENABLE_BLUETOOTH_CODE = 13;
+    public static final int ENABLE_BLUETOOTH_CODE = 13;
 
     @NonNull
     private final BluetoothPreferences prefs = new BluetoothPreferences();
@@ -39,7 +38,9 @@ public class BluetoothService {
 
     public void start(@NonNull Context context) {
         deviceMode = prefs.load(context);
-        if (bluetoothState == BT_STOPPED) {
+        if (!isEnabled()) {
+            Timber.e("Bluetooth disabled");
+        } else if (bluetoothState == BT_STOPPED) {
             bluetoothState = BT_STARTED;
             // TODO: Prompt to start bluetooth if needed
             // Start bluetooth thread

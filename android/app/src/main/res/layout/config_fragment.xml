@@ -25,7 +25,8 @@
             android:layout_gravity="end"
             android:gravity="end"
             android:hint="915000000"
-            android:inputType="numberDecimal"/>
+            android:inputType="numberDecimal"
+            android:importantForAutofill="no" />
 
     </FrameLayout>
 
@@ -47,7 +48,8 @@
             android:layout_gravity="end"
             android:gravity="end"
             android:hint="1200"
-            android:inputType="numberDecimal"/>
+            android:inputType="numberDecimal"
+            android:importantForAutofill="no" />
 
     </FrameLayout>
 
@@ -69,7 +71,8 @@
             android:layout_gravity="end"
             android:gravity="end"
             android:hint="0"
-            android:inputType="numberDecimal"/>
+            android:inputType="numberDecimal"
+            android:importantForAutofill="no" />
 
     </FrameLayout>
 
@@ -82,7 +85,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:textSize="10pt"
-            android:text="Left"/>
+            android:text="@string/left"/>
 
         <ImageButton
             android:id="@+id/cfg_left"
@@ -90,7 +93,7 @@
             android:layout_height="46dp"
             android:layout_gravity="end"
             android:src="@drawable/clockwise"
-            android:contentDescription="Direction"
+            android:contentDescription="@string/direction"
             style="@style/Widget.AppCompat.Button.Borderless"/>
 
     </FrameLayout>
@@ -104,7 +107,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:textSize="10pt"
-            android:text="Right"/>
+            android:text="@string/right"/>
 
         <ImageButton
             android:id="@+id/cfg_right"
@@ -112,7 +115,7 @@
             android:layout_height="46dp"
             android:layout_gravity="end"
             android:src="@drawable/clockwise"
-            android:contentDescription="Direction"
+            android:contentDescription="@string/direction"
             style="@style/Widget.AppCompat.Button.Borderless"/>
 
     </FrameLayout>
@@ -131,7 +134,7 @@
         android:padding="24dp"
         android:drawablePadding="20dp"
         android:drawableEnd="@drawable/sendit"
-        android:text="Set Config"
+        android:text="@string/set_config"
         style="@style/Widget.AppCompat.Button.Borderless"/>
 
 </LinearLayout>

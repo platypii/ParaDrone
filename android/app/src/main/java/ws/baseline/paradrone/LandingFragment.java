@@ -1,5 +1,6 @@
 package ws.baseline.paradrone;
 
+import java.util.Locale;
 import ws.baseline.paradrone.bluetooth.ApLandingZone;
 import ws.baseline.paradrone.databinding.LandingFragmentBinding;
 import ws.baseline.paradrone.geo.LandingZone;
@@ -44,7 +45,23 @@ public class LandingFragment extends Fragment {
             }
         });
 
+        // Listen for map moves
+        final DroneMap frag = (DroneMap) getParentFragmentManager().findFragmentById(R.id.map);
+        if (frag != null && frag.map != null) {
+            update(frag.center(), frag.direction());
+            frag.map.setOnCameraMoveListener(() -> {
+                update(frag.center(), frag.direction());
+            });
+        }
+
         return binding.getRoot();
+    }
+
+    private void update(@Nullable LatLng ll, double direction) {
+        if (ll != null) {
+            final double degrees = Math.toDegrees(direction);
+            binding.landingLocation.setText(String.format(Locale.US, "%.6f, %.6f, %.0f", ll.latitude, ll.longitude, degrees));
+        }
     }
 
     @Nullable

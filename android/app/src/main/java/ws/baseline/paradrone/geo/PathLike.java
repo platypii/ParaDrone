@@ -8,6 +8,9 @@ public interface PathLike {
     PointV start();
     PointV end();
 
+    /**
+     * Fly the path a given distance.
+     */
     @NonNull
     Path fly(double distance);
 
