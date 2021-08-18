@@ -23,8 +23,8 @@ MotorConfigMessage motor_config = {
   .dir = 0
 };
 // Multiplier, 1 = clockwise, -1 = counterclockwise
-short config_left_direction = 1;
-short config_right_direction = 1;
+short config_direction_left = 1;
+short config_direction_right = 1;
 
 static void load_flight_mode();
 static void load_landing_zone();
@@ -102,9 +102,9 @@ void set_landing_zone(LandingZoneMessage *packed) {
 static void load_motor_config() {
   if (EEPROM.read(ADDR_MC) == 'C') {
     EEPROM.get(ADDR_MC, motor_config);
-    config_left_direction = (motor_config.dir & 1) * 2 - 1;
-    config_right_direction = (motor_config.dir & 2) - 1;
-    Serial.printf("Cfg %d T%d S%d L%d R%d\n", motor_config.frequency, motor_config.top, motor_config.stall, config_left_direction, config_right_direction);
+    config_direction_left = (motor_config.dir & 1) * 2 - 1;
+    config_direction_right = (motor_config.dir & 2) - 1;
+    Serial.printf("Cfg %d T%d S%d L%d R%d\n", motor_config.frequency, motor_config.top, motor_config.stall, config_direction_left, config_direction_right);
   }
 }
 

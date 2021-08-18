@@ -24,8 +24,8 @@ extern LandingZone *config_landing_zone;
 extern MotorConfigMessage motor_config;
 
 // Motor direction
-extern short config_left_direction;
-extern short config_right_direction;
+extern short config_direction_left;
+extern short config_direction_right;
 
 // Last R/C message received
 extern long last_rc_millis;
@@ -85,7 +85,6 @@ void set_landing_zone(LandingZoneMessage *packed);
 void set_motor_config(MotorConfigMessage *msg);
 
 // Motors
-void motor_init();
 void motor_loop();
 void set_motor_speed(const short left, const short right);
 void set_motor_position(uint8_t new_left, uint8_t new_right);

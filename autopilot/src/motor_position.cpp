@@ -96,6 +96,7 @@ static void update_position_estimate() {
     if (fabs(motor_position_right - motor_target_right) <= epsilon) {
       motor_position_right = motor_target_right;
     }
+    // TODO: Use PID instead
     if (fabs(motor_position_left - motor_target_left) <= epsilon) {
       motor_position_left = motor_target_left;
     }
@@ -112,8 +113,8 @@ static short speed(const float delta) {
   // Start slowing down when delta < 23
   short speed = delta * 10;
   // Minimum speed 64
-  if (speed < 0) speed -= 64;
-  if (speed > 0) speed += 64;
+  if (speed < 0) speed -= 40;
+  if (speed > 0) speed += 40;
   // Max speed 255
   if (speed < -255) return -255;
   else if (speed > 255) return 255;
