@@ -5,6 +5,7 @@
 
 // Last RC command received time
 long last_rc_millis = -RC_OVERRIDE_MILLIS; // Don't override on reboot
+long last_speed_override = -1;
 
 Path *current_plan;
 const char *current_plan_name;
@@ -45,9 +46,10 @@ static bool valid_point(GeoPointV * p) {
  */
 void rc_set_speed(const short new_left, const short new_right) {
   last_rc_millis = millis();
-  set_motor_speed(new_left, new_right);
+  set_motor_speeds(new_left, new_right);
+  last_speed_override = millis();
   // Special case for full up // TODO: Why? What about 1 toggle up?
-  if (new_left <= -254 && new_right <= -254) set_motor_position(0, 0);
+  if (new_left <= -254 && new_right <= -254) set_motor_target(0, 0);
 }
 
 /**
@@ -55,7 +57,7 @@ void rc_set_speed(const short new_left, const short new_right) {
  */
 void rc_set_position(uint8_t new_left, uint8_t new_right) {
   last_rc_millis = millis();
-  set_motor_position(new_left, new_right);
+  set_motor_target(new_left, new_right);
 }
 
 /**
@@ -71,11 +73,11 @@ void planner_update_location(GeoPointV *point) {
       current_plan_name = NULL;
     } else if (alt_agl < ALT_FLARE) {
       // Flare!!
-      set_motor_position(255, 255);
+      set_motor_target(255, 255);
       current_plan_name = flare;
     } else if (alt_agl < ALT_NO_TURNS_BELOW) {
       // Hands up for landing
-      set_motor_position(0, 0);
+      set_motor_target(0, 0);
       // set_motor_speed(-255, -255); // TODO: Full speed up?
       current_plan_name = land;
     } else if (valid_point(point)) {
@@ -85,7 +87,7 @@ void planner_update_location(GeoPointV *point) {
       current_plan = new_plan;
       current_plan_name = new_plan->name;
       ParaControls ctrl = path_controls(current_plan);
-      set_motor_position(ctrl.left, ctrl.right);
+      set_motor_target(ctrl.left, ctrl.right);
       const double error_x = current_plan->end.x;
       const double error_y = current_plan->end.y;
       const double landing_error = sqrt(error_x * error_x + error_y * error_y);
@@ -104,10 +106,10 @@ void planner_loop() {
   if (!rc_override()) {
     if (!autopilot_enabled()) {
       // Idle mode
-      set_motor_position(10, 10);
+      set_motor_target(10, 10);
     } else if (gps_expired()) {
       // Autopilot + expired GPS signal, put glider into slight right turn
-      set_motor_position(1, 10);
+      set_motor_target(1, 10);
     }
   }
 }

@@ -14,6 +14,8 @@
 // Sequential PWM channels
 static int next_pwm_channel = 0;
 
+static float normalize_position(float position);
+
 /**
  * @param pin_hall_a pin number for hall sensor A
  * @param pin_hall_b pin number for hall sensor B
@@ -21,10 +23,12 @@ static int next_pwm_channel = 0;
  * @param pin_pwm2 pin number for motor driver IN2
  * @param hall_isr the isr function to attach to interrupt
  */
-Motor::Motor(int pin_hall_a, int pin_hall_b, int pin_pwm1, int pin_pwm2, void hall_isr(), int *ticks)
+Motor::Motor(int pin_hall_a, int pin_hall_b, int pin_pwm1, int pin_pwm2, void hall_isr())
   : pwm_channel1(next_pwm_channel++)
   , pwm_channel2(next_pwm_channel++)
 {
+  // Default state
+  position = 10;
   // Setup pins
   ledcAttachPin(pin_pwm1, pwm_channel1);
   ledcAttachPin(pin_pwm2, pwm_channel2);
@@ -37,11 +41,13 @@ Motor::Motor(int pin_hall_a, int pin_hall_b, int pin_pwm1, int pin_pwm2, void ha
 }
 
 /**
- * Set motor speeds directly.
+ * Set motor speed directly.
  * -255 = full speed up, 255 = full speed down
  */
-void Motor::set_speed(short speed) {
+void Motor::set_speed(short new_speed) {
   // Serial.printf("Set ctrl %d %d\n", left, right);
+  // TODO: Update position estimate
+  speed = new_speed;
   if (speed < 0) {
     set_speed_hw(DRIVE_FORWARD, -speed);
   } else if (speed > 0) {
@@ -51,6 +57,11 @@ void Motor::set_speed(short speed) {
   }
 }
 
+/**
+ * Set motor speed PWM and direction.
+ * @param drive the direction to drive the motor
+ * @param speed speed 0..255
+ */
 void Motor::set_speed_hw(const int drive, uint8_t speed) {
   if (drive == DRIVE_FORWARD) {
     ledcWrite(pwm_channel1, 0);
@@ -65,4 +76,26 @@ void Motor::set_speed_hw(const int drive, uint8_t speed) {
     ledcWrite(pwm_channel1, 0);
     ledcWrite(pwm_channel2, 0);
   }
+}
+
+/**
+ * If the current position is not the target position, engage the motor
+ */
+void Motor::update(int dt) {
+  position += 0.000125 * speed * dt; // 1/8000
+  position = normalize_position(position);
+
+  // Close enough
+  // TODO: Use PID instead
+  const float epsilon = 0.8;
+  if (fabs(position - target) <= epsilon) {
+    position = target;
+  }
+}
+
+/**
+ * Position ranges from 0..255
+ */
+static float normalize_position(float position) {
+  return position < 0 ? 0 : (position > 255 ? 255 : position);
 }

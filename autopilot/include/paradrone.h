@@ -4,6 +4,7 @@
 #include "geo.h"
 #include "landingzone.h"
 #include "messages.h"
+#include "motor.h"
 
 // LoRa North America
 #define LORA_BAND 915E6
@@ -29,6 +30,7 @@ extern short config_direction_right;
 
 // Last R/C message received
 extern long last_rc_millis;
+extern long last_speed_override;
 
 // AP state
 extern GeoPointV *last_location;
@@ -40,15 +42,9 @@ extern Path *current_plan;
 extern const char *current_plan_name;
 bool rc_override();
 
-// Current motor position
-extern float motor_position_left;
-extern float motor_position_right;
-// Target motor position
-extern short motor_target_left;
-extern short motor_target_right;
-// Motor speed
-extern short motor_speed_left;
-extern short motor_speed_right;
+// Left and Right motors
+extern Motor motor_left;
+extern Motor motor_right;
 
 // Toggle speed and left/right balance
 float get_turn_speed();
@@ -86,8 +82,8 @@ void set_motor_config(MotorConfigMessage *msg);
 
 // Motors
 void motor_loop();
-void set_motor_speed(const short left, const short right);
-void set_motor_position(uint8_t new_left, uint8_t new_right);
+void set_motor_speeds(const short left, const short right);
+void set_motor_target(uint8_t new_left, uint8_t new_right);
 
 // Planner
 void planner_loop();

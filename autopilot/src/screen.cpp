@@ -116,15 +116,15 @@ static void screen_draw() {
   }
 
   // Current motor position
-  sprintf(buf, "%d ", (short) motor_position_left);
+  sprintf(buf, "%d ", (short) motor_left.position);
   int prewidth = Heltec.display->getStringWidth(buf);
-  sprintf(buf, "%d | %d", (short) motor_position_left, (short) motor_position_right);
+  sprintf(buf, "%d | %d", (short) motor_left.position, (short) motor_right.position);
   Heltec.display->drawString(DISPLAY_WIDTH / 2 - prewidth, 54, buf);
   // Target position
-  if (motor_position_left != motor_target_left || motor_position_right != motor_target_right) {
-    sprintf(buf, "%d ", motor_target_left);
+  if (motor_left.position != motor_left.target || motor_right.position != motor_right.target) {
+    sprintf(buf, "%d ", motor_left.target);
     prewidth = Heltec.display->getStringWidth(buf);
-    sprintf(buf, "%d | %d", motor_target_left, motor_target_right);
+    sprintf(buf, "%d | %d", motor_left.target, motor_right.target);
     Heltec.display->drawString(DISPLAY_WIDTH / 2 - prewidth, 44, buf);
   }
 
