@@ -1,5 +1,4 @@
-import { Circle, Point, PointV, Turn } from "../dtypes"
-import { MotorPosition } from "../paracontrols"
+import { Circle, MotorPosition, Point, PointV, Turn } from "../dtypes"
 import { Path } from "./path"
 import { SegmentLine } from "./segment-line"
 import { toDegrees, toRadians } from "./trig"

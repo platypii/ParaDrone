@@ -1,5 +1,8 @@
 import { GeoPointV } from "./dtypes"
 
+/**
+ * Send a simulated location to a real device for testing
+ */
 export function sendToDevice(host: string, loc: GeoPointV) {
   const xhr = new XMLHttpRequest()
   const url = getUrl(host, loc as unknown as {[key: string]: number})
@@ -7,6 +10,9 @@ export function sendToDevice(host: string, loc: GeoPointV) {
   xhr.send()
 }
 
+/**
+ * Construct a url with query string parameters
+ */
 function getUrl(host: string, obj: {[key: string]: number}): string {
   const params = Object.keys(obj).map((key) => key + "=" + obj[key]).join("&")
   return `http://${host}/msg?${params}`

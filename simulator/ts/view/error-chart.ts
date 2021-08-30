@@ -23,9 +23,10 @@ export class ErrorChart {
 
     // X Axis
     this.xAxis.scale.range([0, width])
-    this.xAxis.axis = d3.axisBottom(this.xAxis.scale)
-      .ticks(8)
+    this.xAxis.axis = d3.axisTop(this.xAxis.scale)
+      .ticks(6)
     this.xAxis.layer = this.svg.append("g")
+      .attr("transform", `translate(0,${height})`)
 
     // Y Axis
     this.yAxis.scale.range([height, 0])

@@ -1,5 +1,4 @@
-import { Point, PointV } from "../dtypes"
-import { MotorPosition } from "../paracontrols"
+import { MotorPosition, Point, PointV } from "../dtypes"
 import { interpolate } from "../util"
 import { Path } from "./path"
 

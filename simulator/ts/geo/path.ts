@@ -1,5 +1,4 @@
-import { Point, PointV } from "../dtypes"
-import { MotorPosition } from "../paracontrols"
+import { MotorPosition, Point, PointV } from "../dtypes"
 import { SegmentLine } from "./segment-line"
 import { SegmentTurn } from "./segment-turn"
 

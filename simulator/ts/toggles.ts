@@ -1,29 +1,26 @@
-import { MotorPosition } from "./paracontrols"
+import { MotorPosition } from "./dtypes"
+import { Motor } from "./motor"
 
 /**
  * Represents toggle position for a paraglider
  */
 export class Toggles {
-  // Toggle controls
-  public currentPosition: MotorPosition = {left: 0, right: 0}
-  public targetPosition: MotorPosition = {left: 0, right: 0}
+  // Toggle motors
+  public left: Motor = new Motor()
+  public right: Motor = new Motor()
 
   /**
    * If the current position is not the target position, engage the motors
    */
-  public tick(dt: number) {
-    // Calculate target delta, and motor speed to get there
-    const speedLeft = motorSpeed(this.targetPosition.left - this.currentPosition.left)
-    const speedRight = motorSpeed(this.targetPosition.right - this.currentPosition.right)
-    // Update position estimate
-    this.currentPosition.left += speedLeft * dt / 8
-    this.currentPosition.right += speedRight * dt / 8
-    this.currentPosition.left = normalizePosition(this.currentPosition.left)
-    this.currentPosition.right = normalizePosition(this.currentPosition.right)
+  public update(dt: number) {
+    this.left.update(dt)
+    this.right.update(dt)
   }
 
-  public setTarget(targetPosition: MotorPosition) {
-    this.targetPosition = targetPosition
+  public setTarget(left: number, right: number) {
+    this.left.target = left
+    this.right.target = right
+    // TODO: update motor speeds?
   }
 
   /**
@@ -32,33 +29,13 @@ export class Toggles {
   public turnSpeed(): number {
     const minSpeed = 6 // m/s
     const maxSpeed = 12 // m/s
-    return maxSpeed - (this.currentPosition.left + this.currentPosition.right) / 512 * (maxSpeed - minSpeed)
+    return maxSpeed - (this.left.position + this.right.position) / 512 * (maxSpeed - minSpeed)
   }
 
   /**
    * Left/right balance of current toggle position
    */
   public turnBalance(): number {
-    return (this.currentPosition.right - this.currentPosition.left) / 255 // [-1..1]
+    return (this.right.position - this.left.position) / 255 // [-1..1]
   }
-}
-
-/**
- * Return motor speed for a given position delta
- * @return motor speed in range -255..255
- */
-function motorSpeed(delta: number): number {
-  // Start slowing down when delta < 23
-  let speed = delta * 10
-  // Minimum speed 32
-  if (speed < 0) speed -= 32
-  if (speed > 0) speed += 32
-  // Max speed 255
-  if (speed < -255) return -255
-  else if (speed > 255) return 255
-  else return speed
-}
-
-function normalizePosition(position: number): number {
-  return position < 0 ? 0 : (position > 255 ? 255 : position)
 }

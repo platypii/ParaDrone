@@ -1,7 +1,6 @@
-import { GeoPointV, Wind } from "./dtypes"
+import { GeoPointV, MotorPosition, Wind } from "./dtypes"
 import * as geo from "./geo/geo"
 import { LandingZone } from "./geo/landingzone"
-import { MotorPosition } from "./paracontrols"
 import { Toggles } from "./toggles"
 
 const zerowind: Wind = {
@@ -36,14 +35,6 @@ export class Paraglider {
   }
 
   /**
-   * Pull the toggles to given deflections
-   * @param targetPosition how far to pull the toggles in meters
-   */
-  public setControls(targetPosition: MotorPosition): void {
-    this.toggles.setTarget(targetPosition)
-  }
-
-  /**
    * Set the location of the paramotor
    */
   public setLocation(point: GeoPointV): void {
@@ -64,19 +55,6 @@ export class Paraglider {
   }
 
   /**
-   * Return a copy of this Paramotor's state
-   */
-  public copy(): Paraglider {
-    const p = new Paraglider()
-    p.loc = this.loc && {...this.loc}
-    p.pitch = this.pitch
-    p.roll = this.roll
-    p.toggles.currentPosition = {...this.toggles.currentPosition}
-    p.toggles.targetPosition = {...this.toggles.targetPosition}
-    return p
-  }
-
-  /**
    * Step forward dt seconds of time.
    */
   public tick(dt: number, wind: Wind): void {
@@ -85,7 +63,7 @@ export class Paraglider {
       this.setLocation(next)
 
       // Update motor position
-      this.toggles.tick(dt)
+      this.toggles.update(dt)
     }
   }
 

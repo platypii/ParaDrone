@@ -30,7 +30,8 @@ export class Autopilot {
       // Replan with new location
       const plan = this.plan = search3(this.para, this.lz)
       // Apply to paraglider toggles
-      para.setControls(plan.path.controls())
+      const controls = plan.path.controls()
+      para.toggles.setTarget(controls.left, controls.right)
     })
   }
 }

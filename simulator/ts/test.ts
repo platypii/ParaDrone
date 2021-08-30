@@ -122,6 +122,9 @@ function avgScore(scores: LandingScore[]): LandingScore {
   return total
 }
 
+/**
+ * Landing error, based on location and direction
+ */
 function error(loc: GeoPoint, lz: LandingZone): LandingScore {
   // Immediate path error
   // return plan_score(lz, search(loc, lz))
