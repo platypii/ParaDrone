@@ -5,7 +5,8 @@ import { Path3 } from "./geo/path3"
 import { SegmentLine } from "./geo/segment-line"
 import { Paraglider } from "./paraglider"
 import { LandingPattern } from "./plan/pattern"
-import { best_plan, no_turns_below, path_no_turns_below } from "./plan/planner"
+import { FlarePath } from "./plan/plan-flare"
+import { best_plan, flare_height, no_turns_below, path_no_turns_below } from "./plan/planner"
 import { naive } from "./plan/planner-naive"
 import { straight } from "./plan/planner-straight"
 import { viaWaypoints } from "./plan/planner-waypoints"
@@ -70,7 +71,10 @@ export function search(loc: Point3V, para: Paraglider, lz: LandingZone): Path {
   // Construct flight paths
   const straightPath = straight(loc).fly(Math.max(1, flight_distance_remaining))
 
-  if (loc.alt <= no_turns_below) {
+  if (loc.alt < flare_height) {
+    // Flare!!
+    return new FlarePath(straightPath)
+  } else if (loc.alt <= no_turns_below) {
     // No turns under 100ft
     return straightPath
   } else if (distance2 > 1000 * 1000) {

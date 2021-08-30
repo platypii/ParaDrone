@@ -9,6 +9,13 @@ export class Toggles {
   public left: Motor = new Motor()
   public right: Motor = new Motor()
 
+  public controls(): MotorPosition {
+    return {
+      left: this.left.target,
+      right: this.right.target
+    }
+  }
+
   /**
    * If the current position is not the target position, engage the motors
    */

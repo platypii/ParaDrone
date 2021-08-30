@@ -23,7 +23,7 @@
             Wind
           </div>
           <div>
-            <svg id="windgram"></svg>
+            <svg id="windgram" width="100" height="100"></svg>
             <div class="wind-labels">
               <div id="wind-speed"></div>
               <div id="wind-direction"></div>
@@ -72,11 +72,13 @@
             Sim
             <input type="checkbox" id="sim-enabled" title="Show simulated path" checked>
           </div>
-          <div class="sidebar-parameter">
-            <div class="text-faded">error</div>
-            <div id="sim-error"></div>
+          <div class="sidebar-collapse" id="sim-section">
+            <div class="sidebar-parameter">
+              <div class="text-faded">error</div>
+              <div id="sim-error"></div>
+            </div>
+            <svg id="sim-error-chart"></svg>
           </div>
-          <svg id="sim-error-chart"></svg>
         </div>
 
         <div class="sidebar-section">

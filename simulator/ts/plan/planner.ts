@@ -6,6 +6,7 @@ import { distance } from "../util"
 
 // Planning params
 export const no_turns_below = 30 // meters
+export const flare_height = 6 // meters
 
 export interface LandingScore {
   score: number

@@ -27,9 +27,10 @@ export class Player {
   public start(): void {
     if (this.player === undefined) {
       this.player = window.setInterval(() => {
-        this.para.tick(this.dt, this.wind)
         if (this.para.landed(this.lz)) {
           this.stop()
+        } else {
+          this.para.tick(this.dt, this.wind)
         }
       }, this.interval)
     }

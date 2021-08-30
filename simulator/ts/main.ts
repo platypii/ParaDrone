@@ -31,6 +31,7 @@ const planEnabled = document.getElementById("plan-enabled") as HTMLInputElement
 const planName = document.getElementById("plan-name") as HTMLElement
 const planError = document.getElementById("plan-error") as HTMLElement
 const simEnabled = document.getElementById("sim-enabled") as HTMLInputElement
+const simSection = document.getElementById("sim-section") as HTMLElement
 const simError = document.getElementById("sim-error") as HTMLElement
 const deviceEnabled = document.getElementById("device-enabled") as HTMLInputElement
 const deviceIp = document.getElementById("device-ip") as HTMLInputElement
@@ -99,10 +100,12 @@ function update() {
     const sim_error = geo.distancePoint(actual[actual.length - 1], lz.destination)
     simError.innerText = `${sim_error.toFixed(0)} m`
     // Update error chart
-    errorChart.update(simsteps.map((s) => s.score.score))
+    errorChart.update(simsteps)
   } else {
     simError.innerHTML = "&nbsp;"
   }
+  // Show/hide
+  simSection.style.maxHeight = simEnabled.checked ? "200px" : "0"
 
   // Update map
   map.setState({

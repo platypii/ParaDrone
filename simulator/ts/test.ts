@@ -1,14 +1,15 @@
-import { GeoPoint } from "./dtypes"
+import { GeoPointV } from "./dtypes"
 import { latLngGrid } from "./geo/hex"
 import { kpow, LandingZone } from "./geo/landingzone"
 import { DroneMap } from "./map/drone-map"
 import { HeatLayer } from "./map/heat-layer"
+import { Paraglider } from "./paraglider"
 import { LandingScore, landing_score } from "./plan/planner"
 import { sim } from "./sim"
 import { Windgram } from "./view/windgram"
 
 interface TestScore extends LandingScore {
-  location: GeoPoint
+  location: GeoPointV
 }
 
 // size x size grid centered on lz
@@ -52,10 +53,14 @@ function runTests() {
   gridLayers.length = 0
   startTime = new Date().getTime()
   const lz = kpow
-  const input: GeoPoint[] = latLngGrid(lz.destination, gridDim, gridStep).map((ll) => {
+  const para = new Paraglider()
+  const input: GeoPointV[] = latLngGrid(lz.destination, gridDim, gridStep).map((ll) => {
     return {
       ...ll,
       alt: startAlt,
+      vN: 0,
+      vE: para.groundSpeed,
+      climb: para.climbRate,
       millis: 0
     }
   })
@@ -66,7 +71,7 @@ function runTests() {
 /**
  * Map over a list but with setTimeout to allow the browser to refresh.
  */
-function sleepySearch(input: GeoPoint[], output: TestScore[], index: number): void {
+function sleepySearch(input: GeoPointV[], output: TestScore[], index: number): void {
   const batchSize = 24
   if (index >= input.length) {
     // Done
@@ -81,7 +86,7 @@ function sleepySearch(input: GeoPoint[], output: TestScore[], index: number): vo
   setTimeout(() => sleepySearch(input, output, index + batchSize), 80)
 }
 
-function evaluate(location: GeoPoint): TestScore {
+function evaluate(location: GeoPointV): TestScore {
   const score = {
     location,
     ...error(location, kpow)
@@ -125,7 +130,7 @@ function avgScore(scores: LandingScore[]): LandingScore {
 /**
  * Landing error, based on location and direction
  */
-function error(loc: GeoPoint, lz: LandingZone): LandingScore {
+function error(loc: GeoPointV, lz: LandingZone): LandingScore {
   // Immediate path error
   // return plan_score(lz, search(loc, lz))
   // Simulated path error
