@@ -6,6 +6,9 @@ import { GeoPointV } from "./dtypes"
 export function sendToDevice(host: string, loc: GeoPointV) {
   const xhr = new XMLHttpRequest()
   const url = getUrl(host, loc as unknown as {[key: string]: number})
+  xhr.addEventListener("error", () => {
+    document.getElementById("device-ip")!.style.border = "1px solid #d11"
+  })
   xhr.open("GET", url)
   xhr.send()
 }

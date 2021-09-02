@@ -22,13 +22,17 @@ export class Paraglider {
   public readonly glide = -this.groundSpeed / this.climbRate
 
   // State
-  public readonly toggles: Toggles = new Toggles()
+  public readonly toggles: Toggles
   public loc?: GeoPointV
-  public heading: number = 0 // radians
-  public pitch: number = 0
-  public roll: number = 0
+
+  // TODO: Heading, pitch, roll Orientation
 
   private readonly locationListeners: Array<(point: GeoPointV) => void> = []
+
+  constructor(loc?: GeoPointV, toggles?: Toggles) {
+    this.toggles = toggles || new Toggles()
+    this.loc = loc
+  }
 
   public landed(lz: LandingZone): boolean {
     return this.loc !== undefined && this.loc.alt <= lz.destination.alt
@@ -38,13 +42,13 @@ export class Paraglider {
    * Set the location of the paramotor
    */
   public setLocation(point: GeoPointV): void {
-    this.loc = {...point}
+    this.loc = point
     // Notify listeners
     for (const listener of this.locationListeners) {
       listener(this.loc)
     }
     // TODO: Update internal heading model
-    this.heading = Math.atan2(point.vE, point.vN)
+    // this.heading = Math.atan2(point.vE, point.vN)
   }
 
   /**
@@ -60,10 +64,12 @@ export class Paraglider {
   public tick(dt: number, wind: Wind): void {
     if (this.loc) {
       const next = this.predict(dt, wind)!
-      this.setLocation(next)
 
-      // Update motor position
+      // Update toggle position
       this.toggles.update(dt)
+
+      // Notify listeners (eg- autopilot planner)
+      this.setLocation(next)
     }
   }
 
@@ -124,5 +130,9 @@ export class Paraglider {
   public flightDistanceRemaining(alt: number): number {
     const timeToGround = -alt / this.climbRate
     return this.groundSpeed * timeToGround
+  }
+
+  public clone(): Paraglider {
+    return new Paraglider(this.loc, this.toggles.clone())
   }
 }

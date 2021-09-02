@@ -6,8 +6,13 @@ import { Motor } from "./motor"
  */
 export class Toggles {
   // Toggle motors
-  public left: Motor = new Motor()
-  public right: Motor = new Motor()
+  public readonly left: Motor
+  public readonly right: Motor
+
+  constructor(left?: Motor, right?: Motor) {
+    this.left = left || new Motor()
+    this.right = right || new Motor()
+  }
 
   public controls(): MotorPosition {
     return {
@@ -44,5 +49,9 @@ export class Toggles {
    */
   public turnBalance(): number {
     return (this.right.position - this.left.position) / 255 // [-1..1]
+  }
+
+  public clone(): Toggles {
+    return new Toggles(this.left.clone(), this.right.clone())
   }
 }

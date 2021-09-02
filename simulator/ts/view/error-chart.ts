@@ -6,6 +6,7 @@ export class ErrorChart extends BaseChart {
   private errorPath: d3.Selection<SVGPathElement, any, HTMLElement, any>
   private left: d3.Selection<SVGGElement, any, HTMLElement, any>
   private right: d3.Selection<SVGGElement, any, HTMLElement, any>
+  private focusLine: d3.Selection<SVGLineElement, any, HTMLElement, any>
 
   constructor() {
     super()
@@ -25,19 +26,35 @@ export class ErrorChart extends BaseChart {
       .attr("class", "left")
     this.right = this.svg.append("g")
       .attr("class", "right")
+
+    // Focus line
+    this.focusLine = this.layers.append("line")
+      .attr("class", "focus")
+      .attr("x1", 0)
+      .attr("x2", this.width - 30)
+      .style("stroke", "#aaa")
+      .style("stroke-width", 1)
+  }
+
+  public setFocus(i: number): void {
+    const y = Math.floor(this.yAxis.scale(i)) + 0.5
+    this.focusLine
+      .attr("y1", y)
+      .attr("y2", y)
   }
 
   public update(steps: SimStep[]): void {
     const errors = steps.map((s) => s.score.score)
-    const upperBound = Math.max(d3.max(errors) || 1, 100)
-    this.xAxis.scale.domain([0, upperBound])
-    this.yAxis.scale.domain([0, steps.length])
+    const errorBound = Math.max(d3.max(errors) || 1, 100)
+    const stepBound = Math.max(steps.length, 107) // TODO: 107 is default
+    this.xAxis.scale.domain([0, errorBound])
+    this.yAxis.scale.domain([0, stepBound])
     this.updateAxes()
 
     // Update error line
     const line = d3.line<number>()
       .x((d: number) => this.xAxis.scale(d))
-      .y((d: number, i: number) => this.yAxis.scale(i))
+      .y((d: number, i: number) => this.yAxis.scale(steps.length - i))
     this.errorPath
       .attr("d", line(errors) || "")
 

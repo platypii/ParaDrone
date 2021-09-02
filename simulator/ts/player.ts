@@ -2,11 +2,13 @@ import { Wind } from "./dtypes"
 import { LandingZone } from "./geo/landingzone"
 import { Paraglider } from "./paraglider"
 
+const playButton = document.getElementById("map-play")!
+
 /**
  * Control playback of the simulation
  */
 export class Player {
-  private readonly interval = 300 // milliseconds
+  private readonly interval = 200 // milliseconds
   private readonly dt = 1 // seconds
 
   private readonly para: Paraglider
@@ -19,13 +21,22 @@ export class Player {
     this.para = para
     this.lz = lz
     this.wind = wind
-    document.getElementById("map-play")!.addEventListener("click", () => this.start())
+    playButton.addEventListener("click", () => {
+      if (para.loc) {
+        if (this.player === undefined) {
+          this.start()
+        } else {
+          this.stop()
+        }
+      }
+    })
     document.getElementById("map-step")!.addEventListener("click", () => this.step())
-    document.getElementById("map-stop")!.addEventListener("click", () => this.stop())
   }
 
   public start(): void {
     if (this.player === undefined) {
+      playButton.classList.remove("icon-start")
+      playButton.classList.add("icon-pause")
       this.player = window.setInterval(() => {
         if (this.para.landed(this.lz)) {
           this.stop()
@@ -37,6 +48,9 @@ export class Player {
   }
 
   public step(): void {
+    if (this.player !== undefined) {
+      this.stop()
+    }
     if (!this.para.landed(this.lz)) {
       this.para.tick(this.dt, this.wind)
     }
@@ -44,6 +58,8 @@ export class Player {
 
   public stop(): void {
     if (this.player !== undefined) {
+      playButton.classList.add("icon-start")
+      playButton.classList.remove("icon-pause")
       clearInterval(this.player)
       this.player = undefined
     }

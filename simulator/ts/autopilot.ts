@@ -27,13 +27,18 @@ export class Autopilot {
     this.lz = lz
     this.para = para
     // Subscribe to gps updates
-    para.onLocationUpdate(() => {
+    para.onLocationUpdate(() => this.replan())
+    this.replan()
+  }
+
+  private replan() {
+    if (this.para.loc) {
       // Replan with new location
       const plan = this.plan = search3(this.para, this.lz)
       // Apply to paraglider toggles
       const controls = plan.path.controls()
-      para.toggles.setTarget(controls.left, controls.right)
-    })
+      this.para.toggles.setTarget(controls.left, controls.right)
+    }
   }
 }
 

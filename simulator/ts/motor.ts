@@ -16,6 +16,12 @@ export class Motor {
   // -255 = full speed up, 255 = full speed down
   public speed: number = 0
 
+  public constructor(target?: number, position?: number, speed?: number) {
+    this.target = target || 0
+    this.position = position || 0
+    this.speed = speed || 0
+  }
+
   /**
    * If the current position is not the target position, engage the motor
    */
@@ -25,6 +31,10 @@ export class Motor {
     // Update position estimate
     this.position += this.speed * dt / 8
     this.position = normalizePosition(this.position)
+  }
+
+  public clone(): Motor {
+    return new Motor(this.target, this.position, this.speed)
   }
 }
 

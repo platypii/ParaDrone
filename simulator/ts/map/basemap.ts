@@ -25,6 +25,8 @@ const cesiumOptions = {
   navigationHelpButton: false, // ? button in top left
   navigationInstructionsInitiallyVisible: false,
   sceneModePicker: false, // 2d vs 3d
+  selectionIndicator: false,
+  infoBox: false,
   timeline: false // bottom timeline
 }
 

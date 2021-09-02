@@ -134,7 +134,7 @@ function error(loc: GeoPointV, lz: LandingZone): LandingScore {
   // Immediate path error
   // return plan_score(lz, search(loc, lz))
   // Simulated path error
-  const plan = sim(loc, lz, wind)
+  const plan = sim(new Paraglider(loc), lz, wind)
   const landing = plan[plan.length - 1].loc
   const landingPoint = lz.toPoint3V(landing)
   return landing_score(lz, landingPoint)

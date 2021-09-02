@@ -93,14 +93,17 @@ function update() {
     planName.innerText = autopilot.plan.path.name
     planError.innerText = `${plan_error.toFixed(0)} m`
   }
-  if (simEnabled.checked && start) {
+  if (simEnabled.checked && para.loc) {
     // Simulate forward
-    const simsteps = sim(start, lz, wind)
+    const simsteps = sim(para.clone(), lz, wind)
     actual = simsteps.map((s) => s.loc)
     const sim_error = geo.distancePoint(actual[actual.length - 1], lz.destination)
     simError.innerText = `${sim_error.toFixed(0)} m`
     // Update error chart
     errorChart.update(simsteps)
+
+    // Update error chart
+    errorChart.setFocus(simsteps.length)
   } else {
     simError.innerHTML = "&nbsp;"
   }

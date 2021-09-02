@@ -11,17 +11,15 @@ export interface SimStep {
 }
 
 /**
- * Run a simulation and return the list of points
+ * Run a simulation and return the list of points.
+ * Warning: para argument will be mutated! Pass para.clone().
  */
-export function sim(start: GeoPointV, lz: LandingZone, wind: Wind): SimStep[] {
+export function sim(para: Paraglider, lz: LandingZone, wind: Wind): SimStep[] {
   const dt = 1 // step size in seconds
-  const para = new Paraglider()
   const autopilot = new Autopilot(para, lz)
-  const startV = {...start}
-  para.setLocation(startV)
 
   const actual: SimStep[] = [{
-    loc: startV,
+    loc: {...para.loc!},
     controls: para.toggles.controls(),
     score: landing_score(lz, autopilot.plan!.path.end)
   }]
