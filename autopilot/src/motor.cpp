@@ -23,9 +23,10 @@ static float normalize_position(float position);
  * @param pin_pwm2 pin number for motor driver IN2
  * @param hall_isr the isr function to attach to interrupt
  */
-Motor::Motor(int pin_hall_a, int pin_hall_b, int pin_pwm1, int pin_pwm2, void hall_isr())
+Motor::Motor(int pin_hall_a, int pin_hall_b, int pin_pwm1, int pin_pwm2, short *config_direction, void hall_isr())
   : pwm_channel1(next_pwm_channel++)
   , pwm_channel2(next_pwm_channel++)
+  , config_direction(config_direction)
 {
   // Default state
   position = 10;
@@ -48,10 +49,11 @@ void Motor::set_speed(short new_speed) {
   // Serial.printf("Set ctrl %d %d\n", left, right);
   // TODO: Update position estimate
   speed = new_speed;
-  if (speed < 0) {
-    set_speed_hw(DRIVE_FORWARD, -speed);
-  } else if (speed > 0) {
-    set_speed_hw(DRIVE_BACKWARD, speed);
+  const short hw_speed = *config_direction * speed;
+  if (hw_speed < 0) {
+    set_speed_hw(DRIVE_FORWARD, -hw_speed);
+  } else if (hw_speed > 0) {
+    set_speed_hw(DRIVE_BACKWARD, hw_speed);
   } else {
     set_speed_hw(IDLE_MODE, 0);
   }
@@ -79,10 +81,35 @@ void Motor::set_speed_hw(const int drive, uint8_t speed) {
 }
 
 /**
- * If the current position is not the target position, engage the motor
+ * Update motor position estimate
+ * @param dt milliseconds since last update
  */
 void Motor::update(int dt) {
-  position += 0.000125 * speed * dt; // 1/8000
+  if (!dt) return;
+
+  // Position change based on encoder ticks
+  const float tick_delta = (ticks - last_ticks) / ticks_per_unit;
+  const float tick_speed = tick_delta * 255 / (dt * 1e-3) / units_per_second;
+  last_ticks = ticks;
+
+  // Position change based on target speed
+  const float speed_delta = units_per_second * speed * dt / 255000;
+
+  // Blended position estimate
+  const float use_ticks = 0.8;
+  position += tick_delta * use_ticks + speed_delta * (1 - use_ticks);
+
+  // Update position based on direction sensing
+  const int speed_threshhold = 16;
+  if (speed > 0 && tick_speed - speed > speed_threshhold) {
+    Serial.printf("Trying to go down, actually going up %d %f\n", speed, tick_speed);
+    // position = 0;
+  }
+  if (speed < 0 && tick_speed - speed > speed_threshhold) {
+    Serial.printf("Trying to go up, actually going down %d %f\n", speed, tick_speed);
+    // position = 0;
+  }
+
   position = normalize_position(position);
 
   // Close enough

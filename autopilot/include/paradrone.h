@@ -15,6 +15,8 @@
 
 // Revert manual control to autopilot after 10 seconds of no RC
 #define RC_OVERRIDE_MILLIS 10000
+// In case of speed override, only 3 seconds
+#define RC_SPEED_OVERRIDE_DURATION 3000
 
 // After 60 seconds of no GPS, revert to slow spiral
 #define GPS_EXPIRATION 60000
@@ -83,7 +85,7 @@ void set_motor_config(MotorConfigMessage *msg);
 // Motors
 void motor_loop();
 void set_motor_speeds(const short left, const short right);
-void set_motor_target(uint8_t new_left, uint8_t new_right);
+void set_toggles(uint8_t new_left, uint8_t new_right);
 
 // Planner
 void planner_loop();

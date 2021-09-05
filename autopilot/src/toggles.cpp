@@ -1,6 +1,20 @@
 #include "paradrone.h"
 
 /**
+ * Set desired toggle position
+ * 0 = no deflection (toggles up)
+ * 255 = full deflection (toggles down)
+ */
+void set_toggles(uint8_t new_left, uint8_t new_right) {
+  if (motor_left.target != new_left || motor_right.target != new_right) {
+    screen_update();
+  }
+  motor_left.target = new_left;
+  motor_right.target = new_right;
+  // TODO: update motors speeds?
+}
+
+/**
  * Sustained rate of speed for current toggle position (m/s)
  */
 float get_turn_speed() {

@@ -18,8 +18,7 @@ LandingZone *config_landing_zone;
 MotorConfigMessage motor_config = {
   'C',
   .frequency = (int) LORA_BAND, // Hz
-  .top = 1200, // millimeters
-  .stall = 0, // millimeters
+  .stroke = 1200, // millimeters
   .dir = 0
 };
 // Multiplier, 1 = clockwise, -1 = counterclockwise
@@ -104,7 +103,7 @@ static void load_motor_config() {
     EEPROM.get(ADDR_MC, motor_config);
     config_direction_left = (motor_config.dir & 1) * 2 - 1;
     config_direction_right = (motor_config.dir & 2) - 1;
-    Serial.printf("Cfg %d T%d S%d L%d R%d\n", motor_config.frequency, motor_config.top, motor_config.stall, config_direction_left, config_direction_right);
+    Serial.printf("Cfg %d S%d L%d R%d\n", motor_config.frequency, motor_config.stroke, config_direction_left, config_direction_right);
   }
 }
 

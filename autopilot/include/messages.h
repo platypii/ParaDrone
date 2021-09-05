@@ -46,14 +46,13 @@ struct LandingZoneMessage {
 /**
  * Message with motor configuration.
  * Length of toggle stroke, motor direction, frequency.
- * sizeof 10
+ * sizeof 8
  */
 #pragma pack(1)
 struct MotorConfigMessage {
   char msg_type; // C
   int frequency; // Hz
-  uint16_t top; // millimeters
-  uint16_t stall; // millimeters
+  uint16_t stroke; // millimeters
   uint8_t dir; // left, right direction
 };
 

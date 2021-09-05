@@ -35,13 +35,14 @@ class AutopilotCharacteristic : public BLECharacteristicCallbacks {
     };
     void onWrite(BLECharacteristic *pCharacteristic) {
       std::string value = pCharacteristic->getValue();
-      if (value[0] == 'C' && value.length() == 10) {
+      if (value[0] == 'C' && value.length() == 8) {
         set_motor_config((MotorConfigMessage*) value.c_str());
       } else if (value[0] == 'D' && value.length() == 17) {
         // Location from bluetooth
         GeoPointV *point = unpack_speed((SpeedMessage*) value.c_str());
         update_location(point);
       } else if (value[0] == 'M' && value.length() == 2) {
+        // Flight mode
         const uint8_t mode = value[1];
         if (mode == MODE_IDLE) {
           Serial.printf("%.1fs bt mode idle\n", millis() * 1e-3);
@@ -53,12 +54,12 @@ class AutopilotCharacteristic : public BLECharacteristicCallbacks {
         set_flight_mode(mode);
       } else if (value[0] == 'Q' && value.length() == 2) {
         Serial.printf("%.1fs bt query %c\n", millis() * 1e-3, value[1]);
-        if (value[1] == 'Z') {
-          // Send LZ in response
-          bt_send_lz();
-        } else if (value[1] == 'C') {
+        if (value[1] == 'C') {
           // Send motor config in response
           bt_send_motor_config();
+        } else if (value[1] == 'Z') {
+          // Send LZ in response
+          bt_send_lz();
         }
       } else if (value[0] == 'S' && value.length() == 3) {
         // Message is -127..127, speeds are -255..255

@@ -52,6 +52,7 @@ static void lora_read(int parse_len) {
   }
 
   if (buffer[0] == 'M' && buffer_len == 2) {
+    // Flight mode
     const uint8_t mode = buffer[1];
     if (mode == MODE_IDLE) {
       Serial.printf("%.1fs lora mode idle\n", millis() * 1e-3);
