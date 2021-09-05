@@ -37,7 +37,7 @@ export class Autopilot {
       const plan = this.plan = search3(this.para, this.lz)
       // Apply to paraglider toggles
       const controls = plan.path.controls()
-      this.para.toggles.setTarget(controls.left, controls.right)
+      this.para.toggles.setToggles(controls.left, controls.right)
     }
   }
 }

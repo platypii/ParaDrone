@@ -1,4 +1,4 @@
-import { MotorPosition, Point, PointV } from "../dtypes"
+import { Point, PointV, TogglePosition } from "../dtypes"
 import { SegmentLine } from "./segment-line"
 import { SegmentTurn } from "./segment-turn"
 
@@ -17,7 +17,7 @@ export class Path {
     this.end = segments[segments.length - 1].end
   }
 
-  public controls(): MotorPosition {
+  public controls(): TogglePosition {
     return this.segments[0].controls()
   }
 

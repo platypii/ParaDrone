@@ -1,4 +1,4 @@
-import { MotorPosition } from "./dtypes"
+import { TogglePosition } from "./dtypes"
 import { Motor } from "./motor"
 
 /**
@@ -14,7 +14,7 @@ export class Toggles {
     this.right = right || new Motor()
   }
 
-  public controls(): MotorPosition {
+  public controls(): TogglePosition {
     return {
       left: this.left.target,
       right: this.right.target
@@ -22,14 +22,15 @@ export class Toggles {
   }
 
   /**
-   * If the current position is not the target position, engage the motors
+   * Update motor position estimate, and set motor speed
+   * @param dt seconds since last update
    */
   public update(dt: number) {
-    this.left.update(dt)
-    this.right.update(dt)
+    this.left.update(dt * 1000)
+    this.right.update(dt * 1000)
   }
 
-  public setTarget(left: number, right: number) {
+  public setToggles(left: number, right: number) {
     this.left.target = left
     this.right.target = right
     // TODO: update motor speeds?

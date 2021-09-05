@@ -1,6 +1,6 @@
-import { GeoPointV, LatLng, LatLngAlt, Point, Point3V, Turn } from "../dtypes"
+import { GeoPointV, LatLng, LatLngAlt, Point, Point3V } from "../dtypes"
 import * as geo from "./geo"
-import { toDegrees, toRadians } from "./trig"
+import { toRadians } from "./trig"
 
 /**
  * Defines landing zone parameters.
@@ -30,18 +30,6 @@ export class LandingZone {
       vx: Math.sin(landingDirection),
       vy: Math.cos(landingDirection),
       climb: 0
-    }
-  }
-
-  /**
-   * Convert lat, lng to x, y meters centered at destination
-   */
-  public toPoint(ll: LatLng): Point {
-    const bearing = toRadians(geo.bearing(this.destination.lat, this.destination.lng, ll.lat, ll.lng))
-    const distance = geo.distance(this.destination.lat, this.destination.lng, ll.lat, ll.lng)
-    return {
-      x: distance * Math.sin(bearing),
-      y: distance * Math.cos(bearing)
     }
   }
 

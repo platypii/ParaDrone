@@ -11,6 +11,8 @@ export function distance(point1: Point, point2: Point): number {
 
 /**
  * Linear interpolation
+ * @param start starting point for interpolation (alpha = 0)
+ * @param end ending point for interpolation (alpha = 1)
  * @param alpha interpolation parameter from 0 (start) to 1 (end)
  */
 export function interpolate(start: number, end: number, alpha: number): number {

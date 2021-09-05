@@ -1,4 +1,4 @@
-import { GeoPointV, MotorPosition, Wind } from "./dtypes"
+import { GeoPointV, Wind } from "./dtypes"
 import * as geo from "./geo/geo"
 import { LandingZone } from "./geo/landingzone"
 import { Toggles } from "./toggles"

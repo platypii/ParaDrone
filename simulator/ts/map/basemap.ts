@@ -34,9 +34,6 @@ export class BaseMap {
   public readonly map: Cesium.Viewer
   private layers: MapLayer[] = []
 
-  private readonly defaultCenter = {lat: 39, lng: -100} // USA
-  private readonly defaultZoom = 4 // USA
-
   constructor(options: MapOptions) {
     this.map = new Cesium.Viewer(options.element, cesiumOptions)
     this.map.terrainProvider = Cesium.createWorldTerrain()

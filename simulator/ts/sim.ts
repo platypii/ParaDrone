@@ -1,12 +1,12 @@
 import { Autopilot } from "./autopilot"
-import { GeoPoint, GeoPointV, MotorPosition, Wind } from "./dtypes"
+import { GeoPointV, TogglePosition, Wind } from "./dtypes"
 import { LandingZone } from "./geo/landingzone"
 import { Paraglider } from "./paraglider"
 import { LandingScore, landing_score } from "./plan/planner"
 
 export interface SimStep {
   loc: GeoPointV
-  controls: MotorPosition
+  controls: TogglePosition
   score: LandingScore
 }
 

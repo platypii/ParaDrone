@@ -1,4 +1,4 @@
-import { MotorPosition, Point, PointV } from "../dtypes"
+import { Point, PointV, TogglePosition } from "../dtypes"
 import { interpolate } from "../util"
 import { Path } from "./path"
 
@@ -28,7 +28,7 @@ export class SegmentLine {
     }
   }
 
-  public controls(): MotorPosition {
+  public controls(): TogglePosition {
     return {
       left: 0,
       right: 0

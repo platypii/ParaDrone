@@ -1,4 +1,14 @@
-import { MotorPosition } from "./dtypes"
+
+const epsilon = 0.8
+
+// Motor parameters
+// const spoolRadius = 0.008 // meters
+const spoolCircumference = 0.05 // meters
+const motorRpm = 220 // no-load motor speed
+const strokeLength = 1.2 // meters
+
+// Computed motor parameters
+const unitsPerSecond = 255 * spoolCircumference * motorRpm / (60 * strokeLength)
 
 /**
  * Represents a paradrone motor
@@ -23,14 +33,21 @@ export class Motor {
   }
 
   /**
-   * If the current position is not the target position, engage the motor
+   * Update motor position estimate, and set motor speed
+   * @param dt milliseconds since last update
    */
   public update(dt: number) {
+    // Update position estimate
+    this.position += unitsPerSecond * (this.speed / 255) * (dt / 1000)
+    this.position = normalizePosition(this.position)
+
+    // Close enough
+    if (Math.abs(this.position - this.target) <= epsilon) {
+      this.position = this.target
+    }
+
     // Calculate target delta, and motor speed to get there
     this.speed = motorSpeed(this.target - this.position)
-    // Update position estimate
-    this.position += this.speed * dt / 8
-    this.position = normalizePosition(this.position)
   }
 
   public clone(): Motor {

@@ -19,13 +19,6 @@ export interface GeoPointV {
   climb: number
 }
 
-export interface GeoPoint {
-  millis: number
-  lat: number
-  lng: number
-  alt: number
-}
-
 export interface Point {
   x: number
   y: number
@@ -70,7 +63,7 @@ export interface Wind {
  * 0 = no deflection
  * 255 = full deflection
  */
-export interface MotorPosition {
+export interface TogglePosition {
   left: number
   right: number
 }

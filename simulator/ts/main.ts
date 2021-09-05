@@ -1,5 +1,5 @@
 import { Autopilot } from "./autopilot"
-import { sendToDevice } from "./device"
+import * as device from "./device"
 import { GeoPointV, LatLngAlt } from "./dtypes"
 import * as geo from "./geo/geo"
 import { defaultLz } from "./geo/landingzone"
@@ -33,8 +33,6 @@ const planError = document.getElementById("plan-error") as HTMLElement
 const simEnabled = document.getElementById("sim-enabled") as HTMLInputElement
 const simSection = document.getElementById("sim-section") as HTMLElement
 const simError = document.getElementById("sim-error") as HTMLElement
-const deviceEnabled = document.getElementById("device-enabled") as HTMLInputElement
-const deviceIp = document.getElementById("device-ip") as HTMLInputElement
 
 export function init() {
   welcome.init()
@@ -52,8 +50,8 @@ export function init() {
   planEnabled.onclick = update
   simEnabled.onclick = update
   test.init(map, wind)
+  device.init(para, lz)
   para.onLocationUpdate(() => update())
-  para.onLocationUpdate(() => updateDevice())
   update()
 
   // Default starting position (watertower)
@@ -86,7 +84,7 @@ function update() {
   let actual: GeoPointV[] = []
   if (planEnabled.checked && autopilot.plan && para.loc) {
     // Render current plan
-    const alt_agl = para.loc.alt - lz.destination.alt
+    // const alt_agl = para.loc.alt - lz.destination.alt
     plan = autopilot.plan.render3(para)
       .map((p) => lz.toLatLngAlt(p))
     const plan_error = distance(autopilot.plan.path.end, lz.dest)
@@ -119,14 +117,4 @@ function update() {
   })
   apScreen.update(para, lz, autopilot.plan)
   toggleView.update(para)
-}
-
-function updateDevice() {
-  if (deviceEnabled.checked && deviceIp.value && para.loc) {
-    sendToDevice(deviceIp.value, para.loc)
-  }
-}
-
-function updateToggles() {
-  document.getElementById("ap-alt")!.innerText = ""
 }

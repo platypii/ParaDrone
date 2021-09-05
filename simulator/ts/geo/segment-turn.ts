@@ -1,7 +1,7 @@
-import { Circle, MotorPosition, Point, PointV, Turn } from "../dtypes"
+import { Circle, Point, PointV, TogglePosition, Turn } from "../dtypes"
 import { Path } from "./path"
 import { SegmentLine } from "./segment-line"
-import { toDegrees, toRadians } from "./trig"
+import { toRadians } from "./trig"
 
 // If turn is less than minimum_turn, then don't bury a toggle
 const minimum_turn = toRadians(8)
@@ -36,7 +36,7 @@ export class SegmentTurn {
     }
   }
 
-  public controls(): MotorPosition {
+  public controls(): TogglePosition {
     // Sigmoid-ish activation function.
     const x = this.arcs()
     let activation = 1

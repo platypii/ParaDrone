@@ -1,7 +1,7 @@
 import * as Cesium from "cesium"
 import { LatLngAlt } from "../dtypes"
 import { latLngToCart } from "../geo/latlng"
-import { lineMaterial, MapLayer } from "./basemap"
+import { MapLayer } from "./basemap"
 
 export class PathLayer implements MapLayer {
   private readonly color: string
