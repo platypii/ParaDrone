@@ -39,38 +39,15 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:textSize="10pt"
-            android:text="Top (mm)"/>
+            android:text="Stroke (mm)"/>
 
         <EditText
-            android:id="@+id/cfg_top"
+            android:id="@+id/cfg_stroke"
             android:layout_width="80dp"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
             android:gravity="end"
             android:hint="1200"
-            android:inputType="numberDecimal"
-            android:importantForAutofill="no" />
-
-    </FrameLayout>
-
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:textSize="10pt"
-            android:text="Stall (mm)"/>
-
-        <EditText
-            android:id="@+id/cfg_stall"
-            android:layout_width="80dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:gravity="end"
-            android:hint="0"
             android:inputType="numberDecimal"
             android:importantForAutofill="no" />
 

@@ -66,8 +66,7 @@ public class ConfigFragment extends Fragment {
     public void onConfigMsg(@NonNull ApConfigMsg msg) {
         // Update views
         binding.cfgFreq.setText(String.format(Locale.getDefault(), "%d", msg.frequency));
-        binding.cfgTop.setText(String.format(Locale.getDefault(), "%d", msg.top));
-        binding.cfgStall.setText(String.format(Locale.getDefault(), "%d", msg.stall));
+        binding.cfgStroke.setText(String.format(Locale.getDefault(), "%d", msg.stroke));
         left = msg.left();
         right = msg.right();
         updateLeftRight();
@@ -95,8 +94,7 @@ public class ConfigFragment extends Fragment {
         try {
             // Load form
             final int frequency = Numbers.parseInt(binding.cfgFreq.getText().toString(), -1);
-            final int top = Numbers.parseInt(binding.cfgTop.getText().toString(), -1);
-            final int stall = Numbers.parseInt(binding.cfgStall.getText().toString(), -1);
+            final int stroke = Numbers.parseInt(binding.cfgStroke.getText().toString(), -1);
             final byte dir = (byte) ((left ? 1 : 0) + (right ? 2 : 0));
 
             // Validate
@@ -105,18 +103,13 @@ public class ConfigFragment extends Fragment {
                 binding.cfgFreq.requestFocus();
                 return;
             }
-            if (top < 0 || top > 4000) {
-                binding.cfgTop.setError("0 to 4000 mm");
-                binding.cfgTop.requestFocus();
-                return;
-            }
-            if (stall < 0 || stall > 4000) {
-                binding.cfgStall.setError("0 to 4000 mm");
-                binding.cfgStall.requestFocus();
+            if (stroke < 0 || stroke > 4000) {
+                binding.cfgStroke.setError("0 to 4000 mm");
+                binding.cfgStroke.requestFocus();
                 return;
             }
 
-            final ApConfigMsg msg = new ApConfigMsg(frequency, (short) top, (short) stall, dir);
+            final ApConfigMsg msg = new ApConfigMsg(frequency, (short) stroke, dir);
             Services.bluetooth.actions.setConfig(msg);
         } catch (NumberFormatException e) {
             Timber.e(e);
