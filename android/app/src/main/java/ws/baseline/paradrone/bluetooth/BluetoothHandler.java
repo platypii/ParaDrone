@@ -235,7 +235,7 @@ class BluetoothHandler {
     };
 
     private void processBytes(@NonNull byte[] value) {
-        if (value[0] == 'C' && value.length == 10) {
+        if (value[0] == 'C' && value.length == 8) {
             // Config message
             ApConfigMsg.parse(value);
         } else if (value[0] == 'D' && value.length == 17) {

@@ -10,17 +10,15 @@ import timber.log.Timber;
 
 public class ApConfigMsg implements ApEvent {
     public final int frequency;
-    public final short top; // mm
-    public final short stall; // mm
+    public final short stroke; // mm
     public final byte dir;
 
     @Nullable
     public static ApConfigMsg lastCfg;
 
-    public ApConfigMsg(int frequency, short top, short stall, byte dir) {
+    public ApConfigMsg(int frequency, short stroke, byte dir) {
         this.frequency = frequency;
-        this.top = top;
-        this.stall = stall;
+        this.stroke = stroke;
         this.dir = dir;
     }
 
@@ -29,10 +27,9 @@ public class ApConfigMsg implements ApEvent {
             // 'C', freq, top, stall, dir
             final ByteBuffer buf = ByteBuffer.wrap(value).order(ByteOrder.LITTLE_ENDIAN);
             final int freq = buf.getInt(1);
-            final short top = buf.getShort(5);
-            final short stall = buf.getShort(7);
-            final byte dir = buf.get(9);
-            lastCfg = new ApConfigMsg(freq, top, stall, dir);
+            final short stroke = buf.getShort(5);
+            final byte dir = buf.get(7);
+            lastCfg = new ApConfigMsg(freq, stroke, dir);
             Timber.i("ap -> phone: cfg %s", lastCfg);
             EventBus.getDefault().post(lastCfg);
         } else {
@@ -43,13 +40,12 @@ public class ApConfigMsg implements ApEvent {
     @NonNull
     public byte[] toBytes() {
         // Pack frequency into bytes
-        final byte[] bytes = new byte[10];
+        final byte[] bytes = new byte[8];
         bytes[0] = 'C';
         final ByteBuffer buf = ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN);
         buf.putInt(1, frequency);
-        buf.putShort(5, top);
-        buf.putShort(7, stall);
-        buf.put(9, dir);
+        buf.putShort(5, stroke);
+        buf.put(7, dir);
         return bytes;
     }
 
@@ -73,6 +69,6 @@ public class ApConfigMsg implements ApEvent {
         final double f = frequency * 1e-6;
         final char l = left() ? '↑' : '↓';
         final char r = right() ? '↑' : '↓';
-        return String.format(Locale.getDefault(), "C %f MHz, %d, %d, %c, %c", f, top, stall, l, r);
+        return String.format(Locale.getDefault(), "C %f MHz, %d, %c, %c", f, stroke, l, r);
     }
 }
