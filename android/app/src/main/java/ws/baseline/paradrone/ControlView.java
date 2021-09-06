@@ -154,7 +154,7 @@ public class ControlView extends View {
         // Send control message at most every 300ms, except always send zero
         if (System.currentTimeMillis() - last_controls_sent >= control_rate || left_toggle + right_toggle == 0) {
             last_controls_sent = System.currentTimeMillis();
-            Services.bluetooth.actions.setMotorPosition(left_toggle, right_toggle);
+            Services.bluetooth.actions.setTogglePosition(left_toggle, right_toggle);
         }
 
         invalidate();

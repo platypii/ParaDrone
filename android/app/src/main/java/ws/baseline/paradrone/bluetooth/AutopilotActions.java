@@ -30,7 +30,7 @@ public class AutopilotActions {
         fetchLandingZone();
     }
 
-    public void setMotorPosition(int left, int right) {
+    public void setTogglePosition(int left, int right) {
         if (left < 0 || left > 255 || right < 0 || right > 255) {
             Timber.e("Invalid motor controls %d %d", left, right);
         }
@@ -66,7 +66,7 @@ public class AutopilotActions {
         sendCommand(new byte[] {'M', (byte) mode});
     }
 
-    public void webInit(@NonNull String ssid, @NonNull String password) {
+    public void startWebServer(@NonNull String ssid, @NonNull String password) {
         Timber.i("phone -> ap: web init %s:%s", ssid, password);
         sendCommand(("W" + ssid + ":" + password).getBytes());
     }

@@ -100,18 +100,31 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"/>
+        android:layout_weight="1" />
 
-    <Button
-        android:id="@+id/cfg_send"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:gravity="center_vertical|end"
-        android:padding="24dp"
-        android:drawablePadding="20dp"
-        android:drawableEnd="@drawable/sendit"
-        android:text="@string/set_config"
-        style="@style/Widget.AppCompat.Button.Borderless"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/cfg_status"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center_vertical" />
+
+        <Button
+            android:id="@+id/cfg_send"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:gravity="center_vertical|end"
+            android:padding="24dp"
+            android:drawablePadding="20dp"
+            android:drawableEnd="@drawable/sendit"
+            android:text="@string/set_config"
+            style="@style/Widget.AppCompat.Button.Borderless" />
+
+    </LinearLayout>
 
 </LinearLayout>
