@@ -5,6 +5,7 @@
     <string name="location_disabled">Location not enabled</string>
     <string name="options_menu">Options menu</string>
     <string name="landing_arrow">Landing arrow</string>
+    <string name="flare">Flare</string>
 
     <!-- Config -->
     <string name="direction">Direction</string>

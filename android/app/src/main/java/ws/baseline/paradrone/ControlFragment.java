@@ -32,7 +32,7 @@ public class ControlFragment extends Fragment {
             Services.bluetooth.actions.setMotorSpeed(0, -127);
         });
         binding.buttonDown.setOnClickListener((e) -> {
-            Services.bluetooth.actions.setMotorPosition(255, 255);
+            Services.bluetooth.actions.setTogglePosition(255, 255);
         });
         binding.setModeIdle.setOnClickListener((e) -> {
             Services.bluetooth.actions.setMode(MODE_IDLE);

@@ -71,4 +71,14 @@ public class ApConfigMsg implements ApEvent {
         final char r = right() ? '↑' : '↓';
         return String.format(Locale.getDefault(), "C %f MHz, %d, %c, %c", f, stroke, l, r);
     }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (obj instanceof ApConfigMsg) {
+            final ApConfigMsg other = (ApConfigMsg) obj;
+            return other.frequency == frequency && other.stroke == stroke && other.dir == dir;
+        } else {
+            return false;
+        }
+    }
 }

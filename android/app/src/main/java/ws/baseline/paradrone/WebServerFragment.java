@@ -81,7 +81,7 @@ public class WebServerFragment extends Fragment {
         final String password = binding.wifiPassword.getText().toString();
         if (!ssid.isEmpty()) {
             binding.webServerUrl.setText("");
-            Services.bluetooth.actions.webInit(ssid, password);
+            Services.bluetooth.actions.startWebServer(ssid, password);
             saveForm(ssid, password);
         } else {
             Toast.makeText(getContext(), "Wifi SSID name required", Toast.LENGTH_SHORT).show();

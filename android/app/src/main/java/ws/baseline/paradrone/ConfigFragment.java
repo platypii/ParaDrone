@@ -29,6 +29,15 @@ public class ConfigFragment extends Fragment {
     private boolean left = false;
     private boolean right = false;
 
+    private enum ConfigViewState {
+        LOADING,
+        READY,
+        SAVING
+    }
+    private ConfigViewState configState = ConfigViewState.LOADING;
+
+    private ApConfigMsg saving = null;
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = ConfigFragmentBinding.inflate(inflater, container, false);
@@ -42,9 +51,6 @@ public class ConfigFragment extends Fragment {
         });
         binding.cfgSend.setOnClickListener((e) -> send());
 
-        // Initiate request for current status
-        Services.bluetooth.actions.fetchConfig();
-
         return binding.getRoot();
     }
 
@@ -54,6 +60,10 @@ public class ConfigFragment extends Fragment {
         ViewState.setMode(ViewState.ViewMode.CFG);
         EventBus.getDefault().register(this);
         onBluetoothState(null);
+
+        // Initiate request for current status
+        Services.bluetooth.actions.fetchConfig();
+        configState = ConfigViewState.LOADING;
     }
 
     @Override
@@ -64,12 +74,23 @@ public class ConfigFragment extends Fragment {
 
     @Subscribe
     public void onConfigMsg(@NonNull ApConfigMsg msg) {
-        // Update views
-        binding.cfgFreq.setText(String.format(Locale.getDefault(), "%d", msg.frequency));
-        binding.cfgStroke.setText(String.format(Locale.getDefault(), "%d", msg.stroke));
-        left = msg.left();
-        right = msg.right();
-        updateLeftRight();
+        if (configState == ConfigViewState.LOADING) {
+            // Update views
+            binding.cfgFreq.setText(String.format(Locale.getDefault(), "%d", msg.frequency));
+            binding.cfgStroke.setText(String.format(Locale.getDefault(), "%d", msg.stroke));
+            left = msg.left();
+            right = msg.right();
+            updateLeftRight();
+        } else if (configState == ConfigViewState.SAVING) {
+            // Check sent value matches the fetched value
+            if (msg.equals(saving)) {
+                binding.cfgStatus.setText("Save success");
+            } else {
+                binding.cfgStatus.setText("Save failed");
+                Timber.e("Configuration save mismatch " + saving + " != " + msg);
+            }
+        }
+        configState = ConfigViewState.READY;
     }
 
     @Subscribe
@@ -91,6 +112,7 @@ public class ConfigFragment extends Fragment {
      * Validate, parse form, and send to device
      */
     private void send() {
+        binding.cfgStatus.setText("");
         try {
             // Load form
             final int frequency = Numbers.parseInt(binding.cfgFreq.getText().toString(), -1);
@@ -109,8 +131,11 @@ public class ConfigFragment extends Fragment {
                 return;
             }
 
-            final ApConfigMsg msg = new ApConfigMsg(frequency, (short) stroke, dir);
-            Services.bluetooth.actions.setConfig(msg);
+            configState = ConfigViewState.SAVING;
+
+            saving = new ApConfigMsg(frequency, (short) stroke, dir);
+            Services.bluetooth.actions.setConfig(saving);
+            Services.bluetooth.actions.fetchConfig();
         } catch (NumberFormatException e) {
             Timber.e(e);
         }
