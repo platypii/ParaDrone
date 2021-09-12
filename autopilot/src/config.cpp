@@ -6,6 +6,7 @@
 #define ADDR_LZ 0
 #define ADDR_MC 13
 #define ADDR_AP 22
+#define ADDR_CAL 23
 
 #define SIGNUM(x) (x < 0) ? -1 : (x > 0)
 
@@ -24,6 +25,9 @@ MotorConfigMessage motor_config = {
 // Multiplier, 1 = clockwise, -1 = counterclockwise
 short config_direction_left = 1;
 short config_direction_right = 1;
+
+// Encoder calibration
+int config_ticks_per_second = 1800;
 
 static void load_flight_mode();
 static void load_landing_zone();
@@ -117,4 +121,12 @@ void set_motor_config(MotorConfigMessage *msg) {
   EEPROM.put(ADDR_MC, *msg);
   EEPROM.commit();
   load_motor_config();
+}
+
+void set_calibration(int ticks_per_second) {
+  // Persist to EEPROM
+  EEPROM.put(ADDR_CAL, ticks_per_second);
+  EEPROM.commit();
+
+  config_ticks_per_second = ticks_per_second;
 }

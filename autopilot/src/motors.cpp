@@ -40,7 +40,7 @@ void motor_loop() {
   motor_right.update(dt);
 
   // Only update speed if it hasn't been overridden
-  if (last_speed_override < 0 || millis() - last_speed_override > RC_SPEED_OVERRIDE_DURATION) {
+  if (last_speed_override < 0 || millis() > last_speed_override + RC_SPEED_OVERRIDE_DURATION) {
     // Calculate target delta and speed to get there
     const short new_speed_left = speed(motor_left.target - motor_left.position);
     const short new_speed_right = speed(motor_right.target - motor_right.position);

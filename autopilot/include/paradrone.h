@@ -30,6 +30,9 @@ extern MotorConfigMessage motor_config;
 extern short config_direction_left;
 extern short config_direction_right;
 
+// Encoder calibration
+extern int config_ticks_per_second;
+
 // Last R/C message received
 extern long last_rc_millis;
 extern long last_speed_override;
@@ -61,6 +64,7 @@ void screen_update();
 void bt_init();
 void bt_send_location(GeoPointV *point);
 void bt_send_url(const char *url);
+void bt_send_calibration(uint16_t left1, uint16_t left2, uint16_t right1, uint16_t right2);
 
 // GPS
 void gps_init();
@@ -81,6 +85,8 @@ void lora_send_lz();
 void config_init();
 void set_landing_zone(LandingZoneMessage *packed);
 void set_motor_config(MotorConfigMessage *msg);
+void set_calibration(int ticks_per_second);
+void calibrate();
 
 // Motors
 void motor_loop();

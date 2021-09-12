@@ -57,6 +57,9 @@ class AutopilotCharacteristic : public BLECharacteristicCallbacks {
         if (value[1] == 'C') {
           // Send motor config in response
           bt_send_motor_config();
+        } else if (value[1] == 'I') {
+          // Run motor calibration
+          calibrate();
         } else if (value[1] == 'Z') {
           // Send LZ in response
           bt_send_lz();
@@ -156,6 +159,18 @@ void bt_send_url(const char *url) {
     uint8_t data[20] = "U";
     memcpy(data + 1, url, len);
     ap_ch->setValue(data, len + 1);
+    ap_ch->notify();
+  }
+}
+
+void bt_send_calibration(uint16_t left1, uint16_t left2, uint16_t right1, uint16_t right2) {
+  if (bt_connected) {
+    uint8_t data[9] = "I";
+    *(short*)(data + 1) = left1;
+    *(short*)(data + 3) = left2;
+    *(short*)(data + 5) = right1;
+    *(short*)(data + 7) = right2;
+    ap_ch->setValue(data, 9);
     ap_ch->notify();
   }
 }

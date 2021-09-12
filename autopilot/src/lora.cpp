@@ -79,7 +79,7 @@ static void lora_read(int parse_len) {
     rc_set_speed(left, right);
     Serial.printf("%.1fs lora motor speed %d %d\n", millis() * 1e-3, left, right);
   } else if (buffer[0] == 'T' && buffer_len == 3) {
-    // Parse controls
+    // Toggle position
     uint8_t left = buffer[1];
     uint8_t right = buffer[2];
     rc_set_position(left, right);

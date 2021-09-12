@@ -15,6 +15,7 @@
 static int next_pwm_channel = 0;
 
 static float normalize_position(float position);
+static float expected_ticks_per_sec(int speed);
 
 /**
  * @param pin_hall_a pin number for hall sensor A
@@ -86,26 +87,29 @@ void Motor::set_speed_hw(const int drive, uint8_t speed) {
 void Motor::update(int dt) {
   if (!dt) return;
 
-  // Position change based on encoder ticks
-  const float tick_delta = (ticks - last_ticks) / ticks_per_unit;
-  const float tick_speed = tick_delta * 255 / (dt * 1e-3) / units_per_second;
+  const int tick_delta = ticks - last_ticks;
   last_ticks = ticks;
 
-  // Position change based on target speed
-  const float speed_delta = units_per_second * speed * dt / 255000;
+  // Position change based on encoder ticks
+  const float tick_distance = tick_delta / ticks_per_unit;
+  const float ticks_per_sec = tick_delta / (dt * 1e-3);
+
+  // Position change based on pwm speed
+  const float pwm_ticks_per_sec = expected_ticks_per_sec(speed);
+  const float pwm_distance = pwm_ticks_per_sec / ticks_per_unit * dt * 1e-3;
 
   // Blended position estimate
   const float use_ticks = 0.8;
-  position += tick_delta * use_ticks + speed_delta * (1 - use_ticks);
+  position += tick_distance * use_ticks + pwm_distance * (1 - use_ticks);
 
   // Update position based on direction sensing
   const int speed_threshhold = 16;
-  if (speed > 0 && tick_speed - speed > speed_threshhold) {
-    Serial.printf("Trying to go down, actually going up %d %f\n", speed, tick_speed);
+  if (speed > 0 && ticks_per_sec - pwm_ticks_per_sec > speed_threshhold) {
+    // Serial.printf("Trying to go down, actually going up %d %f\n", speed, tick_speed);
     // position = 0;
   }
-  if (speed < 0 && tick_speed - speed > speed_threshhold) {
-    Serial.printf("Trying to go up, actually going down %d %f\n", speed, tick_speed);
+  if (speed < 0 && ticks_per_sec - pwm_ticks_per_sec > speed_threshhold) {
+    // Serial.printf("Trying to go up, actually going down %d %f\n", speed, tick_speed);
     // position = 0;
   }
 
@@ -124,4 +128,20 @@ void Motor::update(int dt) {
  */
 static float normalize_position(float position) {
   return position < 0 ? 0 : (position > 255 ? 255 : position);
+}
+
+/**
+ * Return expected ticks/sec for a given motor PWM speed
+ *      ___/
+ *     /
+ */
+static float expected_ticks_per_sec(int speed) {
+  if (speed < -64) {
+    speed += 64;
+  } else if (speed > 64) {
+    speed -= 64;
+  } else {
+    return 0;
+  }
+  return 10.2 * speed;
 }
