@@ -19,6 +19,7 @@ Point3V start = {
 void test_straight() {
   Path *path = straight(start);
   TEST_ASSERT_NOT_NULL(path);
+  if (!path) return;
   TEST_ASSERT_EQUAL_STRING("Str", path->name);
   TEST_ASSERT_EQUAL(1, path->segment_count);
   TEST_ASSERT_EQUAL(10, path_length(path));
@@ -28,6 +29,7 @@ void test_straight() {
 void test_naive() {
   Path *path = naive(start, lz.dest, r);
   TEST_ASSERT_NOT_NULL(path);
+  if (!path) return;
   TEST_ASSERT_EQUAL_STRING("NaiveR", path->name);
   TEST_ASSERT_EQUAL(2, path->segment_count);
   TEST_ASSERT_EQUAL(1589, path_length(path));
@@ -37,6 +39,7 @@ void test_naive() {
 void test_shortest_dubins() {
   Path *path = shortest_dubins(start, lz.dest, r);
   TEST_ASSERT_NOT_NULL(path);
+  if (!path) return;
   TEST_ASSERT_EQUAL_STRING("DubinR", path->name);
   TEST_ASSERT_EQUAL(3, path->segment_count);
   TEST_ASSERT_EQUAL(1848, path_length(path));
@@ -63,6 +66,7 @@ void test_waypoints() {
 void test_autopilot_far() {
   Path *path = search(start, &lz, PARAMOTOR_TURNRADIUS);
   TEST_ASSERT_NOT_NULL(path);
+  if (!path) return;
   const double score = hypot(path->end.x, path->end.y);
   TEST_ASSERT_EQUAL_STRING("NaiveR", path->name);
   TEST_ASSERT_EQUAL(2, path->segment_count);
@@ -76,6 +80,7 @@ void test_autopilot_near() {
   Point3V point = lz.to_point3V(&loc);
   Path *path = search(point, &lz, PARAMOTOR_TURNRADIUS);
   TEST_ASSERT_NOT_NULL(path);
+  if (!path) return;
   const double score = hypot(path->end.x, path->end.y);
   TEST_ASSERT_EQUAL_STRING("Waypoint", path->name);
   TEST_ASSERT_EQUAL(13, path->segment_count);

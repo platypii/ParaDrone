@@ -106,16 +106,21 @@ static double parse_degrees_minutes(const char *dm, const char *nsew) {
   if (!*dm || !*nsew) {
     return NAN;
   }
-  int index = strchr(dm, '.') - dm - 2;
-  char degrees_str[4] = "";
-  strncpy(degrees_str, dm, index);
-  double d = atof(degrees_str);
-  double m = atof(dm + index);
-  double degrees = d + m / 60.0;
-  if (*nsew == 'S' || *nsew == 'W') {
-    return -degrees;
+  const char *dot = strchr(dm, '.');
+  if (dot) {
+    const int index = dot - dm - 2;
+    char degrees_str[4] = "";
+    strncpy(degrees_str, dm, index);
+    const double d = atof(degrees_str);
+    const double m = atof(dm + index);
+    const double degrees = d + m / 60.0;
+    if (*nsew == 'S' || *nsew == 'W') {
+      return -degrees;
+    } else {
+      return degrees;
+    }
   } else {
-    return degrees;
+    return NAN;
   }
 }
 
@@ -150,7 +155,7 @@ static uint64_t parse_time(const char *str) {
  */
 static double parse_double(const char *str) {
   char *end;
-  double parsed = strtod(str, &end);
+  const double parsed = strtod(str, &end);
   if (str != end) {
     return parsed;
   } else {

@@ -12,6 +12,7 @@
 
 /**
  * Construct a new path object.
+ * Segments will be shallow copied to new array.
  */
 Path *new_path(const char *name, uint8_t segment_count, Segment *segments[]) {
   if (segment_count <= 0) {
@@ -100,18 +101,23 @@ double path_length(Path *path) {
   return len;
 }
 
-ParaControls path_controls(Path *path) {
+/**
+ * Return the toggle position to fly a path
+ */
+TogglePosition path_controls(Path *path) {
   Segment *segment = path->segments[0];
   if (segment->segment_type == 'T') {
     Turn *turn = (Turn *) segment;
     return turn_controls(turn);
   } else {
     // Straight
-    ParaControls ctrl = {};
-    return ctrl;
+    return TogglePosition {};
   }
 }
 
+/**
+ * Free a path and all its segments
+ */
 void free_path(Path *path) {
   if (path) {
     // Free segments

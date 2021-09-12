@@ -46,7 +46,6 @@ Motor::Motor(int pin_hall_a, int pin_hall_b, int pin_pwm1, int pin_pwm2, short *
  * -255 = full speed up, 255 = full speed down
  */
 void Motor::set_speed(short new_speed) {
-  // Serial.printf("Set ctrl %d %d\n", left, right);
   // TODO: Update position estimate
   speed = new_speed;
   const short hw_speed = *config_direction * speed;

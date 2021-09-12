@@ -86,8 +86,8 @@ void planner_update_location(GeoPointV *point) {
       if (current_plan) free_path(current_plan);
       current_plan = new_plan;
       current_plan_name = new_plan->name;
-      ParaControls ctrl = path_controls(current_plan);
-      set_toggles(ctrl.left, ctrl.right);
+      TogglePosition toggles = path_controls(current_plan);
+      set_toggles(toggles.left, toggles.right);
       const double error_x = current_plan->end.x;
       const double error_y = current_plan->end.y;
       const double landing_error = sqrt(error_x * error_x + error_y * error_y);

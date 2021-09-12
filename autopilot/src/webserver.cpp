@@ -19,17 +19,21 @@ unsigned long previousTime = 0;
 // Define timeout time in milliseconds (example: 2000ms = 2s)
 const long timeoutTime = 2000;
 
-static void send_header(WiFiClient client, int status, const char *contentType);
+static void send_header(WiFiClient client, int status, const char *content_type = NULL, boolean cors = false);
 static void send_landing_page(WiFiClient client);
 static void send_file(WiFiClient client, char *filename);
 static void delete_file(WiFiClient client, char *filename);
 static void parse_location();
+static void parse_lz();
 
 void web_init(const char *ssid, const char *password) {
   if (web_started) {
     Serial.println("Web already started");
     return;
   }
+
+  // Stop GPS
+  Serial2.end();
 
   // Connect to Wi-Fi network with SSID and password
   Serial.print("Connecting to ");
@@ -94,8 +98,13 @@ void web_loop() {
             } else if (request.startsWith("GET /msg")) {
               // Parse location from parameters
               parse_location();
+              send_header(client, 200, NULL, true);
+            } else if (request.startsWith("GET /lz")) {
+              // Parse lz from parameters
+              parse_lz();
+              send_header(client, 200, NULL, true);
             } else {
-              send_header(client, 404, NULL);
+              send_header(client, 404);
             }
 
             client.println();
@@ -116,10 +125,13 @@ void web_loop() {
   }
 }
 
-static void send_header(WiFiClient client, int status, const char *contentType) {
+static void send_header(WiFiClient client, int status, const char *content_type, boolean cors) {
   client.printf("HTTP/1.1 %d OK\n", status);
-  if (contentType) {
-    client.printf("Content-type: %s\n", contentType);
+  if (content_type) {
+    client.printf("Content-type: %s\n", content_type);
+  }
+  if (cors) {
+    client.printf("Access-Control-Allow-Origin: *\n");
   }
   client.println("Connection: close");
   client.println();
@@ -180,7 +192,7 @@ static void send_file(WiFiClient client, char *filename) {
       client.write(buf, len);
     }
   } else {
-    send_header(client, 404, NULL);
+    send_header(client, 404);
     client.printf("Failed to open file '%s'\n", filename);
   }
   file.close();
@@ -189,9 +201,9 @@ static void send_file(WiFiClient client, char *filename) {
 static void delete_file(WiFiClient client, char *filename) {
   Serial.printf("Delete %s\n", filename);
   if (SPIFFS.remove(filename)) {
-    send_header(client, 200, NULL);
+    send_header(client, 200);
   } else {
-    send_header(client, 400, NULL);
+    send_header(client, 400);
     client.printf("Failed to delete file '%s'\n", filename);
   }
 }
@@ -228,4 +240,26 @@ static void parse_location() {
     .climb = climb
   };
   update_location(loc);
+}
+
+/**
+ * Parse landing zone from request parameters
+ */
+static void parse_lz() {
+  const int url_start = request.indexOf(' ', 0) + 5;
+  const int url_end = request.indexOf(' ', url_start);
+  String params = request.substring(url_start, url_end);
+  const double lat = get_param(params, "lat");
+  const double lng = get_param(params, "lng");
+  const double alt = get_param(params, "alt");
+  const double dir = get_param(params, "dir");
+  // Set lz
+  LandingZoneMessage *lz = new LandingZoneMessage {
+    .msg_type = 'Z',
+    .lat = (int) (lat * 1e6), // microdegrees
+    .lng = (int) (lng * 1e6), // microdegrees
+    .alt = (short) (alt * 10), // decimeters
+    .landing_direction = (short) (dir * 1e3) // milliradians
+  };
+  set_landing_zone(lz);
 }

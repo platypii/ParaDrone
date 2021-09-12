@@ -1,6 +1,8 @@
 #ifndef _MOTOR_H
 #define _MOTOR_H
 
+#include <stdint.h>
+
 // Motor parameters
 #define spool_circumference 0.05 // meters
 #define motor_rpm 220 // no-load motor speed

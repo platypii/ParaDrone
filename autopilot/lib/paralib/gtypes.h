@@ -95,7 +95,7 @@ struct Path {
  * 0 = no deflection
  * 255 = full deflection
  */
-struct ParaControls {
+struct TogglePosition {
   uint8_t left;
   uint8_t right;
 };

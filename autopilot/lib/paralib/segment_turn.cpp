@@ -98,7 +98,7 @@ Path *turn_fly(Turn *turn, const double distance) {
  * Return target toggle position for a given turn.
  * If the turn is short, don't crank a hard toggle turn.
  */
-ParaControls turn_controls(Turn *turn) {
+TogglePosition turn_controls(Turn *turn) {
   const float x = arcs(turn);
   float activation = 1;
   if (x < minimum_turn) {
@@ -107,13 +107,13 @@ ParaControls turn_controls(Turn *turn) {
     activation = 0.01f + 0.99f * (x - minimum_turn) / (maximum_turn - minimum_turn);
   }
   const uint8_t deflect = activation * 255;
-  ParaControls ctrl = {};
+  TogglePosition toggles = {};
   if (turn->turn == TURN_RIGHT) {
-    ctrl.right = deflect;
+    toggles.right = deflect;
   } else {
-    ctrl.left = deflect;
+    toggles.left = deflect;
   }
-  return ctrl;
+  return toggles;
 }
 
 /**

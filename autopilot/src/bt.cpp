@@ -73,9 +73,13 @@ class AutopilotCharacteristic : public BLECharacteristicCallbacks {
       } else if (value[0] == 'W') {
         Serial.printf("%.1fs bt web server\n", millis() * 1e-3);
         const char *userpass = value.c_str();
-        const char *password = strchr(value.c_str(), ':') + 1;
-        const char *ssid = value.substr(1, password - userpass - 2).c_str();
-        web_init(ssid, password);
+        char *split = strchr(userpass, ':');
+        if (split) {
+          *split = 0;
+          web_init(userpass + 1, split + 1);
+        } else {
+          Serial.printf("%.1fs bt invalid command %s\n", millis() * 1e-3, value.c_str());
+        }
       } else if (value[0] == 'Z' && value.length() == 13) {
         set_landing_zone((LandingZoneMessage*) value.c_str());
         screen_update();

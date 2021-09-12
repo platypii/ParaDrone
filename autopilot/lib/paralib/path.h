@@ -19,13 +19,13 @@ PointV turn_start(Turn *turn);
 PointV turn_end(Turn *turn);
 Path *turn_fly(Turn *turn, const double distance);
 double turn_length(Turn *turn);
-ParaControls turn_controls(Turn *turn);
+TogglePosition turn_controls(Turn *turn);
 
 // Paths
 Path *new_path(const char *name, uint8_t segment_count, Segment *segments[]);
 Path *path_fly_free(Path *path, double distance);
 double path_length(Path *path);
-ParaControls path_controls(Path *path);
+TogglePosition path_controls(Path *path);
 void free_path(Path *path);
 
 #endif

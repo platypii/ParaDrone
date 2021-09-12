@@ -91,7 +91,7 @@ void set_toggles(uint8_t new_left, uint8_t new_right);
 void planner_loop();
 void planner_update_location(GeoPointV *point);
 double plan_score(LandingZone *lz, Path *plan);
-ParaControls path_controls(Path *path);
+TogglePosition path_controls(Path *path);
 
 // Flight computer
 void set_flight_mode(uint8_t mode);
