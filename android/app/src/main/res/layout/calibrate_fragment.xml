@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:ignore="HardcodedText">
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:padding="16dp"
+        android:src="@drawable/calibrate" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal">
+
+        <TextView
+            android:id="@+id/calibrate_left1"
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_marginHorizontal="60dp"
+            android:layout_marginVertical="16dp" />
+
+        <TextView
+            android:id="@+id/calibrate_right1"
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_marginHorizontal="60dp"
+            android:layout_marginVertical="16dp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal">
+
+        <TextView
+            android:id="@+id/calibrate_left2"
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_marginHorizontal="60dp"
+            android:layout_marginVertical="16dp" />
+
+        <TextView
+            android:id="@+id/calibrate_right2"
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_marginHorizontal="60dp"
+            android:layout_marginVertical="16dp" />
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/cfg_status"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center_vertical" />
+
+
+        <Button
+            android:id="@+id/calibrate"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:gravity="center_vertical|end"
+            android:padding="24dp"
+            android:drawablePadding="20dp"
+            android:drawableEnd="@drawable/measure"
+            android:text="@string/calibrate"
+            style="@style/Widget.AppCompat.Button.Borderless"/>
+
+    </LinearLayout>
+
+</LinearLayout>

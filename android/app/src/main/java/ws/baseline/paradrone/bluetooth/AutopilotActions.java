@@ -71,6 +71,11 @@ public class AutopilotActions {
         sendCommand(("W" + ssid + ":" + password).getBytes());
     }
 
+    public void calibrate() {
+        Timber.i("phone -> ap: calibrate");
+        sendCommand(new byte[] {'Q', 'I'});
+    }
+
     private void sendCommand(@NonNull byte[] value) {
         if (bt.bluetoothHandler != null) {
             bt.bluetoothHandler.sendCommand(value);

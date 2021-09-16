@@ -12,6 +12,9 @@
     <string name="right">Right</string>
     <string name="left">Left</string>
     <string name="set_config">Set Config</string>
+    <string name="calibrate">Calibrate</string>
+    <string name="save_success">Save success</string>
+    <string name="save_failed">Save failed</string>
 
     <!-- Landing zone -->
     <string name="landing_location">Latitude, Longitude, Direction</string>

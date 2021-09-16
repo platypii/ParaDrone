@@ -60,7 +60,7 @@ public class LandingFragment extends Fragment {
     private void update(@Nullable LatLng ll, double direction) {
         if (ll != null) {
             final double degrees = Math.toDegrees(direction);
-            binding.landingLocation.setText(String.format(Locale.US, "%.6f, %.6f, %.0f", ll.latitude, ll.longitude, degrees));
+            binding.landingLocation.setText(String.format(Locale.US, "%.6f, %.6f, %.0f°", ll.latitude, ll.longitude, degrees));
         }
     }
 
