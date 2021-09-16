@@ -49,6 +49,7 @@ public class ConfigFragment extends Fragment {
             right = !right;
             updateLeftRight();
         });
+        binding.cfgCalibrate.setOnClickListener((e) -> calibrate());
         binding.cfgSend.setOnClickListener((e) -> send());
 
         return binding.getRoot();
@@ -84,9 +85,9 @@ public class ConfigFragment extends Fragment {
         } else if (configState == ConfigViewState.SAVING) {
             // Check sent value matches the fetched value
             if (msg.equals(saving)) {
-                binding.cfgStatus.setText("Save success");
+                binding.cfgStatus.setText(R.string.save_success);
             } else {
-                binding.cfgStatus.setText("Save failed");
+                binding.cfgStatus.setText(R.string.save_failed);
                 Timber.e("Configuration save mismatch " + saving + " != " + msg);
             }
         }
@@ -106,6 +107,17 @@ public class ConfigFragment extends Fragment {
             binding.cfgLeft.setImageDrawable(getDrawable(ctx, leftIcon));
             binding.cfgRight.setImageDrawable(getDrawable(ctx, rightIcon));
         }
+    }
+
+    /**
+     * Open the calibration fragment
+     */
+    private void calibrate() {
+        getParentFragmentManager()
+                .beginTransaction()
+                .replace(R.id.control_plane, new CalibrateFragment())
+                .addToBackStack(null)
+                .commit();
     }
 
     /**
@@ -140,4 +152,5 @@ public class ConfigFragment extends Fragment {
             Timber.e(e);
         }
     }
+
 }

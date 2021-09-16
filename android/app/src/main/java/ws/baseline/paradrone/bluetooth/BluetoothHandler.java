@@ -241,6 +241,9 @@ class BluetoothHandler {
         } else if (value[0] == 'D' && value.length == 17) {
             // Speed message
             ApSpeedMsg.parse(value);
+        } else if (value[0] == 'I' && value.length == 9) {
+            // Calibration message
+            ApCalibrationMsg.parse(value);
         } else if (value[0] == 'L' && value.length == 11) {
             // Location message
             ApLocationMsg.parse(value);
