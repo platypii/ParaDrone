@@ -13,7 +13,9 @@ import { viaWaypoints } from "./plan/planner-waypoints"
 import { allDubins } from "./plan/shortest-dubins"
 
 const naive_distance = 600 // Fly straight to the lz
-const lookahead = 3000 // milliseconds
+const lookahead = 2000 // milliseconds
+// Expand the radius to account for time to turn
+const radiusFactor = 1.2
 
 /**
  * Controls a paraglider toward a landing zone
@@ -63,7 +65,7 @@ export function search(loc: Point3V, para: Paraglider, lz: LandingZone): Path {
   }
 
   const pattern = new LandingPattern(para, lz)
-  const effectiveRadius = para.turnRadius * 1.25
+  const effectiveRadius = para.turnRadius * radiusFactor
   const distance2 = loc.x * loc.x + loc.y * loc.y // squared
 
   // How much farther can we fly with available altitude?

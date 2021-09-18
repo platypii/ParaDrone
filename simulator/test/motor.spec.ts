@@ -17,7 +17,7 @@ describe("Motor model", () => {
 
     motor.update(100) // 10 Hz
     assert.equal(motor.target, 40)
-    assert.approximately(motor.position, 3.9, 0.01)
+    assert.approximately(motor.position, 6.3, 0.1)
     assert.equal(motor.speed, 255)
   })
 })

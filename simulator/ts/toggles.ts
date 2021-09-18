@@ -42,14 +42,14 @@ export class Toggles {
   public turnSpeed(): number {
     const minSpeed = 6 // m/s
     const maxSpeed = 12 // m/s
-    return maxSpeed - (this.left.position + this.right.position) / 512 * (maxSpeed - minSpeed)
+    return maxSpeed - (this.left.actualPosition + this.right.actualPosition) / 512 * (maxSpeed - minSpeed)
   }
 
   /**
    * Left/right balance of current toggle position
    */
   public turnBalance(): number {
-    return (this.right.position - this.left.position) / 255 // [-1..1]
+    return (this.right.actualPosition - this.left.actualPosition) / 255 // [-1..1]
   }
 
   public clone(): Toggles {

@@ -15,7 +15,7 @@ export interface SimStep {
  * Warning: para argument will be mutated! Pass para.clone().
  */
 export function sim(para: Paraglider, lz: LandingZone, wind: Wind): SimStep[] {
-  const dt = 1000 // step size in milliseconds
+  const dt = 200 // step size in milliseconds
   const autopilot = new Autopilot(para, lz)
 
   const actual: SimStep[] = [{

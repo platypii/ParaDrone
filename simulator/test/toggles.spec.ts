@@ -17,7 +17,7 @@ describe("Toggles model", () => {
 
     assert.equal(toggles.left.target, 40)
     assert.equal(toggles.right.target, 0)
-    assert.approximately(toggles.left.position, 3.9, 0.01)
+    assert.approximately(toggles.left.position, 6.3, 0.1)
     assert.equal(toggles.right.position, 0)
     assert.equal(toggles.left.speed, 255)
     assert.equal(toggles.right.speed, 0)

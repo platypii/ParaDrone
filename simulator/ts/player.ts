@@ -8,7 +8,7 @@ const playButton = document.getElementById("map-play")!
  * Control playback of the simulation
  */
 export class Player {
-  private readonly tickInterval = 1000 // milliseconds
+  private readonly tickInterval = 200 // milliseconds
   private readonly playbackSpeed = 5 // milliseconds
 
   private readonly para: Paraglider
