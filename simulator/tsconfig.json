@@ -12,7 +12,7 @@
     "noFallthroughCasesInSwitch": true,
     "noEmitOnError": true,
     "noImplicitReturns": true,
-    // "noUnusedLocals": true, // TODO: stricter
+    "noUnusedLocals": true,
     // "noUnusedParameters": true, // TODO: stricter
     "outDir": "js",
     // "outFile": "js/main.js",

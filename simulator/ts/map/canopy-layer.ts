@@ -4,7 +4,6 @@ import { MapLayer } from "./basemap"
 
 export class CanopyLayer implements MapLayer {
   private loc?: GeoPointV
-  private rotation: number = 0
 
   private map?: Cesium.Viewer
   private entity?: Cesium.Entity

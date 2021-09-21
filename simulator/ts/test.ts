@@ -76,7 +76,6 @@ function sleepySearch(input: GeoPointV[], output: TestScore[], index: number): v
   if (index >= input.length) {
     // Done
     btn.disabled = false
-    // TODO: Un-set spinner
     return
   }
   for (let i = index; i < index + batchSize && i < input.length; i++) {
@@ -93,10 +92,11 @@ function evaluate(location: GeoPointV): TestScore {
   }
 
   // Update map layer
-  // TODO: Color by score
-  let color = "#1f15"
-  if (score.distance > 50) {
-    color = "#f115"
+  let color = "#1e15"
+  if (score.distance > 100) {
+    color = "#e115" // red
+  } else if (score.distance > 50) {
+    color = "#ee15" // yellow
   }
   const layer = new HeatLayer(location, gridStep, color)
   gridLayers.push(layer)

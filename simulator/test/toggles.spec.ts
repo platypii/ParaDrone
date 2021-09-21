@@ -12,8 +12,8 @@ describe("Toggles model", () => {
     assert.equal(toggles.right.speed, 0)
 
     toggles.setToggles(40, 0)
-    toggles.update(0.1) // 10 Hz
-    toggles.update(0.1) // 10 Hz
+    toggles.update(100) // 10 Hz
+    toggles.update(100) // 10 Hz
 
     assert.equal(toggles.left.target, 40)
     assert.equal(toggles.right.target, 0)

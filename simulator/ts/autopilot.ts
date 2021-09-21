@@ -12,7 +12,7 @@ import { straight } from "./plan/planner-straight"
 import { viaWaypoints } from "./plan/planner-waypoints"
 import { allDubins } from "./plan/shortest-dubins"
 
-const lookahead = 3 // seconds
+const lookahead = 3000 // milliseconds
 
 /**
  * Controls a paraglider toward a landing zone

@@ -3,6 +3,8 @@ import * as geo from "./geo/geo"
 import { LandingZone } from "./geo/landingzone"
 import { Toggles } from "./toggles"
 
+const gpsRefresh = 1000 // milliseconds
+
 const zerowind: Wind = {
   vE: 0,
   vN: 0,
@@ -24,6 +26,8 @@ export class Paraglider {
   // State
   public readonly toggles: Toggles
   public loc?: GeoPointV
+
+  private lastGps: number = -gpsRefresh
 
   // TODO: Heading, pitch, roll Orientation
 
@@ -60,16 +64,21 @@ export class Paraglider {
 
   /**
    * Step forward dt seconds of time.
+   * @param dt time step in milliseconds
    */
   public tick(dt: number, wind: Wind): void {
     if (this.loc) {
       const next = this.predict(dt, wind)!
+      this.loc = next
 
       // Update toggle position
       this.toggles.update(dt)
 
       // Notify listeners (eg- autopilot planner)
-      this.setLocation(next)
+      if (this.loc.millis >= this.lastGps + gpsRefresh) {
+        this.setLocation(next)
+        this.lastGps = this.loc.millis
+      }
     }
   }
 
@@ -77,6 +86,7 @@ export class Paraglider {
    * Predict where the glider will be in dt seconds.
    * Takes into account position, speed, and toggle position.
    * TODO: Adjust velocities on WSE
+   * @param dt time step in milliseconds
    */
   public predict(dt: number, wind: Wind = zerowind): GeoPointV | undefined {
     const alpha = 0.5 // moving average filter applied to toggle inputs to simulate the fact that speed and direction don't change instantly
@@ -91,7 +101,7 @@ export class Paraglider {
       const turnSpeed = this.toggles.turnSpeed()
       const turnBalance = this.toggles.turnBalance()
       airSpeed += (turnSpeed - airSpeed) * alpha
-      const distance = airSpeed * dt
+      const distance = airSpeed * dt / 1000
       // Air bearing
       const startBearing = Math.atan2(vEair, vNair)
       const endBearing = startBearing + distance * turnBalance / this.turnRadius
@@ -101,18 +111,18 @@ export class Paraglider {
       // Move lat,lng by distance and bearing of flight path relative to wind
       const prewind = geo.moveBearing(this.loc.lat, this.loc.lng, chordBearing, distance)
       // Move lat,lng by wind drift
-      const postwind = geo.moveBearing(prewind.lat, prewind.lng, wind.bear(), wind.vel() * dt)
+      const postwind = geo.moveBearing(prewind.lat, prewind.lng, wind.bear(), wind.vel() * dt / 1000)
 
       // Adjust velocity
       const vE = airSpeed * Math.sin(endBearing) + wind.vE
       const vN = airSpeed * Math.cos(endBearing) + wind.vN
 
       // Adjust altitude
-      const alt = this.loc.alt + this.loc.climb * dt
+      const alt = this.loc.alt + this.loc.climb * dt / 1000
       const climb = this.loc.climb + (this.climbRate - this.loc.climb) * alpha
 
       return {
-        millis: this.loc.millis + 1000 * dt,
+        millis: this.loc.millis + dt,
         ...postwind,
         alt,
         climb,

@@ -23,11 +23,11 @@ export class Toggles {
 
   /**
    * Update motor position estimate, and set motor speed
-   * @param dt seconds since last update
+   * @param dt milliseconds since last update
    */
   public update(dt: number) {
-    this.left.update(dt * 1000)
-    this.right.update(dt * 1000)
+    this.left.update(dt)
+    this.right.update(dt)
   }
 
   public setToggles(left: number, right: number) {

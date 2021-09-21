@@ -8,8 +8,8 @@ const playButton = document.getElementById("map-play")!
  * Control playback of the simulation
  */
 export class Player {
-  private readonly interval = 200 // milliseconds
-  private readonly dt = 1 // seconds
+  private readonly tickInterval = 1000 // milliseconds
+  private readonly playbackSpeed = 5 // milliseconds
 
   private readonly para: Paraglider
   private readonly lz: LandingZone
@@ -41,9 +41,9 @@ export class Player {
         if (this.para.landed(this.lz)) {
           this.stop()
         } else {
-          this.para.tick(this.dt, this.wind)
+          this.para.tick(this.tickInterval, this.wind)
         }
-      }, this.interval)
+      }, this.tickInterval / this.playbackSpeed)
     }
   }
 
@@ -52,7 +52,7 @@ export class Player {
       this.stop()
     }
     if (!this.para.landed(this.lz)) {
-      this.para.tick(this.dt, this.wind)
+      this.para.tick(this.tickInterval, this.wind)
     }
   }
 

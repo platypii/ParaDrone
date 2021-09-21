@@ -65,7 +65,7 @@ export function init() {
 
 function setStart(latlng: LatLngAlt) {
   start = {
-    millis: new Date().getTime(),
+    millis: 0, // new Date().getTime(),
     lat: latlng.lat,
     lng: latlng.lng,
     alt: latlng.alt,

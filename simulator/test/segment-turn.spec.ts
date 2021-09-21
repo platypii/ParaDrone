@@ -2,8 +2,6 @@ import { Turn } from "../ts/dtypes"
 import { SegmentTurn } from "../ts/geo/segment-turn"
 import { assert } from "chai"
 
-const r = 100
-
 describe("Turn segment", () => {
   const circle = {x: 0, y: 0, radius: 10}
 
