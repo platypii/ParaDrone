@@ -5,6 +5,13 @@
 // tags       : Radio,relay,remote control,drone,paraglider
 // file       : relay.jscad
 
+const { subtract, union } = require('@jscad/modeling').booleans
+const { colorize, cssColors } = require('@jscad/modeling').colors
+const { extrudeLinear } = require('@jscad/modeling').extrusions
+const { mirror, rotate, translate } = require('@jscad/modeling').transforms
+const { polygon } = require('@jscad/modeling').primitives
+const { cube, cylinder } = require('./v1')
+
 const qty = .7
 
 const topY = 32.5
@@ -23,34 +30,34 @@ const rightX = sizeX / 2
 const sh = 2 // shell width
 
 const colors = {
-  esp32: "white",
-  topcase: "magenta",
-  bottomcase: "purple"
+  esp32: cssColors.white,
+  topcase: cssColors.magenta,
+  bottomcase: cssColors.purple
 }
 
 function main() {
   return union(
     // mechanism(),
-    color(colors.topcase, topcase())
-    // color(colors.bottomcase, bottomcase())
+    colorize(colors.topcase, topcase())
+    // colorize(colors.bottomcase, bottomcase())
   )
 }
 
 function topcase() {
   return union(
-    difference(
+    subtract(
       shell(0, splitZ, sizeZ), // outer
       inner(),
       ahole(),
       translate([leftX - .1, 12.25, splitZ + 2.5], cube({size: [2.2, 8, 3], radius: [0, .6, .6], fn: 15 * qty})), // USB hole
       mechanism()
     ),
-    difference(
+    subtract(
       bulge(0, splitZ - 1, sizeZ),
       ahole(),
       antenna()
     ),
-    difference(
+    subtract(
       topridge(),
       ahole()
     ),
@@ -60,7 +67,7 @@ function topcase() {
 
 function bottomcase() {
   const bot = union(
-    difference(
+    subtract(
       shell(0, 0, splitZ), // outer
       inner(),
       bottomridge(),
@@ -69,13 +76,13 @@ function bottomcase() {
       latchholes(),
       ahole()
     ),
-    difference(
+    subtract(
       bulge(0, 0, splitZ - 1),
       ahole()
     )
   )
   if (battThic) {
-    return difference(bot, powerhole())
+    return subtract(bot, powerhole())
   } else {
     return union(bot, supports())
   }
@@ -93,14 +100,14 @@ function antenna() {
   const z = sizeZ - 5.5
   return union(
     cylinder({r: 3.2, start: [rightX + 10, topY - 6, z], end: [rightX - 2, topY - 6, z], fn: 25 * qty}), // antenna hole
-    translate([32.9, 26.5, z], rotate([0, 90, 0], linear_extrude({height: 2.2},
-      polygon([[4.6,0], [2.3,4], [-2.3,4], [-4.6,0], [-2.3,-4], [2.3,-4]])
+    translate([32.9, 26.5, z], rotate([0, 90, 0], extrudeLinear({height: 2.2},
+      polygon({points: [[4.6, 0], [2.3, 4], [-2.3, 4], [-4.6, 0], [-2.3, -4], [2.3, -4]]})
     )))
   )
 }
 
 function shell(inset, bottom, top) {
-  return translate([leftX + inset, inset, bottom], cube({size: [sizeX - 2*inset, sizeY - 2*inset, top - bottom], radius: [3 - inset, 3 - inset, 0], fn: 15 * qty}))
+  return translate([leftX + inset, inset, bottom], cube({size: [sizeX - 2 * inset, sizeY - 2 * inset, top - bottom], radius: [3 - inset, 3 - inset, 0], fn: 15 * qty}))
 }
 function outer() {
   return shell(0, 0, sizeZ)
@@ -109,21 +116,21 @@ function inner() {
   return shell(sh, 1.5, sizeZ - 1.5)
 }
 function bottomridge() {
-  return difference(
+  return subtract(
     shell(0, splitZ - 1, splitZ),
     shell(1.2, splitZ - 1, splitZ)
   )
 }
 function topridge() {
-  return difference(
+  return subtract(
     shell(0, splitZ - 1, splitZ + .1),
     shell(0.8, splitZ - 2, splitZ + 1)
   )
 }
 
 function bulge(inset, bottom, top) {
-  return difference(
-    translate([rightX - 6 + inset, topY - 12 + inset, bottom], cube({size: [15 - 2*inset, 12 - 2*inset, top - bottom], radius: [3 - inset, 3 - inset, 0], fn: 15 * qty})),
+  return subtract(
+    translate([rightX - 6 + inset, topY - 12 + inset, bottom], cube({size: [15 - 2 * inset, 12 - 2 * inset, top - bottom], radius: [3 - inset, 3 - inset, 0], fn: 15 * qty})),
     shell(0, 0, sizeZ)
   )
 }
@@ -160,12 +167,15 @@ function latchholes() {
 function latch(angle) {
   return rotate(
     [-90, 0, angle],
-    linear_extrude({height: 8}, polygon([[-.5, -1], [-.5, 9.5], [1, 9.2], [1.4, 8.3], [.8, 8], [.8, 6], [1,6], [1, -1]]))
+    extrudeLinear(
+      {height: 8},
+      polygon({points: [[-.5, -1], [-.5, 9.5], [1, 9.2], [1.4, 8.3], [.8, 8], [.8, 6], [1, 6], [1, -1]]})
+    )
   )
 }
 
 function supports() {
-  return difference(
+  return subtract(
     union(
       corner(-19, 4, 0),
       corner(-19, 28, -90),
@@ -204,14 +214,16 @@ function mechanism() {
 
 function esp32() {
   const h = 25.4
-  const circuitboard = linear_extrude({height: 2.5}, polygon([
-    [0,8.2], [-1,7.2], [-1,1.8], [1,0], [48,0], [48,4], [52.3,8], [52.3,h-8], [48,h-4], [48,h], [1,h], [-1,h-1.8], [-1,h-7.2], [0,h-8.2]
-  ]))
+  const circuitboard = extrudeLinear({height: 2.5}, polygon({points: [
+    [0, 8.2], [-1, 7.2], [-1, 1.8], [1, 0], [48, 0], [48, 4], [52.3, 8], [52.3, h-8], [48, h-4], [48, h], [1, h], [-1, h - 1.8], [-1, h - 7.2], [0, h - 8.2]
+  ]}))
   return translate([leftX + 1.2, 3.5, splitZ - 8], union(
-    color(colors.esp32, translate([0, 0, 9], circuitboard)),
-    color([0, 0, 0, 0.4], translate([13.9, 2.7, 12], cube({size: [35, 20.5, 3.8]}))),
-    color([0, 0, 0, 0.4], translate([24.5, 1, 12], cube({size: [14, 2, 3.8]}))),
-    color("black", translate([19, 8, 12], cube({size: [25.8, 13, 4.4]}))),
-    color("brown", cylinder({r: 3.2, start: [11, 19.5, 10], end: [11, 19.5, 15.8], fn: 25 * qty}))
+    colorize(colors.esp32, translate([0, 0, 9], circuitboard)),
+    colorize([0, 0, 0, 0.4], translate([13.9, 2.7, 12], cube({size: [35, 20.5, 3.8]}))),
+    colorize([0, 0, 0, 0.4], translate([24.5, 1, 12], cube({size: [14, 2, 3.8]}))),
+    colorize(cssColors.black, translate([19, 8, 12], cube({size: [25.8, 13, 4.4]}))),
+    colorize(cssColors.brown, cylinder({r: 3.2, start: [11, 19.5, 10], end: [11, 19.5, 15.8], fn: 25 * qty}))
   ))
 }
+
+module.exports = { main }
