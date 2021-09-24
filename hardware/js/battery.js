@@ -4,12 +4,12 @@
 // tags       : GPS,data,arduino,flysight
 // file       : battery.js
 
-const { cube, cuboid, cylinder, cylinderElliptic, rectangle, roundedRectangle } = require('@jscad/modeling').primitives
+const { cuboid, cylinder, roundedRectangle } = require('@jscad/modeling').primitives
 const { subtract, union } = require('@jscad/modeling').booleans
 const { rotateX, translate } = require('@jscad/modeling').transforms
 const { extrudeLinear } = require('@jscad/modeling').extrusions
 
-const qty = 6
+const qty = 3
 
 const battery = {len: 115, width: 31.5, height: 17.4}
 
@@ -34,7 +34,7 @@ function main() {
 }
 
 function screws() {
-  const screw = rotateX(Math.PI / 2, cylinder({radius: 1.6, height: 4, fn: 25 * qty}))
+  const screw = rotateX(Math.PI / 2, cylinder({radius: 1.6, height: 4}))
   const x = 6.5
   return union(
     translate([-halfX - x, 2, h / 4], screw),
@@ -46,7 +46,7 @@ function screws() {
 
 function cuber(x, y, z, r) {
   if (r) {
-    return translate([x / 2, y / 2, 0], extrudeLinear({height: z}, roundedRectangle({size: [x, y], roundRadius: r, segments: 15 * qty})))
+    return translate([x / 2, y / 2, 0], extrudeLinear({height: z}, roundedRectangle({size: [x, y], roundRadius: r, segments: 30 * qty})))
   } else {
     return cuboid({size: [x, y, z], center: [x / 2, y / 2, z / 2]})
   }

@@ -1,8 +1,11 @@
 {
   "devDependencies": {
-    "@jscad/cli": "^2.2.0"
+    "@jscad/cli": "^2.2.6"
   },
   "scripts": {
     "build": "npx jscad js/*.js"
+  },
+  "dependencies": {
+    "@jscad/modeling": "^2.5.1"
   }
 }
