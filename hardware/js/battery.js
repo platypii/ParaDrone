@@ -44,11 +44,19 @@ function screws() {
   )
 }
 
+/**
+ * Generate a rounded rectangle with flat top and bottom.
+ * @param x x size
+ * @param y y size
+ * @param z z size
+ * @param r corner radius
+ * @param q quality setting
+ */
 function cuber(x, y, z, r) {
   if (r) {
-    return translate([x / 2, y / 2, 0], extrudeLinear({height: z}, roundedRectangle({size: [x, y], roundRadius: r, segments: 30 * qty})))
+    return extrudeLinear({height: z}, roundedRectangle({center: [x / 2, y / 2], size: [x, y], roundRadius: r, segments: qty * 30}))
   } else {
-    return cuboid({size: [x, y, z], center: [x / 2, y / 2, z / 2]})
+    return cuboid({center: [x / 2, y / 2, z / 2], size: [x, y, z]})
   }
 }
 

@@ -2,19 +2,22 @@ const { cuboid, cylinder, cylinderElliptic, roundedCuboid } = require('@jscad/mo
 const { rotate, translate } = require('@jscad/modeling').transforms
 
 module.exports = {
+  /**
+   * @deprecated Migrate to jscad v2 cuboid
+   */
   cube: (opt) => {
     opt.center = [opt.size[0] / 2, opt.size[1] / 2, opt.size[2] / 2]
     if (opt.radius) {
       opt.roundRadius = opt.radius
-      if (opt.fn) {
-        opt.segments = opt.fn
-      }
       return roundedCuboid(opt)
     } else {
       return cuboid(opt)
     }
   },
-  cylinder: (opt) => {
+  /**
+   * @deprecated Migrate to jscad v2 cylinder and cylinderElliptic
+   */
+  cylinderV1: (opt) => {
     const rot = [0, 0, 0]
     const center = [0, 0, 0]
     if (opt.start && opt.end) {
@@ -28,12 +31,6 @@ module.exports = {
       if (opt.start[1] !== opt.end[1]) {
         rot[0] = Math.PI / 2 * Math.sign(opt.start[1] - opt.end[1])
       }
-    }
-    if (opt.fn) {
-      opt.segments = opt.fn
-    }
-    if (opt.r) {
-      opt.radius = opt.r
     }
     if (opt.r1 === 0) {
       opt.r1 = 0.01
