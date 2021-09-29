@@ -4,9 +4,10 @@
 // tags       : Motor,actuator,linear,drone,paraglider
 // file       : spool.jscad
 
-const { cuboid, cylinder } = require('@jscad/modeling').primitives
-const { subtract, union } = require('@jscad/modeling').booleans
-const { translate } = require('@jscad/modeling').transforms
+const jscad = require('@jscad/modeling')
+const { subtract, union } = jscad.booleans
+const { cuboid, cylinder } = jscad.primitives
+const { translate } = jscad.transforms
 
 const qty = 1
 
@@ -27,7 +28,7 @@ function main() {
 }
 
 function twopiece() {
-  return union(
+  return [
     translate([0, -20, 0],
       subtract(
         half1(),
@@ -35,14 +36,14 @@ function twopiece() {
       )
     ),
     translate([0, 20, 0], half2())
-  )
+  ]
 }
 
 function onepiece() {
-  return union(
+  return [
     translate([0, 0, 0], half1()),
     translate([0, 0, discThic + axleThic], half2())
-  )
+  ]
 }
 
 function half1() {

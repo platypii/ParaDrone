@@ -5,12 +5,12 @@
 // tags       : Radio,relay,remote control,drone,paraglider
 // file       : relay.jscad
 
-const { subtract, union } = require('@jscad/modeling').booleans
-const { colorize, cssColors } = require('@jscad/modeling').colors
-const { extrudeLinear } = require('@jscad/modeling').extrusions
-const { mirrorX, rotate, translate } = require('@jscad/modeling').transforms
-const { cuboid, polygon, roundedCuboid, roundedRectangle } = require('@jscad/modeling').primitives
-const { cube, cylinderV1 } = require('./v1')
+const jscad = require('@jscad/modeling')
+const { subtract, union } = jscad.booleans
+const { colorize, cssColors } = jscad.colors
+const { extrudeLinear } = jscad.extrusions
+const { cuboid, cylinder, polygon, roundedCuboid, roundedRectangle } = jscad.primitives
+const { mirrorX, rotate, rotateY, translate } = jscad.transforms
 
 const qty = 1
 
@@ -27,24 +27,23 @@ const splitZ = 4 + battThic
 const leftX = -sizeX / 2
 const rightX = sizeX / 2
 
-const sh = 2 // shell width
+const sh = 2 // shell thicness
 
 const colors = {
-  esp32: cssColors.white,
   topcase: cssColors.magenta,
   bottomcase: cssColors.purple
 }
 
 function main() {
-  return union(
+  return [
     // mechanism(),
-    colorize(colors.topcase, topcase())
+    colorize(colors.topcase, topcase()),
     // colorize(colors.bottomcase, bottomcase())
-  )
+  ]
 }
 
 function topcase() {
-  return union(
+  return [
     subtract(
       shell(0, splitZ, sizeZ), // outer
       inner(),
@@ -62,7 +61,7 @@ function topcase() {
       ahole()
     ),
     latches()
-  )
+  ]
 }
 
 function bottomcase() {
@@ -84,25 +83,25 @@ function bottomcase() {
 function ahole() {
   const z = sizeZ - 5.5
   return union(
-    cylinderV1({radius: 3.2, start: [rightX + 10, topY - 6, z], end: [rightX - 2, topY - 6, z], segments: 25 * qty}), // antenna hole
-    translate([rightX + 7, topY - 9.2, z - 4], cube({size: [2, 6.4, 4]})), // antenna top square
-    translate([rightX - 3.5, topY - 10, 1.5], cube({size: [11, 8, sizeZ - 3]})) // antenna channel square
+    antenna(),
+    cuboid({center: [rightX + 8, topY - 6, z - 2], size: [2, 6.4, 4]}), // antenna top square
+    cuboid({center: [rightX + 2, topY - 6, sizeZ / 2], size: [11, 8, sizeZ - 3]}) // antenna channel square
   )
 }
 
 function antenna() {
   const z = sizeZ - 5.5
-  return union(
-    cylinderV1({radius: 3.2, start: [rightX + 10, topY - 6, z], end: [rightX - 2, topY - 6, z], segments: 25 * qty}), // antenna hole
-    translate([32.9, 26.5, z], rotate([0, Math.PI / 2, 0], extrudeLinear({height: 2.2},
+  return translate([rightX + 5.4, topY - 6, z], rotateY(Math.PI / 2, union(
+    cylinder({radius: 3.2, height: 12, segments: 25 * qty}), // antenna hole
+    extrudeLinear({height: 2.2},
       polygon({points: [[4.6, 0], [2.3, 4], [-2.3, 4], [-4.6, 0], [-2.3, -4], [2.3, -4]]})
-    )))
-  )
+    )
+  )))
 }
 
 function shell(inset, bottom, top) {
   return translate([leftX + inset, inset, bottom],
-    roundedRect(sizeX - 2 * inset, sizeY - 2 * inset, top - bottom, 3 - inset, 15)
+    roundedRect(sizeX - 2 * inset, sizeY - 2 * inset, top - bottom, 3 - inset, 15 * qty)
   )
 }
 function inner() {
@@ -124,36 +123,31 @@ function topridge() {
 function bulge(inset, bottom, top) {
   return subtract(
     translate([rightX - 6 + inset, topY - 12 + inset, bottom],
-      roundedRect(15 - 2 * inset, 12 - 2 * inset, top - bottom, 3 - inset, 15)
+      roundedRect(15 - 2 * inset, 12 - 2 * inset, top - bottom, 3 - inset, 15 * qty)
     ),
     shell(0, 0, sizeZ)
   )
 }
 
-// Common
-function tophalf(z) {
-  return cuboid({center: [0, sizeY / 2, z + 100], size: [sizeX, sizeY, 200]})
-}
-
 function latches() {
   const latch1 = translate([18, topY - 3, splitZ + 6], latch(Math.PI / 2))
   const latch2 = translate([-18, bottomY + 3, splitZ + 6], latch(-Math.PI / 2))
-  return union(
+  return [
     latch1,
     latch2,
     mirrorX(latch1),
     mirrorX(latch2)
-  )
+  ]
 }
 
 function latchholes() {
-  const z = splitZ - 3.5
-  return union(
-    translate([-19, topY - 2.5, z], cube({size: [10, 1, 1.4]})),
-    translate([9, topY - 2.5, z], cube({size: [10, 1, 1.4]})),
-    translate([-19, bottomY + 1.5, z], cube({size: [10, 1, 1.4]})),
-    translate([9, bottomY + 1.5, z], cube({size: [10, 1, 1.4]}))
-  )
+  const z = splitZ - 2.8
+  return [
+    cuboid({center: [-14, topY - 2, z], size: [10, 1, 1.4]}),
+    cuboid({center: [14, topY - 2, z], size: [10, 1, 1.4]}),
+    cuboid({center: [-14, bottomY + 2, z], size: [10, 1, 1.4]}),
+    cuboid({center: [14, bottomY + 2, z], size: [10, 1, 1.4]})
+  ]
 }
 
 function latch(angle) {
@@ -172,23 +166,23 @@ function powerhole() {
 
 // Mechanism
 function mechanism() {
-  return union(
+  return [
     esp32(),
-    antenna()
-  )
+    colorize(cssColors.gold, antenna())
+  ]
 }
 
 function esp32() {
   const h = 25.4
   const circuitboard = extrudeLinear({height: 2.5}, polygon({points: [
-    [0, 8.2], [-1, 7.2], [-1, 1.8], [1, 0], [48, 0], [48, 4], [52.3, 8], [52.3, h-8], [48, h-4], [48, h], [1, h], [-1, h - 1.8], [-1, h - 7.2], [0, h - 8.2]
+    [0, 8.2], [-1, 7.2], [-1, 1.8], [1, 0], [48, 0], [48, 4], [52.3, 8], [52.3, h - 8], [48, h - 4], [48, h], [1, h], [-1, h - 1.8], [-1, h - 7.2], [0, h - 8.2]
   ]}))
   return translate([leftX + 1.2, 3.5, splitZ - 8], union(
-    colorize(colors.esp32, translate([0, 0, 9], circuitboard)),
-    colorize([0, 0, 0, 0.4], translate([13.9, 2.7, 12], cube({size: [35, 20.5, 3.8]}))),
-    colorize([0, 0, 0, 0.4], translate([24.5, 1, 12], cube({size: [14, 2, 3.8]}))),
-    colorize(cssColors.black, translate([19, 8, 12], cube({size: [25.8, 13, 4.4]}))),
-    colorize(cssColors.brown, cylinderV1({radius: 3.2, start: [11, 19.5, 10], end: [11, 19.5, 15.8], segments: 25 * qty}))
+    colorize(cssColors.white, translate([0, 0, 9], circuitboard)),
+    colorize([0, 0, 0, 0.4], cuboid({center: [31.5, 13, 13.9], size: [35, 20.5, 3.8]})), // recess
+    colorize([0, 0, 0, 0.4], cuboid({center: [31.5, 2, 13.9], size: [14, 2, 3.8]})), // ribbon
+    colorize(cssColors.black, cuboid({center: [31.9, 14.5, 14.2], size: [25.8, 13, 4.4]})), // screen
+    colorize(cssColors.brown, cylinder({radius: 3.2, center: [11, 19.5, 12.9], height: 5.8, segments: 25 * qty}))
   ))
 }
 
@@ -197,12 +191,12 @@ function esp32() {
  * @param x x size
  * @param y y size
  * @param z z size
- * @param r corner radius
- * @param q quality setting
+ * @param roundRadius corner radius
+ * @param segments number of corner segments
  */
-function roundedRect(x, y, z, r, q) {
+function roundedRect(x, y, z, roundRadius, segments) {
   return extrudeLinear({height: z},
-    roundedRectangle({center: [x / 2, y / 2], size: [x, y], roundRadius: r, segments: qty * q})
+    roundedRectangle({center: [x / 2, y / 2], size: [x, y], roundRadius, segments})
   )
 }
 
