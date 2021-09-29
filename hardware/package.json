@@ -4,6 +4,10 @@
     "json5": "^2.2.0"
   },
   "scripts": {
-    "build": "npx jscad js/*.js"
+    "actuator": "npx jscad actuator.js",
+    "autopilot": "npx jscad autopilot.js",
+    "battery": "npx jscad battery.js",
+    "remotecontrol": "npx jscad remotecontrol.js",
+    "spool": "npx jscad spool.js"
   }
 }

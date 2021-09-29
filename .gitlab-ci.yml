@@ -47,3 +47,15 @@ android-test:
   script:
     - cd android
     - ./gradlew testDebugUnitTest
+
+hardware:
+  stage: build
+  image: node:14-slim
+  script:
+    - cd hardware
+    - npm i
+    - npm run actuator
+    - npm run autopilot
+    - npm run battery
+    - npm run remotecontrol
+    - npm run spool
