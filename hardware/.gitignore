@@ -1,3 +1,5 @@
-
+*.dxf
+*.obj
 *.stl
+*.x3d
 node_modules

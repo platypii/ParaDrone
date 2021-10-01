@@ -27,19 +27,19 @@ const rightX = sizeX / 2
 const sh = 2 // shell thicness
 
 const colors = {
-  bn220: cssColors.blue,
-  driver: cssColors.green,
-  topcase: cssColors.magenta,
-  bottomcase: cssColors.purple,
-  bec: cssColors.yellow
+  topcase: cssColors.purple,
+  bottomcase: cssColors.magenta
 }
 
-function main() {
-  return [
-    // mechanism(),
+function main(mech) {
+  const parts = [
     colorize(colors.topcase, topcase()),
     // colorize(colors.bottomcase, bottomcase())
   ]
+  if (mech) {
+    parts.push(mechanism())
+  }
+  return parts
 }
 
 function topcase() {
@@ -105,7 +105,7 @@ function box(delta, z1, z2) {
 }
 
 function screws() {
-  const screw = cylinder({radius: 1.6, center: [0, 0, 2.5], height: 7, segments: 30 * qty})
+  const screw = cylinder({radius: 1.6, center: [0, 0, 2.5], height: 7, segments: 20 * qty})
   const z = -2
   return [
     translate([0, topY - 10, z], screw),
@@ -117,8 +117,8 @@ function topscrews() {
   const trihole = subtract(
     rotateX(Math.PI / 2, extrudeLinear({height: 10}, polygon({points: [[0, 0], [7, 0], [0, 19]]}))),
     cuboid({center: [5, -5, 12], size: [10, 6, 20]}),
-    cylinder({center: [3, -5, 1.5], radius: 1.6, height: 3, segments: 30 * qty}),
-    cylinderElliptic({center: [3, -5, 0.5], startRadius: [0.01, 0.01], endRadius: [3, 3], height: 3.5, segments: 30 * qty})
+    cylinder({center: [3, -5, 1.5], radius: 1.6, height: 3, segments: 20 * qty}),
+    cylinderElliptic({center: [3, -5, 0.5], startRadius: [0.01, 0.01], endRadius: [3, 3], height: 3.5, segments: 20 * qty})
   )
   return [
     translate([rightX, bottomY + 38.8, 0], trihole),
@@ -129,6 +129,7 @@ function topscrews() {
 // Mechanism
 function mechanism() {
   return [
+    pcb(),
     esp32(),
     bn220(),
     driver(),
@@ -141,27 +142,31 @@ function esp32() {
   const circuitboard = extrudeLinear({height: 2.5}, polygon({points: [
     [0, 8.2], [-1, 7.2], [-1, 1.8], [1, 0], [48, 0], [48, 4], [52.3, 8], [52.3, h - 8], [48, h - 4], [48, h], [1, h], [-1, h - 1.8], [-1, h - 7.2], [0, h - 8.2]
   ]}))
-  return translate([leftX + 1.8, bottomY + 31.8, sizeZ - 16.4], union(
+  return translate([leftX + 1.8, bottomY + 31.8, sizeZ - 16.4], [
     colorize(cssColors.white, translate([0, 0.3, 9], circuitboard)),
     colorize([0, 0, 0, 0.4], cuboid({center: [31.5, 13, 13.9], size: [35, 20.4, 3.8]})), // recess
     colorize([0, 0, 0, 0.4], cuboid({center: [31.5, 2, 13.9], size: [14, 2, 3.8]})), // ribbon
     colorize(cssColors.black, cuboid({center: [31.75, 14.5, 14.4], size: [26.1, 13, 4.8]})), // screen
     colorize(cssColors.brown, cylinder({radius: 3.2, center: [11, 19.5, 12.9], height: 5.8, segments: 25 * qty}))
-  ))
+  ])
 }
 
 function bn220() {
-  return colorize(colors.bn220, cuboid({center: [rightX - 12.1, bottomY + 46.3, sizeZ - 6.1], size: [20, 22, 4.2]}))
+  return colorize(cssColors.tan, cuboid({center: [rightX - 12.1, bottomY + 46.3, sizeZ - 6.1], size: [20, 22, 4.2]}))
 }
 
 function driver() {
   // Pololu Dual MC33926 Motor Driver Carrier
-  return colorize(colors.driver, cuboid({center: [0, bottomY + 16, sizeZ - 5], size: [46, 28, 6]}))
+  return colorize(cssColors.darkgreen, cuboid({center: [0, bottomY + 16, sizeZ - 5], size: [46, 28, 6]}))
 }
 
 function bec() {
   // Pololu 3.3V, 500mA Step-Down Voltage Regulator D24V5F3
-  return colorize(colors.bec, cuboid({center: [rightX - 9, bottomY + 23, sizeZ - 8], size: [12.8, 10.2, 3]}))
+  return colorize(cssColors.darkgreen, cuboid({center: [rightX - 9, bottomY + 23, sizeZ - 8], size: [12.8, 10.2, 3]}))
+}
+
+function pcb() {
+  return colorize(cssColors.green, box(sh + 0.2, 0, sh))
 }
 
 /**

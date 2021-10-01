@@ -10,7 +10,7 @@ const { extrudeLinear } = jscad.extrusions
 const { cuboid, cylinder, roundedRectangle } = jscad.primitives
 const { rotateX, translate } = jscad.transforms
 
-const qty = 3
+const qty = 1
 
 const battery = {len: 115, width: 31.5, height: 17.4}
 
@@ -29,13 +29,13 @@ function main() {
     ),
     cuboid({center: [100, -200, 200], size: [400, 400, 400]}), // bottom half
     translate([-halfX, -10, thic], roundedRect(xSize, ySize + 10, h, r, 30 * qty)), // inner
-    translate([-1.5, -1, -1], roundedRect(3, 5, 10, 1, 30 * qty)), // wire hole
+    translate([-1.5, -1, -1], roundedRect(3, 5, 10, 1, 15 * qty)), // wire hole
     screws()
   )
 }
 
 function screws() {
-  const screw = rotateX(Math.PI / 2, cylinder({radius: 1.6, height: 4}))
+  const screw = rotateX(Math.PI / 2, cylinder({radius: 1.6, height: 4, segments: 15 * qty}))
   const x = 6.5
   return [
     translate([-halfX - x, 2, h / 4], screw),
