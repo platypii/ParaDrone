@@ -1,9 +1,9 @@
 {
   "dependencies": {
-    "@jscad/cli": "^2.2.7",
-    "json5": "^2.2.0"
+    "@jscad/cli": "^2.2.8"
   },
   "scripts": {
+    "all": "npx jscad all.js -o all.dxf",
     "actuator": "npx jscad actuator.js",
     "autopilot": "npx jscad autopilot.js",
     "battery": "npx jscad battery.js",
