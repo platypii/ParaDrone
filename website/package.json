@@ -1,0 +1,12 @@
+{
+  "dependencies": {
+    "@jscad/regl-renderer": "^2.4.1"
+  },
+  "devDependencies": {
+    "browserify": "^17.0.0",
+    "uglify-js": "^3.14.2"
+  },
+  "scripts": {
+    "build": "npx browserify render.js | npx uglify-js > html/js/bundle.js"
+  }
+}

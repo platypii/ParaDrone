@@ -4,7 +4,7 @@
   padding: 0;
 }
 body {
-  background: url('img/grid.png');
+  background: url('../img/grid.png');
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: #333;
 }
@@ -32,6 +32,10 @@ h2 {
   margin-top: 20px;
   font-size: 24px;
 }
+h3 {
+  margin-top: 20px;
+  font-size: 16px;
+}
 .subtitle {
   display: block;
   font-size: 12px;
@@ -40,23 +44,17 @@ h2 {
 p {
   margin-bottom: 20px;
 }
-label {
-  display: block;
-  margin-top: 20px;
-  font-weight: bold;
-}
 video {
   background-color: black;
   margin-top: 20px;
   margin-bottom: 20px;
-  width: 300px;
-  height: 169px;
+  width: 320px;
+  height: 180px;
 }
 .file-link {
   display: flex;
   align-items: center;
   margin-top: 5px;
-  margin-bottom: 20px;
 }
 .file-link img {
   height: 36px;
@@ -66,7 +64,19 @@ video {
 .rounded {
   border-radius: 4px;
 }
-#three {
-  width: 300px;
+#jscad {
+  width: 320px;
   height: 180px;
+}
+.video-container {
+  position: relative;
+}
+.video-text {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  color: #ddd;
+  text-align: center;
+  margin-top: -0.5em;
 }

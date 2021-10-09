@@ -4,7 +4,7 @@
 // tags       : GPS,data,arduino,flysight
 // file       : battery.js
 
-const jscad = require('@jscad/modeling')
+const jscad = require("@jscad/modeling")
 const { subtract, union } = jscad.booleans
 const { extrudeLinear } = jscad.extrusions
 const { cuboid, cylinder, roundedRectangle } = jscad.primitives
@@ -30,11 +30,11 @@ function main() {
     cuboid({center: [100, -200, 200], size: [400, 400, 400]}), // bottom half
     translate([-halfX, -10, thic], roundedRect(xSize, ySize + 10, h, r, 30 * qty)), // inner
     translate([-1.5, -1, -1], roundedRect(3, 5, 10, 1, 15 * qty)), // wire hole
-    screws()
+    batteryscrews()
   )
 }
 
-function screws() {
+function batteryscrews() {
   const screw = rotateX(Math.PI / 2, cylinder({radius: 1.6, height: 4, segments: 15 * qty}))
   const x = 6.5
   return [

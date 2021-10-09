@@ -5,7 +5,7 @@
 // tags       : Radio,relay,remote control,drone,paraglider
 // file       : relay.jscad
 
-const jscad = require('@jscad/modeling')
+const jscad = require("@jscad/modeling")
 const { subtract, union } = jscad.booleans
 const { colorize, cssColors } = jscad.colors
 const { extrudeLinear } = jscad.extrusions

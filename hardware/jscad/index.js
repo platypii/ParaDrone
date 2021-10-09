@@ -2,9 +2,9 @@
 // author     : BASEline
 // license    : MIT License
 // tags       : Microcontroller,arduino,autopilot,drone,paraglider
-// file       : all.jscad
+// file       : index.jscad
 
-const jscad = require('@jscad/modeling')
+const jscad = require("@jscad/modeling")
 const { subtract } = jscad.booleans
 const { colorize, cssColors } = jscad.colors
 const { cylinder, roundedCuboid } = jscad.primitives

@@ -5,7 +5,7 @@
 // tags       : Microcontroller,case,arduino,autopilot,drone,paraglider
 // file       : autopilot.jscad
 
-const jscad = require('@jscad/modeling')
+const jscad = require("@jscad/modeling")
 const { intersect, subtract, union } = jscad.booleans
 const { colorize, cssColors } = jscad.colors
 const { extrudeLinear } = jscad.extrusions
@@ -37,7 +37,7 @@ function main(mech) {
     // colorize(colors.bottomcase, bottomcase())
   ]
   if (mech) {
-    parts.push(mechanism())
+    parts.push(circuit())
   }
   return parts
 }
@@ -72,7 +72,7 @@ function bottomcase() {
     cylinder({radius: 2.2, center: [leftX + 4.8, bottomY + 21.1, 2], height: 2.4}), // molex recess
     cylinder({radius: 2.2, center: [leftX + 4.8, bottomY + 11.5, 2], height: 2.4}), // molex recess
     cylinder({radius: 2.2, center: [rightX - 4.8, bottomY + 11.5, 2], height: 2.4}), // molex recess
-    screws()
+    bottomscrews()
   )
 }
 
@@ -104,7 +104,7 @@ function box(delta, z1, z2) {
     roundedRect(sizeX - 2 * delta, sizeY - 2 * delta, z2 - z1, r, 16 * qty))
 }
 
-function screws() {
+function bottomscrews() {
   const screw = cylinder({radius: 1.6, center: [0, 0, 2.5], height: 7, segments: 20 * qty})
   const z = -2
   return [
@@ -126,8 +126,7 @@ function topscrews() {
   ]
 }
 
-// Mechanism
-function mechanism() {
+function circuit() {
   return [
     pcb(),
     esp32(),

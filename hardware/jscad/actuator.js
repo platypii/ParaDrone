@@ -4,7 +4,7 @@
 // tags       : Motor,actuator,linear,drone,paraglider
 // file       : actuator.jscad
 
-const jscad = require('@jscad/modeling')
+const jscad = require("@jscad/modeling")
 const { subtract, union } = jscad.booleans
 const { colorize, cssColors } = jscad.colors
 const { extrudeLinear } = jscad.extrusions

@@ -4,7 +4,7 @@
 // tags       : Motor,actuator,linear,drone,paraglider
 // file       : spool.jscad
 
-const jscad = require('@jscad/modeling')
+const jscad = require("@jscad/modeling")
 const { subtract, union } = jscad.booleans
 const { cuboid, cylinder } = jscad.primitives
 const { translate } = jscad.transforms

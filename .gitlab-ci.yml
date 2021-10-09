@@ -54,6 +54,7 @@ hardware:
   script:
     - cd hardware
     - npm i
+    - npm run model
     - npm run actuator
     - npm run autopilot
     - npm run battery

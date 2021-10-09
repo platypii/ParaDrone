@@ -11,10 +11,12 @@ The flight operations manual, including instructions for building your own, is a
 https://paradr.one/
 
 In this repository:
- - `autopilot/` autopilot software for arduino
- - `hardware/` 3d printing cad files
- - `remotecontrol/` remote control software for arduino using LoRa
- - `simulator/` a web-based path planning simulator
+ - [autopilot/](autopilot) autopilot software for arduino
+ - [hardware/](hardware) 3d printing cad files
+ - [remotecontrol/](remotecontrol) remote control software for arduino using LoRa
+ - [simulator/](simulator) a web-based path planning simulator
+
+![ParaDrone simulator](/html/img/sim.jpg)
 
 ## Software
 
