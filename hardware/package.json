@@ -7,6 +7,7 @@
   },
   "scripts": {
     "model": "npx jscad jscad/index.js -o model.dxf",
+    "print": "npx jscad jscad/print.js -o print.stl",
     "actuator": "npx jscad jscad/actuator.js -o actuator.stl",
     "autopilot": "npx jscad jscad/autopilot.js -o autopilot.stl",
     "battery": "npx jscad jscad/battery.js -o battery.stl",

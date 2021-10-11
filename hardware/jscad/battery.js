@@ -1,8 +1,6 @@
 // title      : ParaDrone battery case
 // author     : BASEline
-// license    : MIT License
 // tags       : GPS,data,arduino,flysight
-// file       : battery.js
 
 const jscad = require("@jscad/modeling")
 const { subtract, union } = jscad.booleans
@@ -10,7 +8,7 @@ const { extrudeLinear } = jscad.extrusions
 const { cuboid, cylinder, roundedRectangle } = jscad.primitives
 const { rotateX, translate } = jscad.transforms
 
-const qty = 1
+let qty = 1
 
 const battery = {len: 115, width: 31.5, height: 17.4}
 
@@ -21,7 +19,10 @@ const ySize = battery.height
 const halfX = xSize / 2
 const r = 8 // radius
 
-function main() {
+function main(print) {
+  if (print === true) {
+    qty = 3
+  }
   return subtract(
     union(
       cuboid({center: [0, thic / 2, h / 2], size: [xSize + 20, thic, h]}), // mount1

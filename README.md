@@ -16,7 +16,7 @@ In this repository:
  - [remotecontrol/](remotecontrol) remote control software for arduino using LoRa
  - [simulator/](simulator) a web-based path planning simulator
 
-![ParaDrone simulator](/html/img/sim.jpg)
+![ParaDrone simulator](/website/html/img/sim.jpg)
 
 ## Software
 

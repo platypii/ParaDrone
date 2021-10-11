@@ -1,8 +1,6 @@
 // title      : ParaDrone Actuator
 // author     : BASEline
-// license    : MIT License
 // tags       : Motor,actuator,linear,drone,paraglider
-// file       : actuator.jscad
 
 const jscad = require("@jscad/modeling")
 const { subtract, union } = jscad.booleans
@@ -11,7 +9,7 @@ const { extrudeLinear } = jscad.extrusions
 const { cuboid, cylinder, cylinderElliptic, polygon, roundedRectangle } = jscad.primitives
 const { rotate, rotateY, translate } = jscad.transforms
 
-const qty = 1
+let qty = 1
 
 const axleZ = 26 // center of axle
 const topZ = axleZ + 24 // top top
@@ -36,35 +34,37 @@ const colors = {
   topcase: cssColors.purple
 }
 
-function main(mech) {
-  const parts = [
-    colorize(colors.topcase, actuator())
-  ]
-  if (mech) {
-    parts.push(mechanism())
+function main(print) {
+  if (print === true) {
+    qty = 3
+    return rotate([Math.PI / 2, -Math.PI / 2, 0], actuator())
+  } else {
+    return [
+      colorize(colors.topcase, actuator()),
+      mechanism()
+    ]
   }
-  return parts
 }
 
 function actuator() {
   const holeY = 5.5
   return subtract(
     hex(0, rightX, 0),
+    // tophole
+    cylinder({radius: 1.4, center: [centerX, holeY, topZ], height: 10, segments: 15 * qty}),
     // motor hole
     axialCylinder(11, leftX, rightX, 60 * qty),
     // pulley hole
     axialCylinder(19, sh, rightX, 120 * qty),
     switchhole(),
-    // tophole
-    cylinder({radius: 1.4, center: [centerX, holeY, topZ], height: 10, segments: 15 * qty}),
     screws()
   )
 }
 
 function screws() {
   const screw = rotateY(Math.PI / 2, [
-    cylinder({radius: 1.6, center: [0, 0, 1.5], height: 3, segments: 20 * qty}),
-    cylinderElliptic({startRadius: [0.01, 0.01], endRadius: [3, 3], center: [0, 0, 0.5], height: 3.5, segments: 20 * qty})
+    cylinder({radius: 1.6, center: [0, 0, 1.5], height: 3, segments: 15 * qty}),
+    cylinderElliptic({startRadius: [0.01, 0.01], endRadius: [3, 3], center: [0, 0, 0.5], height: 3.5, segments: 15 * qty})
   ])
   return [
     translate([0, 13.9, axleZ], screw),

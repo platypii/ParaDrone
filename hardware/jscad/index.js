@@ -1,17 +1,15 @@
 // title      : ParaDrone
 // author     : BASEline
-// license    : MIT License
 // tags       : Microcontroller,arduino,autopilot,drone,paraglider
-// file       : index.jscad
 
 const jscad = require("@jscad/modeling")
 const { subtract } = jscad.booleans
 const { colorize, cssColors } = jscad.colors
 const { cylinder, roundedCuboid } = jscad.primitives
 const { rotate, rotateZ, translate } = jscad.transforms
-const actuator = require("./actuator").main(true)
-const autopilot = require("./autopilot").main(true)
-const battery = require("./battery").main(true)
+const actuator = require("./actuator").main()
+const autopilot = require("./autopilot").main()
+const battery = require("./battery").main()
 
 const boardX = 380
 const boardY = 80

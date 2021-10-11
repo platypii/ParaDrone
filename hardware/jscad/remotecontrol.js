@@ -1,9 +1,6 @@
 // title      : ParaDrone Bluetooth/LoRa Relay Case
 // author     : BASEline
-// license    : MIT License
-// revision   : 1.0
 // tags       : Radio,relay,remote control,drone,paraglider
-// file       : relay.jscad
 
 const jscad = require("@jscad/modeling")
 const { subtract, union } = jscad.booleans

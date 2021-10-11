@@ -1,9 +1,6 @@
 // title      : ParaDrone Autopilot Case
 // author     : BASEline
-// license    : MIT License
-// revision   : 1.0
 // tags       : Microcontroller,case,arduino,autopilot,drone,paraglider
-// file       : autopilot.jscad
 
 const jscad = require("@jscad/modeling")
 const { intersect, subtract, union } = jscad.booleans
@@ -12,7 +9,7 @@ const { extrudeLinear } = jscad.extrusions
 const { cuboid, cylinder, cylinderElliptic, polygon, roundedCuboid, roundedRectangle } = jscad.primitives
 const { rotate, rotateX, rotateY, translate } = jscad.transforms
 
-const qty = 1
+let qty = 1
 
 const topY = 28.9
 const bottomY = -31.8
@@ -31,15 +28,17 @@ const colors = {
   bottomcase: cssColors.magenta
 }
 
-function main(mech) {
-  const parts = [
-    colorize(colors.topcase, topcase()),
-    // colorize(colors.bottomcase, bottomcase())
-  ]
-  if (mech) {
-    parts.push(circuit())
+function main(print) {
+  if (print === true) {
+    qty = 3
+    return translate([0, 0, sizeZ], rotateY(Math.PI, topcase()))
+  } else {
+    return [
+      colorize(colors.topcase, topcase()),
+      // colorize(colors.bottomcase, bottomcase()),
+      circuit()
+    ]
   }
-  return parts
 }
 
 function topcase() {

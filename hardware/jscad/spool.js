@@ -1,8 +1,6 @@
 // title      : ParaDrone Actuator Pulley Spool
 // author     : BASEline
-// license    : MIT License
 // tags       : Motor,actuator,linear,drone,paraglider
-// file       : spool.jscad
 
 const jscad = require("@jscad/modeling")
 const { subtract, union } = jscad.booleans

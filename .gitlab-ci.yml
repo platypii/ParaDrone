@@ -55,6 +55,7 @@ hardware:
     - cd hardware
     - npm i
     - npm run model
+    - npm run print
     - npm run actuator
     - npm run autopilot
     - npm run battery
