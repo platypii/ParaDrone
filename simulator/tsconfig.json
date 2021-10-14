@@ -4,8 +4,7 @@
     "module": "umd", // UMD needed for tests (node), AMD needed for outFile
     "moduleResolution": "node",
     "sourceMap": true,
-    "sourceRoot": "/js",
-    "rootDirs": ["js"],
+    "sourceRoot": "/ts",
     "baseUrl": ".",
     "pretty": true, // Pretty print errors on console
     "strict": true,

@@ -93,7 +93,7 @@ function evaluate(location: GeoPointV): TestScore {
 
   // Update map layer
   let color = "#1e15"
-  if (score.distance > 100) {
+  if (score.distance > 200) {
     color = "#e115" // red
   } else if (score.distance > 50) {
     color = "#ee15" // yellow

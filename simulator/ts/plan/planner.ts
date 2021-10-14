@@ -34,7 +34,7 @@ export function path_no_turns_below(para: Paraglider, path: Path, alt_agl: numbe
  */
 export function best_plan(lz: LandingZone, paths: Path[]): Path | undefined {
   if (paths.length <= 1) return paths[0]
-  let best
+  let best: Path | undefined
   let bestScore = Infinity
   for (const path of paths) {
     const score = plan_score(lz, path)

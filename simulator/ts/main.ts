@@ -44,7 +44,7 @@ export function init() {
     setStart({
       lat: e.lat,
       lng: e.lng,
-      alt: 400 // TODO: Get elevation
+      alt: 600 // TODO: Get elevation
     })
   })
   planEnabled.onclick = update

@@ -12,6 +12,7 @@ import { straight } from "./plan/planner-straight"
 import { viaWaypoints } from "./plan/planner-waypoints"
 import { allDubins } from "./plan/shortest-dubins"
 
+const naive_distance = 600 // Fly straight to the lz
 const lookahead = 3000 // milliseconds
 
 /**
@@ -34,9 +35,9 @@ export class Autopilot {
   private replan() {
     if (this.para.loc) {
       // Replan with new location
-      const plan = this.plan = search3(this.para, this.lz)
+      this.plan = search3(this.para, this.lz)
       // Apply to paraglider toggles
-      const controls = plan.path.controls()
+      const controls = this.plan.path.controls()
       this.para.toggles.setToggles(controls.left, controls.right)
     }
   }
@@ -82,7 +83,7 @@ export function search(loc: Point3V, para: Paraglider, lz: LandingZone): Path {
   } else if (loc.alt <= no_turns_below) {
     // No turns under 100ft
     return straightPath
-  } else if (distance2 > 1000 * 1000) {
+  } else if (distance2 > naive_distance * naive_distance) {
     // Naive when far away
     const naivePath = naive(loc, pattern.startOfFinal(), effectiveRadius) || straightPath
     return path_no_turns_below(para, naivePath, loc.alt)
