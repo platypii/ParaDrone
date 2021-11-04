@@ -11,7 +11,7 @@ void set_toggles(uint8_t new_left, uint8_t new_right) {
   }
   motor_left.target = new_left;
   motor_right.target = new_right;
-  // TODO: update motors speeds?
+  // motors updated on next motor_loop()
 }
 
 /**

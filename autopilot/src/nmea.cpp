@@ -1,3 +1,4 @@
+#include <heltec.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -26,6 +27,17 @@ void parse_nmea(char *line) {
     parse_rmc(line);
   } else if (strncmp(line + 3, "GGA,", 4) == 0) {
     parse_gga(line);
+  } else if (strncmp(line + 3, "TXT,01,01,01,More than 100 frame errors,", 40) == 0) {
+    Serial.printf("%.1f gps frame error\n", millis() * 1e-3);
+    error = "GPS Frame Err";
+  } else {
+    // If we receive unexpected commands like GSV then re-init
+    Serial.printf("%.1f nmea error %s\n", millis() * 1e-3, line);
+    ublox_init();
+    // Only a problem if it persists
+    if (millis() > 5000) {
+      error = "GPS Cmd Err";
+    }
   }
 }
 

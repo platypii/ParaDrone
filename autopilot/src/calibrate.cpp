@@ -7,6 +7,9 @@
 
 static int calibrate_motor(Motor *motor, int left_speed, int right_speed);
 
+/**
+ * Perform a motor calibration routine.
+ */
 void calibrate() {
   // Calibrate each motor, forward and back
   const int ticks_left_forward = calibrate_motor(&motor_left, pwm, 0);

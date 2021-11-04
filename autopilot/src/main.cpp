@@ -3,7 +3,7 @@
 #include "paradrone.h"
 
 #define TIME_START long start_time = millis()
-#define TIME_STEP(name) if (millis() - start_time >= 100) Serial.printf("%.1fs slow %s %ldms thread %d\n", millis() * 1e-3, name, millis() - start_time, xPortGetCoreID()); start_time = millis()
+#define TIME_STEP(name) if (millis() - start_time >= 80) Serial.printf("%.1fs slow %s %ldms thread %d\n", millis() * 1e-3, name, millis() - start_time, xPortGetCoreID()); start_time = millis()
 
 void setup() {
   Heltec.begin(
@@ -46,7 +46,7 @@ void loop() {
  * This orchestrates the services that depend on location updates.
  */
 void update_location(GeoPointV *point) {
-  Serial.printf("%.1fs gps %f, %f, %.1f, %.1f m/s\n", millis() * 1e-3, point->lat, point->lng, point->alt, hypot(point->vE, point->vN));
+  Serial.printf("%.3fs gps %f, %f, %.1f, %.1f m/s\n", millis() * 1e-3, point->lat, point->lng, point->alt, hypot(point->vE, point->vN));
   if (last_location) free(last_location);
   last_location = point;
   last_fix_millis = millis();

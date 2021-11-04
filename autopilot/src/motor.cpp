@@ -18,6 +18,7 @@ static float normalize_position(float position);
 static float expected_ticks_per_sec(int speed);
 
 /**
+ * Construct a new motor object and bind to pins.
  * @param pin_hall_a pin number for hall sensor A
  * @param pin_hall_b pin number for hall sensor B
  * @param pin_pwm1 pin number for motor driver IN1

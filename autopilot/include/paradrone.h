@@ -21,6 +21,9 @@
 // After 60 seconds of no GPS, revert to slow spiral
 #define GPS_EXPIRATION 60000
 
+// Error message
+extern const char *error;
+
 // Persisted config
 extern uint8_t config_flight_mode;
 extern LandingZone *config_landing_zone;
@@ -69,6 +72,7 @@ void bt_send_calibration(uint16_t left1, uint16_t left2, uint16_t right1, uint16
 // GPS
 void gps_init();
 void gps_loop();
+void ublox_init();
 void parse_nmea(char *line);
 void update_location(GeoPointV *point);
 

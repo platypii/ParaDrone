@@ -6,6 +6,8 @@ static long last_redraw_millis = -1;
 static void screen_draw();
 static void sprintd(char *buf, long delta);
 
+const char *error = 0;
+
 void screen_init() {
   Heltec.display->init();
   Heltec.display->flipScreenVertically();
@@ -137,6 +139,12 @@ static void screen_draw() {
   if (bt_connected) {
     Heltec.display->setTextAlignment(TEXT_ALIGN_RIGHT);
     Heltec.display->drawString(DISPLAY_WIDTH, 54, "BT");
+  }
+
+  // Error?
+  if (error) {
+    Heltec.display->setTextAlignment(TEXT_ALIGN_CENTER);
+    Heltec.display->drawString(DISPLAY_WIDTH / 2, 34, error);
   }
 
   Heltec.display->display();

@@ -4,7 +4,8 @@
 #include "plan.h"
 using namespace std;
 
-static const double lookahead = 3; // seconds
+#define NAIVE_DISTANCE 600 // Fly straight to the lz
+#define LOOKAHEAD 3 // seconds
 
 static Path* best_plan(LandingZone *lz, vector<Path*> plans);
 static double plan_score(LandingZone *lz, Path *plan);
@@ -15,7 +16,7 @@ static double direction_error(PointV a, PointV b);
  */
 Path *search3(GeoPointV *ll, LandingZone *lz, float toggle_speed, float toggle_balance) {
   // Run to where the ball is going
-  GeoPointV *next = para_predict(ll, lookahead, toggle_speed, toggle_balance);
+  GeoPointV *next = para_predict(ll, LOOKAHEAD, toggle_speed, toggle_balance);
   Point3V loc = lz->to_point3V(next);
   return search(loc, lz, PARAMOTOR_TURNRADIUS);
 }
@@ -49,7 +50,7 @@ Path *search(Point3V loc3, LandingZone *lz, const double turn_radius) {
   if (loc3.alt <= ALT_NO_TURNS_BELOW) {
     // No turns under 100ft
     return straight_path;
-  } else if (distance2 > 1000 * 1000) {
+  } else if (distance2 > NAIVE_DISTANCE * NAIVE_DISTANCE) {
     // Naive when far away
     Path *naive_path = naive(loc, lz->start_of_final(), effective_radius);
     if (naive_path) {

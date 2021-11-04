@@ -21,7 +21,8 @@ import static ws.baseline.paradrone.plan.ShortestDubins.allDubins;
 
 public class Autopilot {
     private static final double no_turns_below = 30; // meters
-    private static final double lookahead = 3;
+    private static final double naiveDistance = 600; // meters
+    private static final double lookahead = 3; // seconds
 
     /**
      * Search for a 3D plan
@@ -58,7 +59,7 @@ public class Autopilot {
         if (loc.alt <= no_turns_below) {
             // No turns under 100ft
             return straightPath;
-        } else if (distance2 > 1000 * 1000) {
+        } else if (distance2 > naiveDistance * naiveDistance) {
             // Naive when far away
             final Path naivePath = naive(loc, sof, effectiveRadius);
             if (naivePath != null) {

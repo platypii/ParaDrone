@@ -87,11 +87,11 @@ static void IRAM_ATTR hall_isr_right() {
  * @return motor speed in range -255..255
  */
 static short speed(const float delta) {
-  // Start slowing down when delta < 23
+  // Start slowing down when delta < 20
   short speed = delta * 10;
-  // Minimum speed 40
-  if (speed < 0) speed -= 40;
-  if (speed > 0) speed += 40;
+  // Minimum speed 60
+  if (speed < 0) speed -= 60;
+  if (speed > 0) speed += 60;
   // Max speed 255
   if (speed < -255) return -255;
   else if (speed > 255) return 255;

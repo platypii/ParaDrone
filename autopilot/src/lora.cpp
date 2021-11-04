@@ -39,6 +39,9 @@ void lora_loop() {
   }
 }
 
+/**
+ * Parse an incoming LoRa message
+ */
 static void lora_read(int parse_len) {
   uint8_t buffer[MAX_PACKET_SIZE];
   int buffer_len = 0;

@@ -30,6 +30,9 @@ static int buffer_index = 0;
 void gps_init() {
   // Secondary serial port, since primary interferes with programming
   Serial2.begin(9600, SERIAL_8N1, GPS_TX, GPS_RX);
+}
+
+void ublox_init() {
   Serial2.write(UBLOX_INIT, sizeof(UBLOX_INIT));
 }
 

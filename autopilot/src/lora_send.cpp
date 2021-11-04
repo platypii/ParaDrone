@@ -2,6 +2,9 @@
 #include "messages.h"
 #include "paradrone.h"
 
+/**
+ * Broadcast a byte array over LoRa
+ */
 static void lora_send_raw(uint8_t *msg, size_t size) {
   // long start_time = millis();
   LoRa.beginPacket(); // Explicit header mode for variable size packets
@@ -11,6 +14,9 @@ static void lora_send_raw(uint8_t *msg, size_t size) {
   // Serial.printf("LoRa sent %d bytes in %ld ms\n", size, millis() - start_time);
 }
 
+/**
+ * Broadcast location over LoRa
+ */
 void lora_send_location(GeoPointV *point) {
   if (lora_enabled) {
     // Pack point into location message
@@ -29,6 +35,9 @@ void lora_send_location(GeoPointV *point) {
   }
 }
 
+/**
+ * Broadcast landing zone over LoRa
+ */
 void lora_send_lz() {
   LandingZoneMessage msg = pack_lz(config_landing_zone);
   uint8_t *data = (uint8_t*) &msg;
