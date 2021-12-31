@@ -1,10 +1,10 @@
 import * as Cesium from "cesium"
-import { LatLng, LatLngAlt } from "../dtypes"
+import { LatLngAlt } from "../dtypes"
 import { toDegrees } from "../geo/trig"
 
 interface MapOptions {
   element: string
-  center?: LatLng
+  center?: LatLngAlt
   draggableCursor?: string
   maxZoom?: number
   zoom?: number
@@ -47,9 +47,9 @@ export class BaseMap {
 
     // Center
     if (options.center) {
-      this.map.camera.setView({
-        destination: Cesium.Cartesian3.fromDegrees(options.center.lng, options.center.lat, 3000)
-      })
+      const target = Cesium.Cartesian3.fromDegrees(options.center.lng, options.center.lat, options.center.alt)
+      this.map.camera.lookAt(target, new Cesium.HeadingPitchRange(0, -0.8, 2400))
+      this.map.camera.lookAtTransform(Cesium.Matrix4.IDENTITY)
     }
   }
 

@@ -27,7 +27,7 @@ export class Paraglider {
   public readonly toggles: Toggles
   public loc?: GeoPointV
 
-  private lastGps: number = -gpsRefresh
+  private lastGps: number | undefined
 
   // TODO: Heading, pitch, roll Orientation
 
@@ -46,6 +46,10 @@ export class Paraglider {
    * Set the location of the paramotor
    */
   public setLocation(point: GeoPointV): void {
+    if (this.lastGps !== undefined && point.millis < this.lastGps) {
+      // Reset lastGps
+      this.lastGps = undefined
+    }
     this.loc = point
     // Notify listeners
     for (const listener of this.locationListeners) {
@@ -75,7 +79,7 @@ export class Paraglider {
       this.toggles.update(dt)
 
       // Notify listeners (eg- autopilot planner)
-      if (this.loc.millis >= this.lastGps + gpsRefresh) {
+      if (this.lastGps === undefined || this.loc.millis >= this.lastGps + gpsRefresh) {
         this.setLocation(next)
         this.lastGps = this.loc.millis
       }

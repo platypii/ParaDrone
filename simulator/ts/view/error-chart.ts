@@ -7,6 +7,7 @@ export class ErrorChart extends BaseChart {
   private left: d3.Selection<SVGGElement, any, HTMLElement, any>
   private right: d3.Selection<SVGGElement, any, HTMLElement, any>
   private focusLine: d3.Selection<SVGLineElement, any, HTMLElement, any>
+  private timeSteps: number = 107
 
   constructor() {
     super()
@@ -45,10 +46,10 @@ export class ErrorChart extends BaseChart {
 
   public update(steps: SimStep[]): void {
     const errors = steps.map((s) => s.score.score)
-    const errorBound = Math.max(d3.max(errors) || 1, 100)
-    const stepBound = Math.max(steps.length, 107) // TODO: 107 is default
+    const errorBound = Math.max(d3.max(errors) || 1, 200)
+    this.timeSteps = Math.max(this.timeSteps, steps.length)
     this.xAxis.scale.domain([0, errorBound])
-    this.yAxis.scale.domain([0, stepBound])
+    this.yAxis.scale.domain([0, this.timeSteps])
     this.updateAxes()
 
     // Update error line

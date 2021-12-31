@@ -26,7 +26,7 @@ body {
 }
 
 h1 {
-  margin-top: 0;
+  margin-top: 10px;
   margin-bottom: 10px;
   text-align: center;
   color: #6b39a7;
@@ -82,7 +82,6 @@ label {
 .sidebar {
   height: 100%;
   width: 220px;
-  padding: 10px;
   margin: 0;
   overflow-y: auto;
 }
@@ -97,8 +96,6 @@ label {
   font-weight: bold;
   position: relative;
   padding: 4px 6px;
-  margin-left: -10px;
-  margin-right: -10px;
   margin-bottom: 4px;
 }
 .sidebar-header input[type=checkbox] {
@@ -108,6 +105,8 @@ label {
 }
 .sidebar-parameter {
   display: flex;
+  margin-left: 10px;
+  margin-right: 10px;
 }
 .sidebar-parameter > * {
   flex: 1;
@@ -249,4 +248,23 @@ svg#windgram {
     width: 80%;
     left: 10%;
   }
+}
+
+.toggle-container {
+  position: relative;
+}
+.toggle {
+  position: absolute;
+  width: 6px;
+  height: 24px;
+  margin-top: -4px;
+  top: 0;
+}
+#toggle-left {
+  left: 0;
+  background-color: #d11;
+}
+#toggle-right {
+  right: 0;
+  background-color: #1d1;
 }

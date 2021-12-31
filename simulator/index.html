@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#6b00ff">
     <link rel="stylesheet" href="css/main.css">
-    <link rel="stylesheet" href="https://cesium.com/downloads/cesiumjs/releases/1.86/Build/Cesium/Widgets/widgets.css">
+    <link rel="stylesheet" href="https://cesium.com/downloads/cesiumjs/releases/1.89/Build/Cesium/Widgets/widgets.css">
   </head>
 
   <body>
@@ -35,20 +35,24 @@
           <div class="sidebar-header">
             Toggles
           </div>
-          <div class="sidebar-parameter">
-            <div id="toggle-left-target"></div>
-            <div class="text-center text-faded">target</div>
-            <div id="toggle-right-target"></div>
-          </div>
-          <div class="sidebar-parameter">
-            <div id="toggle-left-position"></div>
-            <div class="text-center text-faded">position</div>
-            <div id="toggle-right-position"></div>
-          </div>
-          <div class="sidebar-parameter">
-            <div id="toggle-left-speed"></div>
-            <div class="text-center text-faded">speed</div>
-            <div id="toggle-right-speed"></div>
+          <div class="toggle-container">
+            <div class="sidebar-parameter">
+              <div id="toggle-left-target"></div>
+              <div class="text-center text-faded">target</div>
+              <div id="toggle-right-target"></div>
+            </div>
+            <div class="sidebar-parameter">
+              <div id="toggle-left-position"></div>
+              <div class="text-center text-faded">position</div>
+              <div id="toggle-right-position"></div>
+            </div>
+            <div class="sidebar-parameter">
+              <div id="toggle-left-speed"></div>
+              <div class="text-center text-faded">speed</div>
+              <div id="toggle-right-speed"></div>
+            </div>
+            <div class="toggle" id="toggle-left"></div>
+            <div class="toggle" id="toggle-right"></div>
           </div>
         </div>
 
@@ -151,7 +155,7 @@
     <script>
       requirejs.config({
         paths: {
-          cesium: "https://cesium.com/downloads/cesiumjs/releases/1.86/Build/Cesium/Cesium",
+          cesium: "https://cesium.com/downloads/cesiumjs/releases/1.89/Build/Cesium/Cesium",
           d3: "https://d3js.org/d3.v7.min",
         }
       })
