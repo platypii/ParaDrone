@@ -19,8 +19,8 @@ const ySize = battery.height
 const halfX = xSize / 2
 const r = 8 // radius
 
-function main(print) {
-  if (print === true) {
+function main(params) {
+  if (params.print) {
     qty = 3
   }
   return subtract(

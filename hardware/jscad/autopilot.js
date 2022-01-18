@@ -28,8 +28,12 @@ const colors = {
   bottomcase: cssColors.magenta
 }
 
-function main(print) {
-  if (print === true) {
+function getParameterDefinitions() {
+  return [{name: "print", type: "checkbox", checked: false, caption: "Print mode"}]
+}
+
+function main(params) {
+  if (params.print) {
     qty = 3
     return translate([0, 0, sizeZ], rotateY(Math.PI, topcase()))
   } else {
@@ -181,4 +185,4 @@ function roundedRect(x, y, z, roundRadius, segments) {
   )
 }
 
-module.exports = { main }
+module.exports = { getParameterDefinitions, main }

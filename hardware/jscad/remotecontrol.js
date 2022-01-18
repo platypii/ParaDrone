@@ -7,7 +7,7 @@ const { subtract, union } = jscad.booleans
 const { colorize, cssColors } = jscad.colors
 const { extrudeLinear } = jscad.extrusions
 const { cuboid, cylinder, polygon, roundedCuboid, roundedRectangle } = jscad.primitives
-const { mirrorX, rotate, rotateY, translate } = jscad.transforms
+const { mirrorX, rotate, rotateX, rotateY, translate } = jscad.transforms
 
 const qty = 1
 
@@ -31,12 +31,23 @@ const colors = {
   bottomcase: cssColors.purple
 }
 
-function main() {
-  return [
-    // mechanism(),
-    colorize(colors.topcase, topcase()),
-    // colorize(colors.bottomcase, bottomcase())
-  ]
+function getParameterDefinitions() {
+  return [{name: "print", type: "checkbox", checked: false, caption: "Print mode"}]
+}
+
+function main(params) {
+  if (params.print) {
+    return [
+      translate([0, -5, sizeZ], rotateX(Math.PI, topcase())),
+      bottomcase()
+    ]
+  } else {
+    return [
+      mechanism(),
+      colorize(colors.topcase, topcase()),
+      colorize(colors.bottomcase, bottomcase())
+    ]
+  }
 }
 
 function topcase() {
@@ -174,13 +185,13 @@ function esp32() {
   const circuitboard = extrudeLinear({height: 2.5}, polygon({points: [
     [0, 8.2], [-1, 7.2], [-1, 1.8], [1, 0], [48, 0], [48, 4], [52.3, 8], [52.3, h - 8], [48, h - 4], [48, h], [1, h], [-1, h - 1.8], [-1, h - 7.2], [0, h - 8.2]
   ]}))
-  return translate([leftX + 1.2, 3.5, splitZ - 8], union(
+  return translate([leftX + 1.2, 3.5, splitZ - 8], [
     colorize(cssColors.white, translate([0, 0, 9], circuitboard)),
     colorize([0, 0, 0, 0.4], cuboid({center: [31.5, 13, 13.9], size: [35, 20.5, 3.8]})), // recess
     colorize([0, 0, 0, 0.4], cuboid({center: [31.5, 2, 13.9], size: [14, 2, 3.8]})), // ribbon
     colorize(cssColors.black, cuboid({center: [31.9, 14.5, 14.2], size: [25.8, 13, 4.4]})), // screen
     colorize(cssColors.brown, cylinder({radius: 3.2, center: [11, 19.5, 12.9], height: 5.8, segments: 25 * qty}))
-  ))
+  ])
 }
 
 /**
@@ -197,4 +208,4 @@ function roundedRect(x, y, z, roundRadius, segments) {
   )
 }
 
-module.exports = { main }
+module.exports = { getParameterDefinitions, main }

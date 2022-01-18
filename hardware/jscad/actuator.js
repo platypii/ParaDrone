@@ -34,10 +34,14 @@ const colors = {
   topcase: cssColors.purple
 }
 
-function main(print) {
-  if (print === true) {
+function getParameterDefinitions() {
+  return [{name: "print", type: "checkbox", checked: false, caption: "Print mode"}]
+}
+
+function main(params) {
+  if (params.print) {
     qty = 3
-    return rotate([Math.PI / 2, -Math.PI / 2, 0], actuator())
+    return rotate([-Math.PI / 2, -Math.PI / 2, 0], actuator())
   } else {
     return [
       colorize(colors.topcase, actuator()),
@@ -152,4 +156,4 @@ function axialCylinder(radius, x1, x2, segments) {
   return translate([x1 + height / 2, 0, axleZ], rotateY(Math.PI / 2, cylinder({radius, height, segments})))
 }
 
-module.exports = { main }
+module.exports = { getParameterDefinitions, main }

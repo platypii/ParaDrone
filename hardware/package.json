@@ -3,15 +3,15 @@
   "description": "ParaDrone hardware CAD designs",
   "main": "all.js",
   "dependencies": {
-    "@jscad/cli": "^2.2.8"
+    "@jscad/cli": "^2.2.12"
   },
   "scripts": {
-    "model": "npx jscad jscad/index.js -o model.dxf",
-    "print": "npx jscad jscad/print.js -o print.stl",
-    "actuator": "npx jscad jscad/actuator.js -o actuator.stl",
-    "autopilot": "npx jscad jscad/autopilot.js -o autopilot.stl",
-    "battery": "npx jscad jscad/battery.js -o battery.stl",
-    "remotecontrol": "npx jscad jscad/remotecontrol.js -o remotecontrol.stl",
-    "spool": "npx jscad jscad/spool.js -o spool.stl"
+    "model": "npx jscad jscad/index.js -o model.obj",
+    "print": "npx jscad jscad/index.js -o print.stl --print=1",
+    "actuator": "npx jscad jscad/actuator.js -o actuator.stl --print=1",
+    "autopilot": "npx jscad jscad/autopilot.js -o autopilot.stl --print=1",
+    "battery": "npx jscad jscad/battery.js -o battery.stl --print=1",
+    "remotecontrol": "npx jscad jscad/remotecontrol.js -o remotecontrol.stl --print=1",
+    "spool": "npx jscad jscad/spool.js -o spool.stl --print=1"
   }
 }
