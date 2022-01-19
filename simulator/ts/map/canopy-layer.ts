@@ -37,7 +37,7 @@ export class CanopyLayer implements MapLayer {
           orientation: new Cesium.ConstantProperty(this.orientation()),
           model: {
             uri: "img/paraglider.glb",
-            scale: 0.02
+            scale: 0.2
           }
         }))
       } else if (this.entity) {
@@ -49,7 +49,7 @@ export class CanopyLayer implements MapLayer {
 
   private position(): Cesium.Cartesian3 {
     if (this.loc) {
-      return Cesium.Cartesian3.fromDegrees(this.loc.lng, this.loc.lat, this.loc.alt - 25)
+      return Cesium.Cartesian3.fromDegrees(this.loc.lng, this.loc.lat, this.loc.alt - 5)
     } else {
       return Cesium.Cartesian3.ZERO
     }

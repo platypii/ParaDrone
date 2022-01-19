@@ -160,11 +160,19 @@ label {
 .icon-step {
   background-image: url('../img/plause.svg');
 }
-.icon-stop {
-  background-image: url('../img/stop.svg');
+.icon-pov {
+  background-image: url('../img/eye.svg');
 }
-.icon-pause {
-  background-image: url('../img/pause.svg');
+.icon-pov.active {
+  background-image: url('../img/eye-black.svg');
+  background-color: #ccc;
+}
+.separator {
+  background-color: rgba(160, 160, 160, 0.3);
+  display: inline-block;
+  height: 32px;
+  width: 1px;
+  margin: 0 4px;
 }
 
 #map {

@@ -1,6 +1,7 @@
 import { GeoPointV, LatLngAlt } from "../dtypes"
 import { LandingZone } from "../geo/landingzone"
 import { BaseMap } from "./basemap"
+import { CameraLayer } from "./camera-layer"
 import { CanopyLayer } from "./canopy-layer"
 import { HoverLayer } from "./hover-layer"
 import { LandingLayer } from "./landing-layer"
@@ -14,8 +15,9 @@ interface MapState {
 }
 
 export class DroneMap extends BaseMap {
-  private destLayer = new LandingLayer()
+  private cameraLayer = new CameraLayer()
   private canopyLayer = new CanopyLayer()
+  private destLayer = new LandingLayer()
   private planLayer = new PathLayer("#22b")
   private actualLayer = new PathLayer("#4422bb99")
   private hoverLayer = new HoverLayer()
@@ -26,6 +28,7 @@ export class DroneMap extends BaseMap {
       center: lz.destination,
       zoom: 15
     })
+    this.addLayer(this.cameraLayer)
     this.addLayer(this.destLayer)
     this.addLayer(this.canopyLayer)
     this.addLayer(this.planLayer)
@@ -37,6 +40,7 @@ export class DroneMap extends BaseMap {
   }
 
   public setState(state: MapState) {
+    this.cameraLayer.setLocation(state.current)
     this.canopyLayer.setLocation(state.current)
     this.destLayer.setLz(state.lz)
     this.planLayer.setPath(state.plan)
