@@ -14,8 +14,8 @@ interface MapState {
 }
 
 export class DroneMap extends BaseMap {
-  private destLayer = new LandingLayer()
   private canopyLayer = new CanopyLayer()
+  private destLayer = new LandingLayer()
   private planLayer = new PathLayer("#22b")
   private actualLayer = new PathLayer("#4422bb99")
   private hoverLayer = new HoverLayer()

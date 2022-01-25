@@ -31,6 +31,7 @@ export class BaseChart {
       .tickFormat((d) => d ? `${d}` : "")
     this.xAxis.layer = this.layers.append("g")
       .attr("transform", `translate(0,${this.height})`)
+      .style("color", "#888")
 
     // Y Axis
     this.yAxis.scale.range([this.height, 0])
@@ -38,6 +39,7 @@ export class BaseChart {
       .ticks(6)
       .tickFormat((d) => d ? `${d}s` : "")
     this.yAxis.layer = this.layers.append("g")
+      .style("color", "#888")
   }
 
   public updateAxes(): void {

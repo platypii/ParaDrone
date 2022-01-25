@@ -8,6 +8,7 @@ const deviceIp = document.getElementById("device-ip") as HTMLInputElement
 export function init(para: Paraglider, lz: LandingZone) {
   // Send landing zone to device on enable
   deviceEnabled.addEventListener("change", () => {
+    deviceIp.classList.remove("has-error")
     if (deviceEnabled.checked && deviceIp.value) {
       sendLandingZone(lz)
     }
@@ -55,7 +56,7 @@ function sendToDevice(host: string, path: string, obj: {[key: string]: number | 
   const url = `http://${host}/${path}?${params}`
   const xhr = new XMLHttpRequest()
   xhr.addEventListener("error", () => {
-    document.getElementById("device-ip")!.style.border = "1px solid #d11"
+    deviceIp.classList.add("has-error")
   })
   xhr.open("GET", url)
   xhr.send()

@@ -13,12 +13,11 @@ export class ErrorChart extends BaseChart {
     super()
 
     // Add error line
-    this.errorPath = this.layers.append("g")
+    this.errorPath = this.layers.append("path")
       .attr("class", "plan-error")
-      .append("path")
       .style("fill", "none")
-      .style("stroke", "#11d")
-      .style("stroke-width", 1.2)
+      .style("stroke", "#22f")
+      .style("stroke-width", 1.5)
       .style("stroke-linecap", "round")
       .style("stroke-linejoin", "round")
 
@@ -35,13 +34,19 @@ export class ErrorChart extends BaseChart {
       .attr("x2", this.width - 30)
       .style("stroke", "#aaa")
       .style("stroke-width", 1)
+      .style("opacity", 0)
   }
 
   public setFocus(i: number): void {
-    const y = Math.floor(this.yAxis.scale(i)) + 0.5
-    this.focusLine
-      .attr("y1", y)
-      .attr("y2", y)
+    if (i === 0) {
+      this.focusLine.style("opacity", 0)
+    } else {
+      const y = Math.floor(this.yAxis.scale(i)) + 0.5
+      this.focusLine
+        .attr("y1", y)
+        .attr("y2", y)
+      this.focusLine.style("opacity", 1)
+    }
   }
 
   public update(steps: SimStep[]): void {
@@ -82,7 +87,7 @@ export class ErrorChart extends BaseChart {
       .attr("width", 15)
       .attr("height", segmentSize)
       .attr("x", this.width - 15)
-      .style("fill", "#1d1")
+      .style("fill", "#1b1")
       .merge(right)
       .attr("y", (d: SimStep, i: number) => Math.floor(this.yAxis.scale(steps.length - i)))
       .style("opacity", (d: SimStep) => d.controls.right / 255)

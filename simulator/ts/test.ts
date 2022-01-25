@@ -17,7 +17,14 @@ const gridDim = 13
 const gridStep = 100 // meters
 const startAlt = 600
 
-const btn = document.getElementById("test-button") as HTMLButtonElement
+const testButton = document.getElementById("test-button") as HTMLButtonElement
+const testParams = document.getElementById("test-params")!
+const testScore = document.getElementById("test-score")!
+const testDistance = document.getElementById("test-distance")!
+const testAngle = document.getElementById("test-angle")!
+const testSamples = document.getElementById("test-n")!
+const testTime = document.getElementById("test-time")!
+
 let droneMap: DroneMap
 let wind: Windgram
 
@@ -29,23 +36,24 @@ export function init(map: DroneMap, windgram: Windgram) {
   droneMap = map
   wind = windgram
   // Bind test button
-  btn.addEventListener("click", () => runTests())
+  testButton.addEventListener("click", () => runTests())
 }
 
 function update(output: TestScore[]) {
   const avgError = avgScore(output)
-  document.getElementById("test-score")!.innerText = `Score: ${avgError.score.toFixed(1)}`
-  document.getElementById("test-distance")!.innerText = `Δ ${avgError.distance.toFixed(1)} m`
-  document.getElementById("test-angle")!.innerText = `θ ${(avgError.angle * 180 / Math.PI).toFixed(1)}°`
-  document.getElementById("test-n")!.innerText = `N ${output.length}`
-  document.getElementById("test-time")!.innerText = `${(new Date().getTime() - startTime) / 1000}s`
+  testParams.style.display = "block"
+  testScore.innerText = `${avgError.score.toFixed(1)}`
+  testDistance.innerText = `${avgError.distance.toFixed(1)} m`
+  testAngle.innerText = `${(avgError.angle * 180 / Math.PI).toFixed(1)}°`
+  testSamples.innerText = `${output.length}`
+  testTime.innerText = `${(new Date().getTime() - startTime) / 1000}s`
 }
 
 /**
  * Perform a grid search
  */
 function runTests() {
-  btn.disabled = true
+  testButton.disabled = true
   // Clear layers
   for (const layer of gridLayers) {
     droneMap.removeLayer(layer)
@@ -75,7 +83,7 @@ function sleepySearch(input: GeoPointV[], output: TestScore[], index: number): v
   const batchSize = 24
   if (index >= input.length) {
     // Done
-    btn.disabled = false
+    testButton.disabled = false
     return
   }
   for (let i = index; i < index + batchSize && i < input.length; i++) {

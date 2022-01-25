@@ -16,7 +16,10 @@
   <body>
     <div class="container">
       <div class="sidebar">
-        <h1>ParaDrone</h1>
+        <div class="sidebar-brand">
+          <h1>ParaDrone</h1>
+          <sub>Simulator</sub>
+        </div>
 
         <div class="sidebar-section">
           <div class="sidebar-header">
@@ -81,7 +84,9 @@
               <div class="text-faded">sim error</div>
               <div id="sim-error"></div>
             </div>
-            <svg id="sim-error-chart"></svg>
+            <div class="sidebar-content">
+              <svg id="sim-error-chart"></svg>
+            </div>
           </div>
         </div>
 
@@ -100,12 +105,28 @@
           <div class="sidebar-header">
             Testing
           </div>
-          <button class="btn" id="test-button">Test</button>
-          <div id="test-score"></div>
-          <div id="test-distance"></div>
-          <div id="test-angle"></div>
-          <div id="test-n"></div>
-          <div id="test-time"></div>
+          <div class="sidebar-parameter">
+            <button class="btn" id="test-button">Test</button>
+            <div id="test-time"></div>
+          </div>
+          <div id="test-params">
+            <div class="sidebar-parameter">
+              <div class="text-faded">score</div>
+              <div id="test-score"></div>
+            </div>
+            <div class="sidebar-parameter">
+              <div class="text-faded">distance</div>
+              <div id="test-distance"></div>
+            </div>
+            <div class="sidebar-parameter">
+              <div class="text-faded">angle</div>
+              <div id="test-angle"></div>
+            </div>
+            <div class="sidebar-parameter">
+              <div class="text-faded">samples</div>
+              <div id="test-n"></div>
+            </div>
+          </div>
         </div>
       </div>
 

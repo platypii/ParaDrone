@@ -3,17 +3,17 @@
 BASEline ParaDrone aims to automate the flight of any parachute or paraglider.
 
 The system consists of:
- - Hardware to pull left and right toggles.
- - Electronics for remote control and autopilot control.
+ - Hardware to pull left and right toggles
+ - Electronics for remote control and autopilot control
  - Autopilot software
 
 The flight operations manual, including instructions for building your own, is available at:
 https://paradr.one/
 
 In this repository:
- - [autopilot/](autopilot) autopilot software for arduino
+ - [autopilot/](autopilot) autopilot source code for arduino
  - [hardware/](hardware) 3d printing cad files
- - [remotecontrol/](remotecontrol) remote control software for arduino using LoRa
+ - [remotecontrol/](remotecontrol) remote control source code for arduino using LoRa
  - [simulator/](simulator) a web-based path planning simulator
 
 ![ParaDrone simulator](/website/html/img/sim.jpg)

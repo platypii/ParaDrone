@@ -4,6 +4,8 @@
 
 body {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  background-color: #111;
+  color: #ddd;
   margin: 0;
   padding: 0;
 }
@@ -26,18 +28,20 @@ body {
 }
 
 h1 {
-  margin-top: 10px;
-  margin-bottom: 10px;
+  font-weight: bold;
+  margin: 0;
+  padding-top: 10px;
+  padding-bottom: 10px;
   text-align: center;
-  color: #6b39a7;
-  font-weight: normal;
 }
 h2, h3 {
   margin-bottom: 0;
   margin-top: 10px;
 }
 input {
-  border: 1px solid #ccc;
+  background-color: #141414;
+  border: 1px solid #141414;
+  color: #bbb;
   border-radius: 2px;
   padding: 3px;
 }
@@ -48,6 +52,10 @@ input:focus {
 input[type=checkbox] {
   cursor: pointer;
 }
+input.has-error {
+  background-color: #422;
+  border: 1px solid #822;
+}
 
 label {
   font-weight: bold;
@@ -57,22 +65,25 @@ label {
 
 .btn,
 .btn:active {
-  border: 1px solid #aaa;
+  background-color: #56e;
+  border: 1px solid #56e;
   border-radius: 4px;
-  background-color: #fff;
-  color: #333;
+  color: #eee;
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 16px;
   padding-right: 16px;
   cursor: pointer;
 }
-.btn:hover,
 .btn:focus {
-  background-color: #e6e6e6;
+  border: 1px solid #78f;
 }
-.btn:focus {
-  outline-offset: -2px;
+.btn:focus-visible {
+  outline: 1px solid #eee;
+}
+.btn:hover {
+  background-color: #67f;
+  border: 1px solid #67f;
 }
 .btn[disabled] {
   cursor: not-allowed;
@@ -80,19 +91,24 @@ label {
 }
 
 .sidebar {
+  background-color: #2c2c35;
   height: 100%;
   width: 220px;
   margin: 0;
   overflow-y: auto;
 }
-
+@media (max-width: 767px) {
+  .sidebar {
+    width: 180px;
+  }
+}
 .sidebar-section {
   margin-bottom: 20px;
 }
 
 .sidebar-header {
-  background-color: #eee;
-  color: #222;
+  background-color: #556;
+  color: #bbb;
   font-weight: bold;
   position: relative;
   padding: 4px 6px;
@@ -113,6 +129,74 @@ label {
 }
 .sidebar-parameter > *:last-child {
   text-align: right;
+  margin-top: auto; /* align bottom */
+}
+.sidebar-content {
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.sidebar-brand {
+  background-color: #1f1f26;
+  background: radial-gradient(#281444, #1f1f26);
+  color: #9135ff;
+  text-align: center;
+}
+.sidebar-brand h1 {
+  margin-bottom: -5px;
+  padding-bottom: 0;
+}
+.sidebar-brand sub {
+  position: relative;
+  right: -52px;
+  top: -10px;
+  color: #ddd;
+  font-size: 10pt;
+  font-weight: normal;
+  font-family: serif;
+}
+
+/* Wind */
+svg#windgram {
+  cursor: pointer;
+  stroke-linecap: round;
+}
+.wind-labels {
+  display: inline-block;
+  position: relative;
+  bottom: 32px;
+}
+
+/* Sidebar headers */
+.plan-header {
+  border-right: 5px solid #22d;
+}
+.sim-header {
+  border-right: 5px solid #a3c;
+}
+.device-header {
+  border-right: 5px solid #d39;
+}
+.sidebar-collapse {
+  overflow-y: hidden;
+  transition: max-height 0.25s ease-in;
+}
+
+/* Misc sidebar tweaks */
+#device-ip {
+  min-width: 90px;
+  width: 50%;
+}
+#test-button {
+  margin-top: 4px;
+}
+#test-params {
+  display: none;
+}
+
+svg#sim-error-chart {
+  width: 100%;
+  height: 160px;
 }
 
 /* Map */
@@ -193,36 +277,6 @@ label {
   float: right;
 }
 
-.plan-header {
-  border-right: 5px solid #33c;
-}
-.sim-header {
-  border-right: 5px solid #a3c;
-}
-.sidebar-collapse {
-  overflow-y: hidden;
-  transition: max-height 0.25s ease-in;
-}
-.device-header {
-  border-right: 5px solid #d39;
-}
-
-svg#sim-error-chart {
-  width: 100%;
-  height: 160px;
-}
-
-/* Wind */
-svg#windgram {
-  cursor: pointer;
-  stroke-linecap: round;
-}
-.wind-labels {
-  display: inline-block;
-  position: relative;
-  bottom: 32px;
-}
-
 #welcome {
   position: absolute;
   top: 10%;
@@ -234,7 +288,9 @@ svg#windgram {
   z-index: 20000;
 }
 #welcome h1 {
+  background-color: #1f1f26;
   color: white;
+  border-radius: 4px;
 }
 @media (min-width: 768px) {
   #welcome {
@@ -250,6 +306,7 @@ svg#windgram {
   }
 }
 
+/* Toggle position */
 .toggle-container {
   position: relative;
 }
@@ -266,5 +323,5 @@ svg#windgram {
 }
 #toggle-right {
   right: 0;
-  background-color: #1d1;
+  background-color: #1b1;
 }
