@@ -4,7 +4,7 @@
   padding: 0;
 }
 body {
-  background: url('../img/grid.png');
+  background: #22222e url('../img/grid.png');
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: #333;
 }
@@ -15,14 +15,10 @@ a {
 .content {
   background: white;
   width: 420px;
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: 20px;
-  padding-top: 20px;
-  padding-left: 40px;
-  padding-right: 40px;
-  padding-bottom: 20px;
+  margin: 20px auto;
+  padding: 20px 40px;
   border-radius: 10px;
+  box-shadow: 4px 4px 10px #111;
 }
 h1 {
   font-size: 32px;

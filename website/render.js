@@ -1,5 +1,7 @@
 const paradroneModel = require("../hardware/jscad/index.js").main
 const jscadReglRenderer = require("@jscad/regl-renderer")
+const { toPolygons } = require("@jscad/modeling").geometries.geom3
+const { flatten } = require("@jscad/modeling").utils
 
 // ********************
 // Renderer configuration and initiation.
@@ -13,6 +15,10 @@ const container = document.getElementById("jscad")
 
 const width = container.clientWidth
 const height = container.clientHeight
+
+const rendering = {
+  background: [0, 0, 0, 0] // trans
+}
 
 // prepare the camera
 let camera = {
@@ -33,7 +39,9 @@ const renderer = prepareRender({
   glOptions: { container },
 })
 
-const entities = entitiesFromSolids({}, paradroneModel())
+const model = paradroneModel({})
+flatten(model).forEach(toPolygons) // TODO: this is a workaround for jscad #985
+const entities = entitiesFromSolids({}, model)
 
 // the heart of rendering, as themes, controls, etc change
 let updateView = true
@@ -78,7 +86,7 @@ const updateAndRender = (timestamp) => {
     camera.position = updates.camera.position
     perspectiveCamera.update(camera)
 
-    renderer({ camera, drawCommands, entities })
+    renderer({ camera, drawCommands, entities, rendering })
   }
   window.requestAnimationFrame(updateAndRender)
 }
