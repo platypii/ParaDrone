@@ -6,7 +6,7 @@ const jscad = require("@jscad/modeling")
 const { subtract, union } = jscad.booleans
 const { colorize, cssColors } = jscad.colors
 const { extrudeLinear } = jscad.extrusions
-const { cuboid, cylinder, cylinderElliptic, polygon, roundedRectangle } = jscad.primitives
+const { circle, cuboid, cylinder, cylinderElliptic, polygon, roundedRectangle } = jscad.primitives
 const { rotate, rotateY, translate } = jscad.transforms
 
 let qty = 1
@@ -68,7 +68,7 @@ function actuator() {
 function screws() {
   const screw = rotateY(Math.PI / 2, [
     cylinder({radius: 1.6, center: [0, 0, 1.5], height: 3, segments: 15 * qty}),
-    cylinderElliptic({startRadius: [0.01, 0.01], endRadius: [3, 3], center: [0, 0, 0.5], height: 3.5, segments: 15 * qty})
+    cylinderElliptic({startRadius: [0, 0], endRadius: [3, 3], center: [0, 0, 0.5], height: 3.5, segments: 15 * qty})
   ])
   return [
     translate([0, 13.9, axleZ], screw),
@@ -118,8 +118,9 @@ function switchhole() {
 function motor() {
   return [
     // uxcell DC 12V 200RPM Gear Box Motor
-    axialCylinder(motorRadius, -108, -37, 80 * qty), // motor
-    axialCylinder(motorRadius, -36, -2, 80 * qty), // gear box
+    axialCylinder(motorRadius - 0.5, -108, -95, 80 * qty), // encoder
+    axialCylinder(motorRadius, -94.5, -36.5, 80 * qty), // motor
+    axialCylinder(motorRadius - 0.5, -36, -2, 80 * qty), // gear box
     axialCylinder(3, 0, 14, 20 * qty), // shaft
   ]
 }
@@ -133,8 +134,17 @@ function spool() {
 }
 
 function mount() {
+  const base = extrudeLinear({ height: 2 },
+    subtract(
+      roundedRectangle({ center: [-19, 0], roundRadius: 1.5, size: [38, 36] }),
+      circle({ center: [-5, -15], radius: 1 }),
+      circle({ center: [-35, -15], radius: 1 }),
+      circle({ center: [-5, 15], radius: 1 }),
+      circle({ center: [-35, 15], radius: 1 })
+    )
+  )
   return union(
-    cuboid({center: [-20, 0, 1], size: [40, 36, 2]}),
+    base,
     cuboid({center: [-1, 0, 13], size: [2, 36, 26]}),
     axialCylinder(18, -2, 0, 80 * qty)
   )
@@ -153,7 +163,8 @@ function mechanism() {
  */
 function axialCylinder(radius, x1, x2, segments) {
   const height = x2 - x1
-  return translate([x1 + height / 2, 0, axleZ], rotateY(Math.PI / 2, cylinder({radius, height, segments})))
+  const center = [-axleZ, 0, x1 + height / 2]
+  return rotateY(Math.PI / 2, cylinder({center, height, radius, segments}))
 }
 
 module.exports = { getParameterDefinitions, main }

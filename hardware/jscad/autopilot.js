@@ -3,7 +3,7 @@
 // tags       : Microcontroller,case,arduino,autopilot,drone,paraglider
 
 const jscad = require("@jscad/modeling")
-const { intersect, subtract, union } = jscad.booleans
+const { intersect, subtract } = jscad.booleans
 const { colorize, cssColors } = jscad.colors
 const { extrudeLinear } = jscad.extrusions
 const { cuboid, cylinder, cylinderElliptic, polygon, roundedCuboid, roundedRectangle } = jscad.primitives
@@ -23,11 +23,6 @@ const rightX = sizeX / 2
 
 const sh = 2 // shell thicness
 
-const colors = {
-  topcase: cssColors.purple,
-  bottomcase: cssColors.magenta
-}
-
 function getParameterDefinitions() {
   return [{name: "print", type: "checkbox", checked: false, caption: "Print mode"}]
 }
@@ -38,8 +33,7 @@ function main(params) {
     return translate([0, 0, sizeZ], rotateY(Math.PI, topcase()))
   } else {
     return [
-      colorize(colors.topcase, topcase()),
-      // colorize(colors.bottomcase, bottomcase()),
+      colorize(cssColors.purple, topcase()),
       circuit()
     ]
   }
@@ -59,24 +53,6 @@ function topcase() {
     ),
     topscrews()
   ]
-}
-
-function bottomcase() {
-  const support = cylinder({radius: 3.2, center: [0, 0, 1.8], height: 1.6, segments: 30 * qty})
-  return subtract(
-    union(
-      box(sh + 0.2, 0, sh),
-      cuboid({center: [leftX + 1.25, bottomY + 16, sh / 2], size: [2.5, 24, sh]}), // left connector base
-      cuboid({center: [rightX - 1.25, bottomY + 15, sh / 2], size: [2.5, 22, sh]}), // right connector base
-      translate([0, topY - 10, 0], support),
-      translate([rightX - 16, bottomY + 10, 0], support)
-    ),
-    translate([-25, bottomY + 14, -1], roundedRect(50, 30, 4, 2, 16 * qty)), // Save bottom weight
-    cylinder({radius: 2.2, center: [leftX + 4.8, bottomY + 21.1, 2], height: 2.4}), // molex recess
-    cylinder({radius: 2.2, center: [leftX + 4.8, bottomY + 11.5, 2], height: 2.4}), // molex recess
-    cylinder({radius: 2.2, center: [rightX - 4.8, bottomY + 11.5, 2], height: 2.4}), // molex recess
-    bottomscrews()
-  )
 }
 
 function connectors() {
@@ -107,21 +83,12 @@ function box(delta, z1, z2) {
     roundedRect(sizeX - 2 * delta, sizeY - 2 * delta, z2 - z1, r, 16 * qty))
 }
 
-function bottomscrews() {
-  const screw = cylinder({radius: 1.6, center: [0, 0, 2.5], height: 7, segments: 20 * qty})
-  const z = -2
-  return [
-    translate([0, topY - 10, z], screw),
-    translate([rightX - 16, bottomY + 10, z], screw)
-  ]
-}
-
 function topscrews() {
   const trihole = subtract(
     rotateX(Math.PI / 2, extrudeLinear({height: 10}, polygon({points: [[0, 0], [7, 0], [0, 19]]}))),
     cuboid({center: [5, -5, 12], size: [10, 6, 20]}),
     cylinder({center: [3, -5, 1.5], radius: 1.6, height: 3, segments: 20 * qty}),
-    cylinderElliptic({center: [3, -5, 0.5], startRadius: [0.01, 0.01], endRadius: [3, 3], height: 3.5, segments: 20 * qty})
+    cylinderElliptic({center: [3, -5, 0.5], startRadius: [0, 0], endRadius: [3, 3], height: 3.5, segments: 20 * qty})
   )
   return [
     translate([rightX, bottomY + 38.8, 0], trihole),
@@ -133,9 +100,10 @@ function circuit() {
   return [
     pcb(),
     esp32(),
-    bn220(),
+    gps(),
     driver(),
-    bec()
+    bec(),
+    plugs()
   ]
 }
 
@@ -148,18 +116,19 @@ function esp32() {
     colorize(cssColors.white, translate([0, 0.3, 9], circuitboard)),
     colorize([0, 0, 0, 0.4], cuboid({center: [31.5, 13, 13.9], size: [35, 20.4, 3.8]})), // recess
     colorize([0, 0, 0, 0.4], cuboid({center: [31.5, 2, 13.9], size: [14, 2, 3.8]})), // ribbon
-    colorize(cssColors.black, cuboid({center: [31.75, 14.5, 14.4], size: [26.1, 13, 4.8]})), // screen
+    colorize([0.1, 0.1, 0.1, 0.99], cuboid({center: [31.75, 14.5, 14.4], size: [26.1, 13, 4.8]})), // screen
     colorize(cssColors.brown, cylinder({radius: 3.2, center: [11, 19.5, 12.9], height: 5.8, segments: 25 * qty}))
   ])
 }
 
-function bn220() {
-  return colorize(cssColors.tan, cuboid({center: [rightX - 12.1, bottomY + 46.3, sizeZ - 6.1], size: [20, 22, 4.2]}))
+function gps() {
+  // u-blox SAM-M8Q
+  return colorize(cssColors.tan, cuboid({center: [rightX - 12.1, topY - 12, 6], size: [16, 16, 4.2]}))
 }
 
 function driver() {
   // Pololu Dual MC33926 Motor Driver Carrier
-  return colorize(cssColors.darkgreen, cuboid({center: [0, bottomY + 16, sizeZ - 5], size: [46, 28, 6]}))
+  return colorize(cssColors.darkgreen, cuboid({center: [0, bottomY + 16, 8], size: [46, 28, 6]}))
 }
 
 function bec() {
@@ -169,6 +138,14 @@ function bec() {
 
 function pcb() {
   return colorize(cssColors.green, box(sh + 0.2, 0, sh))
+}
+
+function plugs() {
+  return colorize([0.1, 0.1, 0.1, 1], [
+    cuboid({center: [rightX - 5, bottomY + 10, 5.5], size: [9.5, 13, 6]}),
+    cuboid({center: [leftX + 5, bottomY + 10, 5.5], size: [9.5, 13, 6]}),
+    cuboid({center: [leftX + 5, bottomY + 22.5, 5.5], size: [9.5, 10, 6]})
+  ])
 }
 
 /**

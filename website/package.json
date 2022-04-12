@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@jscad/modeling": "^2.9.2",
     "@jscad/regl-renderer": "^2.5.3"
   },
   "devDependencies": {

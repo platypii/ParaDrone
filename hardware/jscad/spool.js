@@ -5,26 +5,31 @@
 const jscad = require("@jscad/modeling")
 const { subtract, union } = jscad.booleans
 const { cuboid, cylinder } = jscad.primitives
-const { rotateY, translate } = jscad.transforms
+const { colorize } = jscad.colors
 
 let qty = 1
 
-//   ==   axle
-// ====== disc
-//   ==   axle
-// ====== disc
-const discRadius = 19 - 0.8
-const axleRadius = 8
+// oversized washers
+// https://www.mcmaster.com/large-diameter-washers/od~1-1-2/
+const washerThic = 1.5
+const washerOuter = 1.5 * 12.7 // outer radius
+const washerInnerSmall = 6.7
+const washerInnerLarge = 8.3
+const washerColor = [0.1, 0.1, 0.1, 0.99]
+
+//    ||    core
+// ===||=== washer
+//   ||||   core
+// ==||||== washer
+//  ||||||  core
+const z1 = 3
+const z2 = 10
+const z3 = 13
 const shaftRadius = 4.2
 const threadRadius = 1.1
 
-// thicness
-const discThic = 2
-const axleThic = 5
-
 function getParameterDefinitions() {
   return [
-    {name: "tooling", type: "choice", values: ["FDM", "CNC"], caption: "Tooling"},
     {name: "print", type: "checkbox", checked: false, caption: "Print mode"}
   ]
 }
@@ -32,81 +37,56 @@ function getParameterDefinitions() {
 function main(params) {
   if (params.print) {
     qty = 3
-  }
-  if (params.tooling === "CNC") {
-    return onepiece()
+    return core()
   } else {
-    return twopiece()
+    return [
+      washer1(),
+      washer2(),
+      core()
+    ]
   }
 }
 
-function twopiece() {
-  return [
-    translate([0, -20, 0],
-      subtract(
-        solid(),
-        gluechannel(),
-        dShaft()
-      )
-    ),
-    translate([0, 20, 0],
-      subtract(
-        solid(),
-        threadhole(),
-        dShaft()
-      )
-    )
-  ]
-}
-
-function onepiece() {
-  return [
-    subtract(
-      solid(),
-      shaft()
-    ),
-    translate([0, 0, discThic + axleThic],
-      subtract(
-        solid(),
-        shaft(),
-        threadhole(),
-        setScrew()
-      )
-    )
-  ]
-}
-
-function solid() {
-  return union(
-    cylinder({radius: discRadius, height: discThic, center: [0, 0, discThic / 2], segments: qty * 120}), // disc
-    cylinder({radius: axleRadius, height: axleThic, center: [0, 0, discThic + axleThic / 2], segments: qty * 100}) // axle
+const washer1 = () => {
+  const center = [0, 0, z1 + washerThic / 2]
+  const height = washerThic
+  const washer = subtract(
+    cylinder({ center, height, radius: washerOuter, segments: qty * 120 }),
+    cylinder({ center, height, radius: washerInnerLarge, segments: qty * 100 })
   )
+  return colorize(washerColor, washer)
 }
 
-/**
- * Motor shaft
- */
-function shaft() {
-  return cylinder({radius: shaftRadius, height: 18, center: [0, 0, 9], segments: qty * 80})
+const washer2 = () => {
+  const center = [0, 0, z2 + washerThic / 2]
+  const height = washerThic
+  const washer = subtract(
+    cylinder({ center, height, radius: washerOuter, segments: qty * 120 }),
+    cylinder({ center, height, radius: washerInnerSmall, segments: qty * 100 }),
+    threadhole()
+  )
+  return colorize(washerColor, washer)
+}
+
+const core = () => {
+  return subtract(
+    union(
+      cylinder({radius: 0.58 * washerOuter, height: z1, center: [0, 0, z1 / 2], segments: qty * 100}), // axle
+      cylinder({radius: washerInnerLarge, height: z2 - z1, center: [0, 0, z1 + (z2 - z1) / 2], segments: qty * 100}), // axle
+      cylinder({radius: washerInnerSmall, height: z3 - z2, center: [0, 0, z2 + (z3 - z2) / 2], segments: qty * 100}) // axle
+    ),
+    dShaft()
+  )
 }
 
 /**
  * D-shaft
  */
 function dShaft() {
+  const shaft = cylinder({radius: shaftRadius, height: 18, center: [0, 0, 9], segments: qty * 80})
   return subtract(
-    shaft(),
+    shaft,
     cuboid({size: [100, 100, 100], center: [0, 53, 50]})
-  )
-}
-
-/**
- * Set screw
- */
-function setScrew() {
-  const z = discThic + axleThic / 2
-  return rotateY(Math.PI / 2,
-    cylinder({radius: threadRadius, height: axleRadius, center: [-z, 0, axleRadius / 2], segments: qty * 24})
   )
 }
 
@@ -114,19 +94,8 @@ function setScrew() {
  * Thread hole to secure pulley string
  */
 function threadhole() {
-  return cylinder({radius: threadRadius, height: discThic, center: [0, axleRadius + threadRadius, discThic / 2], segments: qty * 24})
-}
-
-/**
- * Channel to hold glue for two piece version
- */
-function gluechannel() {
-  const depth = 0.5
-  const midZ = discThic + axleThic - depth / 2
-  return subtract(
-    cylinder({radius: 6.4, height: depth, center: [0, 0, midZ], segments: qty * 60}),
-    cylinder({radius: 5.6, height: depth, center: [0, 0, midZ], segments: qty * 60})
-  )
+  const center = [0, washerInnerSmall + threadRadius * 2, z2 + washerThic / 2]
+  return cylinder({radius: threadRadius, height: washerThic, center, segments: qty * 24})
 }
 
 module.exports = { getParameterDefinitions, main }

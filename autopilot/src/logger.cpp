@@ -34,7 +34,7 @@ static File get_file(struct tm *date) {
   char filename[24] = "/";
   strftime(filename + 1, 12, "%Y-%m-%d", date);
   strcat(filename, ".csv");
-  printf("Logging to %s\n", filename);
+  Serial.printf("Logging to %s\n", filename);
   // Open file for append writing
   return SPIFFS.open(filename, "a");
 

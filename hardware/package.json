@@ -1,9 +1,9 @@
 {
   "name": "paradrone-hardware",
   "description": "ParaDrone hardware CAD designs",
-  "main": "all.js",
   "dependencies": {
-    "@jscad/cli": "^2.2.12"
+    "@jscad/cli": "^2.2.18",
+    "@jscad/modeling": "^2.9.2"
   },
   "scripts": {
     "model": "npx jscad jscad/index.js -o model.obj",
