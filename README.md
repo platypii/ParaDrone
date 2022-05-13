@@ -1,5 +1,8 @@
 # BASEline ParaDrone
 
+[![workflow status](https://github.com/platypii/ParaDrone/actions/workflows/ci.yml/badge.svg)](https://github.com/platypii/ParaDrone/actions)
+[![mit license](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+
 BASEline ParaDrone aims to automate the flight of any parachute or paraglider.
 
 The system consists of:

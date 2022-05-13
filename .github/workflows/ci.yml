@@ -1,0 +1,64 @@
+name: CI
+on:
+  pull_request:
+  push:
+
+jobs:
+  autopilot:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: autopilot
+    steps:
+      - uses: actions/checkout@v2
+      - run: pip3 install platformio
+      - run: pio lib update
+      - run: pio test -e native
+
+  rc:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: remotecontrol
+    steps:
+      - uses: actions/checkout@v2
+      - run: pip3 install platformio
+      - run: pio lib update
+      - run: pio run
+
+  android:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: android
+    steps:
+      - uses: actions/checkout@v2
+      - run: ./gradlew testDebugUnitTest
+
+  hardware:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: hardware
+    steps:
+      - uses: actions/checkout@v2
+      - run: npm i
+      - run: npm run model
+      - run: npm run print
+      - run: npm run actuator
+      - run: npm run autopilot
+      - run: npm run battery
+      - run: npm run remotecontrol
+      - run: npm run spool
+
+  simulator:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: simulator
+    steps:
+      - uses: actions/checkout@v2
+      - run: npm i
+      - run: npx tsc
+      - run: npm run lint
+      - run: npm test
