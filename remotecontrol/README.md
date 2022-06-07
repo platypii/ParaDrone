@@ -1,6 +1,6 @@
-# BASEline ParaDrone - AutoPilot Software
+# BASEline ParaDrone - Remote Control Software
 
-ParaDrone autopilot software runs on a small arduino microcontroller. I use the Heltec ESP32 LoRa V2. This module is nice because it has the ESP32, a screen, and a LoRa radio all bundled together.
+ParaDrone supports remote control operation via LoRa radio. I use the Heltec ESP32 LoRa V2 as a kind of LoRa modem. The ParaDrone android app connects to the Remote Control via bluetooth, and the Remote Control sends commands to ParaDrone via LoRa. This is the code for the Remote Control.
 
 PlatformIO is used to manage the software.
 
@@ -16,9 +16,3 @@ Open the project in this directory.
 
 Connect the ESP32 to the computer by USB.
 Use the PlatformIO "Upload" function to program the device.
-
-## Testing
-
-```
-pio test -e native
-```

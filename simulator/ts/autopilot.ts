@@ -95,8 +95,8 @@ export function search(loc: Point3V, para: Paraglider, lz: LandingZone): Path {
       // naive(loc, lz.dest, effectiveRadius),
       straightPath
     ]
-    .filter((path): path is Path => !!path)
-    .map((p) => path_no_turns_below(para, p, loc.alt))
+      .filter((path): path is Path => !!path)
+      .map((p) => path_no_turns_below(para, p, loc.alt))
     return best_plan(lz, paths) || straightPath
   }
 }

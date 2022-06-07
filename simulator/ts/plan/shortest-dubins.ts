@@ -9,7 +9,7 @@ export function allDubins(loc: PointV, dest: PointV, r: number): Path[] {
     dubins(loc, dest, r, Turn.Left, Turn.Right), // lsr
     dubins(loc, dest, r, Turn.Left, Turn.Left) // lsl
   ]
-  .filter((path): path is Path => !!path)
+    .filter((path): path is Path => !!path)
 }
 
 /**

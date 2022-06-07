@@ -7,7 +7,7 @@ export class Windgram {
   public vE: number = -0
   public vN: number = -0
 
-  private line: d3.Selection<SVGLineElement, any, HTMLElement, any>
+  private line: d3.Selection<SVGLineElement, unknown, HTMLElement, unknown>
   private readonly speedLabel = document.getElementById("wind-speed")!
   private readonly directionLabel = document.getElementById("wind-direction")!
 
@@ -20,7 +20,7 @@ export class Windgram {
     const height = 100
     this.radius = Math.min(width, height) / 2
 
-    const svg: d3.Selection<Element, any, any, any> = d3.select("svg#windgram")
+    const svg: d3.Selection<Element, unknown, HTMLElement, unknown> = d3.select("svg#windgram")
     svg.attr("width", width)
     svg.attr("height", height)
 
