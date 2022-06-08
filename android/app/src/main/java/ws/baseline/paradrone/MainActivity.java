@@ -1,24 +1,18 @@
 package ws.baseline.paradrone;
 
-import android.content.Intent;
-import androidx.annotation.Nullable;
 import ws.baseline.paradrone.bluetooth.BluetoothService;
 import ws.baseline.paradrone.databinding.ActivityMainBinding;
 
-import android.Manifest;
-import android.content.pm.PackageManager;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import timber.log.Timber;
 
 public class MainActivity extends AppCompatActivity {
-
-    private static final int PERMISSION_REQUEST_LOCATION = 2010;
 
     private ActivityMainBinding binding;
 
@@ -29,11 +23,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         Timber.plant(new Timber.DebugTree());
-
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // Location is needed for map location and bluetooth
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_REQUEST_LOCATION);
-        }
 
         binding.setConfig.setOnClickListener((e) -> {
             getSupportFragmentManager()

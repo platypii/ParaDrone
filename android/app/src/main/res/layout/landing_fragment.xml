@@ -45,7 +45,8 @@
             android:layout_gravity="bottom"
             android:layout_marginBottom="4dp"
             android:textSize="12pt"
-            android:text="m MSL"/>
+            android:text="m MSL"
+            android:labelFor="@id/lz_elevation"/>
 
         <ImageButton
             android:id="@+id/get_elevation"

@@ -19,4 +19,12 @@
         android:text="@string/bluetooth_searching"
         app:drawableTopCompat="@drawable/paradrone" />
 
+    <Button
+        android:id="@+id/permission_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/grant_permission"
+        android:layout_gravity="center_horizontal|bottom"
+        android:visibility="gone" />
+
 </FrameLayout>

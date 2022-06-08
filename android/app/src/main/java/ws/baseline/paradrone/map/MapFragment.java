@@ -1,6 +1,7 @@
 package ws.baseline.paradrone.map;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.View;
@@ -58,14 +59,15 @@ public class MapFragment extends SupportMapFragment implements OnMapReadyCallbac
         // Map defaults
         map.setMapType(GoogleMap.MAP_TYPE_HYBRID);
 
-        // Show current phone location
-        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            map.setMyLocationEnabled(true);
-        }
-
         // Drag listener
         map.setOnCameraMoveStartedListener(this);
         map.setOnCameraIdleListener(this);
+
+        // Show current phone location
+        final Activity activity = getActivity();
+        if (activity != null && ContextCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            map.setMyLocationEnabled(true);
+        }
     }
 
     void addLayer(@NonNull MapLayer layer) {

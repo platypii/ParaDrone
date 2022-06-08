@@ -57,7 +57,7 @@ public class ConvertTest {
     }
 
     @Test
-    public void convertbearing3() {
+    public void convertBearing3() {
         assertEquals("N", Convert.bearing3(toRadians(0.0)));
         assertEquals("NE", Convert.bearing3(toRadians(45.0)));
         assertEquals("E", Convert.bearing3(toRadians(90.0)));

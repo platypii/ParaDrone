@@ -1,5 +1,7 @@
 package ws.baseline.paradrone.bluetooth;
 
+import ws.baseline.paradrone.Permissions;
+
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
@@ -38,11 +40,16 @@ public class BluetoothService {
 
     public void start(@NonNull Context context) {
         deviceMode = prefs.load(context);
-        if (!isEnabled()) {
+        final Permissions permissions = Permissions.getPermissions(context);
+        // TODO: Check for location on android pre-30
+        if (!permissions.bluetoothEnabled) {
             Timber.e("Bluetooth disabled");
+        } else if (!permissions.locationPermission) {
+            Timber.e("Location permission required");
+        } else if (!permissions.locationEnabled) {
+            Timber.e("Location disabled");
         } else if (bluetoothState == BT_STOPPED) {
             bluetoothState = BT_STARTED;
-            // TODO: Prompt to start bluetooth if needed
             // Start bluetooth thread
             if (bluetoothHandler == null) {
                 bluetoothHandler = new BluetoothHandler(this, context);

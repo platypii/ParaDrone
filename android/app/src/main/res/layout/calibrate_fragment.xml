@@ -12,7 +12,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:padding="16dp"
-        android:src="@drawable/calibrate" />
+        android:src="@drawable/calibrate"
+        android:contentDescription="ParaDrone"/>
 
     <LinearLayout
         android:layout_width="match_parent"

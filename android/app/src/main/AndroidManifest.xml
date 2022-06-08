@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="ws.baseline.paradrone">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-feature
         android:name="android.hardware.bluetooth"
@@ -19,6 +18,7 @@
         android:theme="@style/Theme.AppCompat.DayNight.NoActionBar">
         <meta-data android:name="com.google.android.geo.API_KEY" android:value="@string/google_maps_key"/>
         <activity android:name=".MainActivity"
+            android:exported="true"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
