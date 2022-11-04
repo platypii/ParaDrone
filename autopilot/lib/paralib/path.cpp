@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include "path.h"
 
-#ifdef UNIT_TEST
+#ifdef PIO_UNIT_TESTING
 #define PRINTF printf
 #else
 #include <Arduino.h>
