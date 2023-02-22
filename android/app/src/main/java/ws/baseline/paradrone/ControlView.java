@@ -48,6 +48,8 @@ public class ControlView extends View {
         //noinspection IntegerDivisionInFloatingPointContext
         canvas.drawLine(w / 2, 0, w / 2, h, paint);
 
+        // Left right labels
+        paint.setColor(0xff555555);
         paint.setTextAlign(Paint.Align.LEFT);
         canvas.drawText("L", 5, h - 30, paint);
         paint.setTextAlign(Paint.Align.RIGHT);

@@ -4,7 +4,6 @@ import ws.baseline.paradrone.Permissions;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
-import android.content.Context;
 import android.content.Intent;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -38,9 +37,9 @@ public class BluetoothService {
     @NonNull
     public final AutopilotActions actions = new AutopilotActions(this);
 
-    public void start(@NonNull Context context) {
-        deviceMode = prefs.load(context);
-        final Permissions permissions = Permissions.getPermissions(context);
+    public void start(@NonNull Activity activity) {
+        deviceMode = prefs.load(activity);
+        final Permissions permissions = Permissions.getPermissions(activity);
         // TODO: Check for location on android pre-30
         if (!permissions.bluetoothEnabled) {
             Timber.e("Bluetooth disabled");
@@ -52,7 +51,7 @@ public class BluetoothService {
             bluetoothState = BT_STARTED;
             // Start bluetooth thread
             if (bluetoothHandler == null) {
-                bluetoothHandler = new BluetoothHandler(this, context);
+                bluetoothHandler = new BluetoothHandler(this, activity);
             }
             bluetoothHandler.start();
         } else {

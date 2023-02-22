@@ -3,7 +3,7 @@
     <string name="bluetooth_searching">Searching for ParaDrone…</string>
     <string name="bluetooth_permission">Bluetooth permission required</string>
     <string name="bluetooth_disabled">Bluetooth not enabled</string>
-    <string name="bluetooth_disabled_action">Open bluetooth settings</string>
+    <string name="bluetooth_disabled_action">Enable bluetooth</string>
     <string name="location_permission">Location permission required</string>
     <string name="location_disabled">Location not enabled</string>
     <string name="location_disabled_action">Enable location service</string>

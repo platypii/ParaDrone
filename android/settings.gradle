@@ -1,2 +1,2 @@
 include ':app'
-rootProject.name='BASEline ParaDrone'
+rootProject.name='ParaDrone'

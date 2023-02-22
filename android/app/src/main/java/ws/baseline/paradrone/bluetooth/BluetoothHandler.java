@@ -1,9 +1,9 @@
 package ws.baseline.paradrone.bluetooth;
 
+import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.le.ScanResult;
-import android.content.Context;
 import android.os.Handler;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -18,6 +18,7 @@ import com.welie.blessed.HciStatus;
 import com.welie.blessed.WriteType;
 import java.util.UUID;
 import timber.log.Timber;
+import ws.baseline.paradrone.Permissions;
 
 import static ws.baseline.paradrone.bluetooth.BluetoothPreferences.DeviceMode.AP;
 import static ws.baseline.paradrone.bluetooth.BluetoothPreferences.DeviceMode.RC;
@@ -43,6 +44,7 @@ class BluetoothHandler {
     private static final UUID rcServiceId = UUID.fromString("ba5e0003-ed55-43fa-bb54-8e721e092603");
     private static final UUID rcCharacteristicId = UUID.fromString("ba5e0004-be98-4de9-9e9a-080b5bb41404");
 
+    private final Activity activity;
     private final Handler handler = new Handler();
     @NonNull
     private final BluetoothService service;
@@ -56,18 +58,34 @@ class BluetoothHandler {
     boolean connected_ap = false;
     boolean connected_rc = false;
 
-    BluetoothHandler(@NonNull BluetoothService service, @NonNull Context context) {
+    BluetoothHandler(@NonNull BluetoothService service, @NonNull Activity activity) {
+        this.activity = activity;
         this.service = service;
-        central = new BluetoothCentralManager(context, bluetoothCentralManagerCallback, new Handler());
+        central = new BluetoothCentralManager(activity, bluetoothCentralManagerCallback, new Handler());
     }
 
     public void start() {
         if (service.getState() == BT_STARTED) {
-            scan();
+            scanIfPermitted();
         } else if (service.getState() == BT_SEARCHING) {
             Timber.w("Already searching");
         } else if (service.getState() == BT_STOPPING || service.getState() != BT_STOPPED) {
             Timber.w("Already stopping");
+        }
+    }
+
+    private void scanIfPermitted() {
+        if (Permissions.hasBluetoothPermissions(activity)) {
+            Timber.d("Bluetooth permitted, starting scan");
+            try {
+                scan();
+            } catch (SecurityException e) {
+                Timber.e("Permission exception while bluetooth scanning", e);
+            }
+        } else {
+            Timber.w("Bluetooth permission required");
+            service.setState(BT_STOPPED);
+            Permissions.requestBluetoothPermissions(activity);
         }
     }
 

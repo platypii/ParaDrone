@@ -5,7 +5,6 @@ import ws.baseline.paradrone.databinding.HomeFragmentBinding;
 
 import android.Manifest;
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -36,9 +35,9 @@ public class HomeFragment extends Fragment {
                     if (result) {
                         Timber.i("Location permission granted");
                         // Re-try bluetooth
-                        final Context context = getContext();
-                        if (context != null) {
-                            Services.bluetooth.start(context);
+                        final Activity activity = getActivity();
+                        if (activity != null) {
+                            Services.bluetooth.start(activity);
                         }
                     } else {
                         Timber.w("Location permission denied");

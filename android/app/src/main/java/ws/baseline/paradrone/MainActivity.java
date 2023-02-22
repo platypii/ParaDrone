@@ -1,5 +1,9 @@
 package ws.baseline.paradrone;
 
+import android.content.Context;
+import android.content.pm.PackageManager;
+import android.util.Log;
+import androidx.annotation.NonNull;
 import ws.baseline.paradrone.bluetooth.BluetoothService;
 import ws.baseline.paradrone.databinding.ActivityMainBinding;
 
@@ -56,6 +60,27 @@ public class MainActivity extends AppCompatActivity {
         if (resultCode == RESULT_OK && requestCode == BluetoothService.ENABLE_BLUETOOTH_CODE) {
             Timber.i("Bluetooth enabled");
             Services.bluetooth.start(this);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == Permissions.RC_BLUE) {
+            // Check for all permissions granted
+            int success = 0;
+            for (int i = 0; i < permissions.length; i++) {
+                if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
+                    success++;
+                }
+            }
+            if (permissions.length == success) {
+                Timber.i("Bluetooth permission granted");
+                // Start bluetooth again
+                Services.bluetooth.start(this);
+            } else {
+                Timber.w("Bluetooth permission not granted");
+            }
         }
     }
 

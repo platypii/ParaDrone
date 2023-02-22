@@ -23,8 +23,10 @@
         android:id="@+id/permission_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/grant_permission"
         android:layout_gravity="center_horizontal|bottom"
+        android:padding="20dp"
+        android:backgroundTint="#622"
+        android:text="@string/grant_permission"
         android:visibility="gone" />
 
 </FrameLayout>
