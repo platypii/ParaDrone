@@ -14,8 +14,8 @@ void setup() {
   gps_init();
   motor_init();
   screen_init(); // 70ms
-  bt_init(); // 680ms
-  lora_init(); // 30ms
+  bt_init(); // 250ms
+  lora_init(); // 70ms
   // web_init("ssid", "password");
 }
 

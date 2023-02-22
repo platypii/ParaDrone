@@ -2,16 +2,16 @@
 #include "paradrone.h"
 
 // Motor control pins
-#define PIN_LEFT_IN1 23
-#define PIN_LEFT_IN2 22
-#define PIN_RIGHT_IN1 17
-#define PIN_RIGHT_IN2 2
+#define PIN_LEFT_IN1 34
+#define PIN_LEFT_IN2 36
+#define PIN_RIGHT_IN1 20
+#define PIN_RIGHT_IN2 26
 
 // Hall sensors
-#define PIN_LEFT_HALL_A 37
-#define PIN_LEFT_HALL_B 36
-#define PIN_RIGHT_HALL_A 33
-#define PIN_RIGHT_HALL_B 32
+#define PIN_LEFT_HALL_A 46
+#define PIN_LEFT_HALL_B 37
+#define PIN_RIGHT_HALL_A 38
+#define PIN_RIGHT_HALL_B 39
 
 // TODO: Learn direction of motor ticks
 static int motor_ticks_flip_left = 1; // -1 to reverse direction

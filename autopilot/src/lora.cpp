@@ -3,7 +3,8 @@
 
 #define MAX_PACKET_SIZE 20 // Same as BT
 
-SX1276 radio = new Module(SS, 26 /*irq*/, RST_LoRa, DIO0);
+// SX1262 radio = new Module(SS, 14, 12, 13);
+SX1262 radio = new Module(SS, DIO0, RST_LoRa, BUSY_LoRa);
 
 static void lora_read();
 static ICACHE_RAM_ATTR void on_receive();
@@ -22,7 +23,7 @@ void lora_init() {
   } else {
     Serial.printf("%.1fs lora init failed %d\n", millis() * 1e-3, state);
   }
-  radio.setDio0Action(on_receive);
+  radio.setDio1Action(on_receive);
   // radio.setCrcFiltering(true);
 
   state = radio.startReceive();
