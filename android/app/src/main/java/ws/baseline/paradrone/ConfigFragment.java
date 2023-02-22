@@ -34,8 +34,10 @@ public class ConfigFragment extends Fragment {
         READY,
         SAVING
     }
+    @NonNull
     private ConfigViewState configState = ConfigViewState.LOADING;
 
+    @Nullable
     private ApConfigMsg saving = null;
 
     @Override

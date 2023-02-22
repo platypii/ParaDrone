@@ -80,7 +80,7 @@ class BluetoothHandler {
             try {
                 scan();
             } catch (SecurityException e) {
-                Timber.e("Permission exception while bluetooth scanning", e);
+                Timber.e(e, "Permission exception while bluetooth scanning");
             }
         } else {
             Timber.w("Bluetooth permission required");
@@ -276,10 +276,10 @@ class BluetoothHandler {
         }
     }
 
-    void sendCommand(byte[] value) {
+    void sendCommand(@NonNull byte[] value) {
         Timber.d("phone -> ap: cmd %c", (char) value[0]);
         final BluetoothGattCharacteristic ch = getCharacteristic();
-        if (ch != null) {
+        if (currentPeripheral != null && ch != null) {
             if (!currentPeripheral.writeCharacteristic(ch, value, WriteType.WITH_RESPONSE)) {
                 Timber.e("Failed to send cmd %c", (char) value[0]);
             }

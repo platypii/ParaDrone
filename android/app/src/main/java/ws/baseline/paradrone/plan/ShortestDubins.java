@@ -12,6 +12,7 @@ import static ws.baseline.paradrone.plan.PlannerDubins.dubins;
 
 public class ShortestDubins {
 
+    @NonNull
     static Path[] allDubins(@NonNull PointV loc, @NonNull PointV dest, double r) {
         return new Path[]{
                 dubins(loc, dest, r, TURN_RIGHT, TURN_RIGHT),

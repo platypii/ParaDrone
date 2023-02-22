@@ -47,7 +47,7 @@ public class DroneMap extends MapFragment {
     public void onUpdate(@NonNull ApEvent event) {
         updateLayers();
         // Center on drone, if map hasn't been touched recently
-        if (map != null && Services.location.lastLoc != null && !draging && System.currentTimeMillis() - lastDrag > SNAPBACK_TIME) {
+        if (map != null && Services.location.lastLoc != null && !dragging && System.currentTimeMillis() - lastDrag > SNAPBACK_TIME) {
             map.moveCamera(CameraUpdateFactory.newLatLng(Services.location.lastLoc.toLatLng()));
         }
     }

@@ -102,9 +102,9 @@ public class ApScreenFragment extends Fragment {
         // Alt
         if (ll != null && !Double.isNaN(ll.alt)) {
             if (lz != null) {
-                binding.statusAltitude.setText(Convert.distance(ll.alt - lz.destination.alt, 0, true) + "AGL");
+                binding.statusAltitude.setText(Convert.distance(ll.alt - lz.destination.alt, 0, true) + "mAGL");
             } else {
-                binding.statusAltitude.setText(Convert.distance(ll.alt, 1, true) + "MSL");
+                binding.statusAltitude.setText(Convert.distance(ll.alt, 0, true) + "mMSL");
             }
         }
 

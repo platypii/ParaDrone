@@ -20,7 +20,7 @@ import java.util.List;
  */
 public class MapFragment extends SupportMapFragment implements OnMapReadyCallback, GoogleMap.OnCameraMoveStartedListener, GoogleMap.OnCameraIdleListener {
     // Drag listener
-    boolean draging = false;
+    boolean dragging = false;
     long lastDrag = 0;
 
     // Null if Google Play services APK is not available
@@ -86,15 +86,15 @@ public class MapFragment extends SupportMapFragment implements OnMapReadyCallbac
     @Override
     public void onCameraMoveStarted(int reason) {
         if (reason == REASON_GESTURE) {
-            draging = true;
+            dragging = true;
         }
     }
 
     @Override
     public void onCameraIdle() {
-        if (draging) {
+        if (dragging) {
             lastDrag = System.currentTimeMillis();
-            draging = false;
+            dragging = false;
         }
     }
 }

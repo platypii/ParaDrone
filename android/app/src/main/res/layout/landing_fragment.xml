@@ -34,7 +34,7 @@
             android:id="@+id/lz_elevation"
             android:layout_width="180dp"
             android:layout_height="wrap_content"
-            android:inputType="numberDecimal"
+            android:inputType="numberDecimal|numberSigned"
             android:paddingTop="2dp"
             android:textSize="18pt"/>
 

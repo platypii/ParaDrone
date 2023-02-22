@@ -1,8 +1,6 @@
 package ws.baseline.paradrone;
 
-import android.content.Context;
 import android.content.pm.PackageManager;
-import android.util.Log;
 import androidx.annotation.NonNull;
 import ws.baseline.paradrone.bluetooth.BluetoothService;
 import ws.baseline.paradrone.databinding.ActivityMainBinding;
@@ -57,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK && requestCode == BluetoothService.ENABLE_BLUETOOTH_CODE) {
+        if (resultCode == RESULT_OK && requestCode == BluetoothService.RC_BLUE_ENABLE) {
             Timber.i("Bluetooth enabled");
             Services.bluetooth.start(this);
         }

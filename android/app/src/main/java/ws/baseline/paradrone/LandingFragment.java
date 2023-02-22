@@ -114,7 +114,6 @@ public class LandingFragment extends Fragment {
             Timber.i("Setting landing zone %s", lz);
             ApLandingZone.setPending(lz);
             Services.bluetooth.actions.setLandingZone(lz);
-            // TODO: Show pending, and wait for confirmation
             binding.landingStatus.setText("");
             getParentFragmentManager().popBackStack();
         } else {

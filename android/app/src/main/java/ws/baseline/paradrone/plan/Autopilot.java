@@ -37,6 +37,7 @@ public class Autopilot {
     /**
      * Apply autopilot rules, and then search over waypoint paths
      */
+    @NonNull
     public static Path search(@NonNull Point3V loc, @NonNull Paraglider para, @NonNull LandingZone lz) {
         final LandingPattern pattern = new LandingPattern(para, lz);
         final double effectiveRadius = para.turnRadius * 1.25;
@@ -108,7 +109,7 @@ public class Autopilot {
     /**
      * Plan score. Lower is better.
      */
-    private static double planScore(@NonNull LandingZone lz, Path plan) {
+    private static double planScore(@NonNull LandingZone lz, @Nullable Path plan) {
         if (plan != null) {
             final double distance = plan.end().distance(lz.dest);
             return distance;
