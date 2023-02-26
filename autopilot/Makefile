@@ -3,7 +3,7 @@ paradrone: bin
 	g++ \
 		-I ~/.platformio/packages/tool-unity ~/.platformio/packages/tool-unity/unity.c \
 		-I lib/paralib lib/paralib/*.cpp test/test.cpp \
-		-lm -Wall -Wextra -g -DUNIT_TEST -o bin/paradrone
+		-lm -Wall -Wextra -g -DPIO_UNIT_TESTING -o bin/paradrone
 
 bin:
 	mkdir -p bin

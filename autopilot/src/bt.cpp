@@ -106,6 +106,10 @@ void bt_init() {
     BLECharacteristic::PROPERTY_NOTIFY
   );
   BLEDescriptor *pDescriptor = new BLEDescriptor(BLEUUID((uint16_t)0x2902));
+  // Bluetooth Core Spec v4.1+:
+  // The default value for the Client Characteristic Configuration descriptor value shall be 0x0000
+  uint8_t descriptorValue[2] = {0, 0};
+  pDescriptor->setValue(descriptorValue, 2);
   ap_ch->addDescriptor(pDescriptor);
   ap_ch->setCallbacks(new AutopilotCharacteristic());
 
