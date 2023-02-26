@@ -10,7 +10,6 @@ const char *error = 0;
 
 void screen_init() {
   Heltec.display->init();
-  Heltec.display->flipScreenVertically();
   Heltec.display->setTextAlignment(TEXT_ALIGN_LEFT);
   Heltec.display->setFont(ArialMT_Plain_10);
   Heltec.display->drawString(3, 12, "BASEline");

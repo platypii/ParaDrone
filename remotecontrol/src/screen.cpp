@@ -8,7 +8,6 @@ static void sprintd(char *buf, long delta);
 
 void screen_init() {
   Heltec.display->init();
-  Heltec.display->flipScreenVertically();
   Heltec.display->setTextAlignment(TEXT_ALIGN_LEFT);
   Heltec.display->setFont(ArialMT_Plain_10);
   Heltec.display->drawString(7, 12, "BASEline");
