@@ -33,10 +33,10 @@ Motor::Motor(int pin_hall_a, int pin_hall_b, int pin_pwm1, int pin_pwm2, short *
   // Default state
   position = 10;
   // Setup pins
-  ledcAttachPin(pin_pwm1, pwm_channel1);
-  ledcAttachPin(pin_pwm2, pwm_channel2);
   ledcSetup(pwm_channel1, 20000, 8);
   ledcSetup(pwm_channel2, 20000, 8);
+  ledcAttachPin(pin_pwm1, pwm_channel1);
+  ledcAttachPin(pin_pwm2, pwm_channel2);
   pinMode(pin_hall_a, INPUT);
   pinMode(pin_hall_b, INPUT);
   // Listen for rising hall sensor
