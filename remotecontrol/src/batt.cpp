@@ -1,4 +1,4 @@
-#include <heltec.h>
+#include <Arduino.h>
 
 #define PIN_BATT 37 // 13
 

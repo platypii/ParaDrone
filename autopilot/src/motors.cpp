@@ -1,4 +1,4 @@
-#include <heltec.h>
+#include <Arduino.h>
 #include "paradrone.h"
 
 // Motor control pins

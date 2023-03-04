@@ -1,4 +1,4 @@
-#include <heltec.h>
+#include <Arduino.h>
 #include <EEPROM.h>
 #include "messages.h"
 #include "paradrone.h"
@@ -116,7 +116,7 @@ static void load_motor_config() {
  */
 void set_motor_config(MotorConfigMessage *msg) {
   // Update LoRa frequency
-  LoRa.setFrequency(msg->frequency);
+  lora_set_frequency(msg->frequency);
   // Persist to EEPROM
   EEPROM.put(ADDR_MC, *msg);
   EEPROM.commit();

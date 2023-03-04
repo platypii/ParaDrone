@@ -63,6 +63,10 @@ void lora_send(uint8_t *data, size_t len) {
   }
 }
 
+void lora_set_frequency(long frequency) {
+  LoRa.setFrequency(frequency);
+}
+
 static void lora_send_ping() {
   last_ping_millis = millis();
   uint8_t data = 'P';

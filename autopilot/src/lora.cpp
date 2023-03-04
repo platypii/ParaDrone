@@ -102,3 +102,7 @@ static void lora_read(int parse_len) {
 
   screen_update();
 }
+
+void lora_set_frequency(long frequency) {
+  LoRa.setFrequency(frequency);
+}

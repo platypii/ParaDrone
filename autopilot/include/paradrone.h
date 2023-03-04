@@ -84,6 +84,7 @@ void lora_init();
 void lora_loop();
 void lora_send_location(GeoPointV *point);
 void lora_send_lz();
+void lora_set_frequency(long frequency);
 
 // Config
 void config_init();

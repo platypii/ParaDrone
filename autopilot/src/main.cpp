@@ -1,18 +1,13 @@
+#include <Arduino.h>
 #include <EEPROM.h>
-#include <heltec.h>
 #include "paradrone.h"
 
 #define TIME_START long start_time = millis()
 #define TIME_STEP(name) if (millis() - start_time >= 80) Serial.printf("%.1fs slow %s %ldms thread %d\n", millis() * 1e-3, name, millis() - start_time, xPortGetCoreID()); start_time = millis()
 
 void setup() {
-  Heltec.begin(
-    false, // Display
-    false, // LoRa
-    true, // Serial
-    true, // PABOOST
-    LORA_BAND
-  ); // 50ms
+  Serial.begin(115200);
+  Serial.println("ParaDrone");
   // WiFi.mode(WIFI_OFF);
 
   config_init();

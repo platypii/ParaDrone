@@ -1,4 +1,4 @@
-#include <heltec.h>
+#include <Arduino.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>

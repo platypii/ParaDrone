@@ -1,14 +1,10 @@
-#include <heltec.h>
+#include <Arduino.h>
 #include "rc.h"
 
 void setup() {
-  Heltec.begin(
-    false, // Display
-    false, // LoRa
-    true, // Serial
-    true, // PABOOST
-    LORA_BAND
-  ); // 50ms
+  Serial.begin(115200);
+  Serial.println("ParaDrone");
+
   screen_init(); // 200ms
   bt_init(); // 680ms
   lora_init(); // 70ms

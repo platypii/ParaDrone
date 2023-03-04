@@ -1,4 +1,4 @@
-#include <heltec.h>
+#include <Arduino.h>
 #include <BLEDevice.h>
 #include <BLEUtils.h>
 #include <BLEServer.h>
@@ -32,7 +32,7 @@ class RelayCharacteristic : public BLECharacteristicCallbacks {
       if (value[0] == 'F' && value.length() == 5) {
         const int freq = *(int*)(value.c_str() + 1);
         Serial.printf("LoRa %.1fs set freq %f\n", millis() * 1e-3, freq * 1e-6);
-        LoRa.setFrequency(freq);
+        lora_set_frequency(freq);
       } else {
         // Forward via LoRa
         lora_send((uint8_t*) value.data(), value.length());

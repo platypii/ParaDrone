@@ -27,6 +27,7 @@ void bt_notify(uint8_t *data, size_t len);
 void lora_init();
 void lora_loop();
 void lora_send(uint8_t *data, size_t len);
+void lora_set_frequency(long frequency);
 
 float get_battery_level();
 
