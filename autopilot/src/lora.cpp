@@ -1,37 +1,41 @@
-#include <LoRa.h>
+#include <RadioLib.h>
 #include "paradrone.h"
 
 #define MAX_PACKET_SIZE 20 // Same as BT
 
-static void lora_read(int parse_len);
+SX1276 radio = new Module(SS, 26 /*irq*/, RST_LoRa, DIO0);
+
+static void lora_read();
+static ICACHE_RAM_ATTR void on_receive();
+bool received_flag = false;
 
 // LoRa transmission is disabled until we receive a packet
 bool lora_enabled = false;
 static long last_received_millis = -1;
 
 void lora_init() {
-  // SPI.begin(SCK, MISO, MOSI, SS);
-  LoRa.setPins(SS, RST_LoRa, DIO0);
-  if (!LoRa.begin(motor_config.frequency)) { // TODO: while?
-    Serial.printf("%.1fs lora init failed\n", millis() * 1e-3);
+  // TODO: powerlevel 20
+  // spreading factor 10 (lower = more chirp/s = faster data, higher = better sensitivity)
+  int state = radio.begin(motor_config.frequency * 1e-6, 125, 10, 5 /*cr*/, 0xBA, 17 /*pwr*/);
+  if (state == RADIOLIB_ERR_NONE) {
+    Serial.printf("%.1fs lora init %d Hz\n", millis() * 1e-3, motor_config.frequency);
+  } else {
+    Serial.printf("%.1fs lora init failed %d\n", millis() * 1e-3, state);
   }
-  // LoRa.setPreambleLength();
-  // LoRa.setSignalBandwidth(125E3); // 250E3, 125E3*, 62.5E3, ...
-  // LoRa.setSPIFrequency();
-  LoRa.setSpreadingFactor(10); // 7..12 default 11. lower = more chirp/s = faster data, higher = better sensitivity
-  // LoRa.setTxPower(20, RF_PACONFIG_PASELECT_PABOOST); // 5..20 default 14
-  // LoRa.setTxPowerMax(20);
-  LoRa.setCodingRate4(5); // Lower ECC for downlink
-  LoRa.setSyncWord(0xBA);
-  LoRa.enableCrc();
-  LoRa.receive();
+  radio.setDio0Action(on_receive);
+  // radio.setCrcFiltering(true);
+
+  state = radio.startReceive();
+  if (state != RADIOLIB_ERR_NONE) {
+    Serial.printf("%.1fs lora receive failed %d\n", millis() * 1e-3, state);
+  }
 }
 
 void lora_loop() {
-  int parse_len = LoRa.parsePacket();
-  if (parse_len) {
+  if (received_flag) {
+    received_flag = false;
     last_received_millis = millis();
-    lora_read(parse_len);
+    lora_read();
 
     if (!lora_enabled) {
       Serial.printf("%.1fs lora enabled\n", millis() * 1e-3);
@@ -43,17 +47,15 @@ void lora_loop() {
 /**
  * Parse an incoming LoRa message
  */
-static void lora_read(int parse_len) {
+static void lora_read() {
   uint8_t buffer[MAX_PACKET_SIZE];
   int buffer_len = 0;
-  // Read bytes
-  while (LoRa.available() && buffer_len < MAX_PACKET_SIZE) {
-    buffer[buffer_len++] = LoRa.read();
-  }
 
-  if (parse_len != buffer_len) {
-    Serial.printf("%.1fs lora length mismatch %d != %d\n", millis() * 1e-3, parse_len, buffer_len);
+  int state = radio.readData(buffer, MAX_PACKET_SIZE);
+  if (state != RADIOLIB_ERR_NONE) {
+    Serial.printf("%.1fs lora read failed %d\n", millis() * 1e-3, state);
   }
+  buffer_len = radio.getPacketLength();
 
   if (buffer[0] == 'M' && buffer_len == 2) {
     // Flight mode
@@ -99,7 +101,7 @@ static void lora_read(int parse_len) {
     Serial.print('\n');
   }
 
-  LoRa.receive(); // Put it back in receive mode
+  radio.startReceive(); // Put it back in receive mode
 
   screen_update();
 }
@@ -108,7 +110,7 @@ static void lora_read(int parse_len) {
  * Set the LoRa frequency
  */
 void lora_set_frequency(long frequency) {
-  LoRa.setFrequency(frequency);
+  radio.setFrequency(frequency);
 }
 
 /**
@@ -116,10 +118,8 @@ void lora_set_frequency(long frequency) {
  */
 static void lora_send_raw(uint8_t *msg, size_t size) {
   // long start_time = millis();
-  LoRa.beginPacket(); // Explicit header mode for variable size packets
-  LoRa.write(msg, size);
-  LoRa.endPacket();
-  LoRa.receive(); // Put it back in receive mode
+  radio.transmit(msg, size);
+  // radio.startReceive(); // Put it back in receive mode
   // Serial.printf("%.1fs lora sent %d bytes in %ld ms\n", millis() * 1e-3, size, millis() - start_time);
 }
 
@@ -156,4 +156,9 @@ void lora_send_lz() {
   } else {
     lora_send_raw((uint8_t*) "Z", 1);
   }
+}
+
+static ICACHE_RAM_ATTR void on_receive() {
+  // Don't do any real work here inside ISR
+  received_flag = true;
 }
