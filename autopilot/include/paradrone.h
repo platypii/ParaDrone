@@ -51,8 +51,8 @@ extern const char *current_plan_name;
 bool rc_override();
 
 // Left and Right motors
-extern Motor motor_left;
-extern Motor motor_right;
+extern Motor *motor_left;
+extern Motor *motor_right;
 
 // Toggle speed and left/right balance
 float get_turn_speed();
@@ -93,6 +93,7 @@ void set_calibration(int ticks_per_second);
 void calibrate();
 
 // Motors
+void motor_init();
 void motor_loop();
 void set_motor_speeds(const short left, const short right);
 void set_toggles(uint8_t new_left, uint8_t new_right);

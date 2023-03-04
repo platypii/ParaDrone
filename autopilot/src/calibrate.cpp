@@ -12,10 +12,10 @@ static int calibrate_motor(Motor *motor, int left_speed, int right_speed);
  */
 void calibrate() {
   // Calibrate each motor, forward and back
-  const int ticks_left_forward = calibrate_motor(&motor_left, pwm, 0);
-  const int ticks_left_backward = calibrate_motor(&motor_left, -pwm, 0);
-  const int ticks_right_forward = calibrate_motor(&motor_right, 0, pwm);
-  const int ticks_right_backward = calibrate_motor(&motor_right, 0, -pwm);
+  const int ticks_left_forward = calibrate_motor(motor_left, pwm, 0);
+  const int ticks_left_backward = calibrate_motor(motor_left, -pwm, 0);
+  const int ticks_right_forward = calibrate_motor(motor_right, 0, pwm);
+  const int ticks_right_backward = calibrate_motor(motor_right, 0, -pwm);
 
   Serial.printf("%.1fs calibration left %d %d right %d %d\n", millis() * 1e-3, ticks_left_forward, ticks_left_backward, ticks_right_forward, ticks_right_backward);
 

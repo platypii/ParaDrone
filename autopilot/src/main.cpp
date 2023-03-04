@@ -17,6 +17,7 @@ void setup() {
 
   config_init();
   gps_init();
+  motor_init();
   screen_init(); // 200ms
   bt_init(); // 680ms
   lora_init(); // 70ms
