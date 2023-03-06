@@ -12,7 +12,7 @@ static long last_received_millis = -1;
 
 void lora_init() {
   if (!LoRa.begin(motor_config.frequency, true)) { // TODO: while?
-    Serial.println("LoRa init failed");
+    Serial.printf("%.1fs lora init failed\n", millis() * 1e-3);
   }
   // LoRa.setPreambleLength();
   // LoRa.setSignalBandwidth(125E3); // 250E3, 125E3*, 62.5E3, ...
@@ -95,7 +95,7 @@ static void lora_read(int parse_len) {
     for (int i = 0; i < buffer_len; i++) {
       Serial.printf("%02x", buffer[i]);
     }
-    Serial.printf("\n");
+    Serial.print('\n');
   }
 
   LoRa.receive(); // Put it back in receive mode
@@ -119,7 +119,7 @@ static void lora_send_raw(uint8_t *msg, size_t size) {
   LoRa.write(msg, size);
   LoRa.endPacket();
   LoRa.receive(); // Put it back in receive mode
-  // Serial.printf("LoRa sent %d bytes in %ld ms\n", size, millis() - start_time);
+  // Serial.printf("%.1fs lora sent %d bytes in %ld ms\n", millis() * 1e-3, size, millis() - start_time);
 }
 
 /**
@@ -147,8 +147,12 @@ void lora_send_location(GeoPointV *point) {
  * Broadcast landing zone over LoRa
  */
 void lora_send_lz() {
-  LandingZoneMessage msg = pack_lz(config_landing_zone);
-  uint8_t *data = (uint8_t*) &msg;
-  size_t len = sizeof(msg);
-  lora_send_raw(data, len);
+  if (config_landing_zone) {
+    LandingZoneMessage msg = pack_lz(config_landing_zone);
+    uint8_t *data = (uint8_t*) &msg;
+    size_t len = sizeof(msg);
+    lora_send_raw(data, len);
+  } else {
+    lora_send_raw((uint8_t*) "Z", 1);
+  }
 }

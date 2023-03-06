@@ -28,7 +28,7 @@ static void parse_lz();
 
 void web_init(const char *ssid, const char *password) {
   if (web_started) {
-    Serial.println("Web already started");
+    Serial.printf("%.1fs web already started\n", millis() * 1e-3);
     return;
   }
 
@@ -36,7 +36,7 @@ void web_init(const char *ssid, const char *password) {
   Serial2.end();
 
   // Connect to Wi-Fi network with SSID and password
-  Serial.print("Connecting to ");
+  Serial.printf("%.1fs connecting to ", millis() * 1e-3);
   Serial.print(ssid);
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
@@ -48,7 +48,7 @@ void web_init(const char *ssid, const char *password) {
 
   // Start SPIFFS file system
   if (!SPIFFS.begin(true)) {
-    Serial.println("Error mounting SPIFFS");
+    Serial.printf("%.1fs error mounting spiffs\n", millis() * 1e-3);
   }
 
   // Start web server
@@ -181,7 +181,7 @@ static void send_landing_page(WiFiClient client) {
 }
 
 static void send_file(WiFiClient client, char *filename) {
-  Serial.printf("Serve %s\n", filename);
+  Serial.printf("%.1fs serve %s\n", millis() * 1e-3, filename);
   // Serve file
   File file = SPIFFS.open(filename);
   if (file) {
@@ -199,7 +199,7 @@ static void send_file(WiFiClient client, char *filename) {
 }
 
 static void delete_file(WiFiClient client, char *filename) {
-  Serial.printf("Delete %s\n", filename);
+  Serial.printf("%.1fs delete %s\n", millis() * 1e-3, filename);
   if (SPIFFS.remove(filename)) {
     send_header(client, 200);
   } else {

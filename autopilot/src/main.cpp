@@ -42,7 +42,7 @@ void loop() {
  * This orchestrates the services that depend on location updates.
  */
 void update_location(GeoPointV *point) {
-  Serial.printf("%.3fs gps %f, %f, %.1f, %.1f m/s\n", millis() * 1e-3, point->lat, point->lng, point->alt, hypot(point->vE, point->vN));
+  Serial.printf("%.1fs gps %f, %f, %.1f, %.1f m/s\n", millis() * 1e-3, point->lat, point->lng, point->alt, hypot(point->vE, point->vN));
   if (last_location) free(last_location);
   last_location = point;
   last_fix_millis = millis();

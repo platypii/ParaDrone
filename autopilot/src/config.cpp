@@ -47,7 +47,7 @@ static void load_flight_mode() {
   const uint8_t mode = EEPROM.read(ADDR_AP);
   if (mode <= 1) {
     config_flight_mode = mode;
-    // Serial.printf("Flight mode %d\n", mode);
+    // Serial.printf("%.1fs flight mode %d\n", millis() * 1e-3, mode);
   }
 }
 
@@ -107,7 +107,7 @@ static void load_motor_config() {
     EEPROM.get(ADDR_MC, motor_config);
     config_direction_left = (motor_config.dir & 1) * 2 - 1;
     config_direction_right = (motor_config.dir & 2) - 1;
-    Serial.printf("Cfg %d S%d L%d R%d\n", motor_config.frequency, motor_config.stroke, config_direction_left, config_direction_right);
+    Serial.printf("%.1fs cfg %d S%d L%d R%d\n", millis() * 1e-3, motor_config.frequency, motor_config.stroke, config_direction_left, config_direction_right);
   }
 }
 

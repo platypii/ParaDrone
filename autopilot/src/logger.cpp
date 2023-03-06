@@ -27,14 +27,14 @@ void log_point(GeoPointV *loc) {
 static File get_file(struct tm *date) {
   // Start SPIFFS file system
   if (!SPIFFS.begin(true)) {
-    Serial.println("Error mounting SPIFFS");
+    Serial.printf("%.1fs error mounting spiffs\n", millis() * 1e-3);
   }
 
   // Construct filename
   char filename[24] = "/";
   strftime(filename + 1, 12, "%Y-%m-%d", date);
   strcat(filename, ".csv");
-  Serial.printf("Logging to %s\n", filename);
+  Serial.printf("%.1fs logging to %s\n", millis() * 1e-3, filename);
   // Open file for append writing
   return SPIFFS.open(filename, "a");
 

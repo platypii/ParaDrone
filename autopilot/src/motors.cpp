@@ -62,7 +62,7 @@ void motor_loop() {
  * -255 = full speed up, 255 = full speed down
  */
 void set_motor_speeds(short left, short right) {
-  // Serial.printf("Set speeds %d %d\n", left, right);
+  // Serial.printf("%.1fs set speeds %d %d\n", millis() * 1e-3, left, right);
   motor_left->set_speed(left);
   motor_right->set_speed(right);
 }

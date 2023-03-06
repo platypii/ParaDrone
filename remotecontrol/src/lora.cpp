@@ -24,7 +24,7 @@ static size_t bytes_ready = 0; // Are bytes ready to be read?
 
 void lora_init() {
   if (!LoRa.begin(LORA_BAND, true)) {
-    Serial.println("LoRa init failed");
+    Serial.printf("%.1fs lora init failed\n", millis() * 1e-3);
   }
   // LoRa.setPreambleLength();
   // LoRa.setSignalBandwidth(125E3); // 250E3, 125E3*, 62.5E3, ...
@@ -57,9 +57,11 @@ void lora_send(uint8_t *data, size_t len) {
   LoRa.endPacket();
   LoRa.receive(); // Put it back in receive mode
   if (data[0] == 'P' && len == 1) {
-    Serial.printf("LoRa %.1fs sent ping\n", millis() * 1e-3);
+    Serial.printf("%.1fs lora sent ping\n", millis() * 1e-3);
+  } else if (data[0] == 'Q' && len == 2) {
+    Serial.printf("%.1fs lora sent query %c\n", millis() * 1e-3, data[1]);
   } else {
-    Serial.printf("LoRa %.1fs sent %c size %d\n", millis() * 1e-3, data[0], len);
+    Serial.printf("%.1fs lora sent %c size %d\n", millis() * 1e-3, data[0], len);
   }
 }
 
@@ -93,17 +95,17 @@ static void lora_read() {
     read_location(buffer);
   } else if (buffer[0] == 'P' && buffer_len == 1) {
     // Received ping, probably from another RC device
-    // Serial.printf("LoRa %.1fs ping\n", millis() * 1e-3);
+    // Serial.printf("%.1fs lora ping\n", millis() * 1e-3);
   } else if (buffer[0] == 'Z' && buffer_len == 13) {
-    Serial.printf("LoRa %.1fs LZ\n", millis() * 1e-3);
-  } else if (buffer[0] == 'N' && buffer_len == 1) {
-    Serial.printf("LoRa %.1fs No LZ\n", millis() * 1e-3);
+    Serial.printf("%.1fs lora lz\n", millis() * 1e-3);
+  } else if (buffer[0] == 'Z' && buffer_len == 1) {
+    Serial.printf("%.1fs lora no lz\n", millis() * 1e-3);
   } else {
-    Serial.printf("LoRa %.1fs unknown %c size %d\n", millis() * 1e-3, buffer[0], buffer_len);
-    // for (int i = 0; i < buffer_len; i++) {
-    //   Serial.printf("%02x", buffer[i]);
-    // }
-    // Serial.printf("\n");
+    Serial.printf("%.1fs lora unexpected %02x size %d\n", millis() * 1e-3, buffer[0], buffer_len);
+    for (int i = 0; i < buffer_len; i++) {
+      Serial.printf("%02x", buffer[i]);
+    }
+    Serial.print('\n');
   }
   screen_update();
 }
@@ -115,7 +117,7 @@ static void read_location(uint8_t *buffer) {
   last_lng = msg->lng * 1e-6; // microdegrees
   last_alt = msg->alt * 0.1f; // decimeters
   last_fix_millis = millis();
-  Serial.printf("LoRa %.1fs loc %f, %f, %.1f\n", last_fix_millis * 1e-3, last_lat, last_lng, last_alt);
+  Serial.printf("%.1fs lora loc %f, %f, %.1f\n", last_fix_millis * 1e-3, last_lat, last_lng, last_alt);
 }
 
 static void on_receive(int packet_size) {

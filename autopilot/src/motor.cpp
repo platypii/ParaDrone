@@ -106,11 +106,11 @@ void Motor::update(int dt) {
   // Update position based on direction sensing
   const int speed_threshhold = 16;
   if (speed > 0 && ticks_per_sec - pwm_ticks_per_sec > speed_threshhold) {
-    // Serial.printf("Trying to go down, actually going up %d %f\n", speed, tick_speed);
+    // Serial.printf("%.1fs trying to go down, actually going up %d %f\n", millis() * 1e-3, speed, tick_speed);
     // position = 0;
   }
   if (speed < 0 && ticks_per_sec - pwm_ticks_per_sec > speed_threshhold) {
-    // Serial.printf("Trying to go up, actually going down %d %f\n", speed, tick_speed);
+    // Serial.printf("%.1fs trying to go up, actually going down %d %f\n", millis() * 1e-3, speed, tick_speed);
     // position = 0;
   }
 

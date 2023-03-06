@@ -118,7 +118,7 @@ void bt_init() {
 }
 
 static void advertise() {
-  // BLEAdvertising *pAdvertising = pServer->getAdvertising();  // this still is working for backward compatibility
+  // BLEAdvertising *pAdvertising = pServer->getAdvertising(); // this still is working for backward compatibility
   BLEAdvertising *pAdvertising = BLEDevice::getAdvertising();
   pAdvertising->addServiceUUID(AP_SERVICE);
   pAdvertising->setScanResponse(true);

@@ -11,16 +11,19 @@
 bool bt_connected = false;
 static BLECharacteristic *ch_relay;
 
+static void advertise();
+
 class RelayServer : public BLEServerCallbacks {
     void onConnect(BLEServer* pServer) {
       bt_connected = true;
-      Serial.println("BT client connected");
       screen_update();
+      Serial.printf("%.1fs bt client connected\n", millis() * 1e-3);
     };
     void onDisconnect(BLEServer* pServer) {
       bt_connected = false;
-      Serial.println("BT client disconnected");
       screen_update();
+      Serial.printf("%.1fs bt client disconnected\n", millis() * 1e-3);
+      advertise();
     }
 };
 
@@ -31,7 +34,7 @@ class RelayCharacteristic : public BLECharacteristicCallbacks {
       std::string value = pCharacteristic->getValue();
       if (value[0] == 'F' && value.length() == 5) {
         const int freq = *(int*)(value.c_str() + 1);
-        Serial.printf("LoRa %.1fs set freq %f\n", millis() * 1e-3, freq * 1e-6);
+        Serial.printf("%.1fs bt set lora freq %f\n", millis() * 1e-3, freq * 1e-6);
         lora_set_frequency(freq);
       } else {
         // Forward via LoRa
@@ -62,11 +65,15 @@ void bt_init() {
   ch_relay->setCallbacks(new RelayCharacteristic());
 
   pService->start();
-  // BLEAdvertising *pAdvertising = pServer->getAdvertising();  // this still is working for backward compatibility
+  advertise();
+}
+
+static void advertise() {
+  // BLEAdvertising *pAdvertising = pServer->getAdvertising(); // this still is working for backward compatibility
   BLEAdvertising *pAdvertising = BLEDevice::getAdvertising();
   pAdvertising->addServiceUUID(RELAY_SERVICE);
   pAdvertising->setScanResponse(true);
-  pAdvertising->setMinPreferred(0x06);  // functions that help with iPhone connections issue
+  pAdvertising->setMinPreferred(0x06); // helps with iphone issue
   pAdvertising->setMinPreferred(0x12);
   BLEDevice::startAdvertising();
 }

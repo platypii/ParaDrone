@@ -3,7 +3,7 @@
 
 void setup() {
   Serial.begin(115200);
-  Serial.println("ParaDrone");
+  Serial.println("ParaDroneRC");
 
   screen_init(); // 200ms
   bt_init(); // 680ms

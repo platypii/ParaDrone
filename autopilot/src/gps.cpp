@@ -48,7 +48,7 @@ void gps_loop() {
     if (ch == '\r' || ch == '\n') {
       if (buffer_index) { // len > 0
         buffer[buffer_index] = '\0';
-        // Serial.printf("%ld nmea %s\n", millis(), buffer);
+        // Serial.printf("%.1fs nmea %s\n", millis() * 1e-3, buffer);
         // Parse NMEA sentence
         parse_nmea(buffer);
         buffer_index = 0;
