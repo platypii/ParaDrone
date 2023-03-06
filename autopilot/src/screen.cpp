@@ -1,4 +1,4 @@
-#include <heltec.h>
+#include <SSD1306Wire.h>
 #include "paradrone.h"
 
 static bool should_redraw = false;
@@ -6,17 +6,26 @@ static long last_redraw_millis = -1;
 static void screen_draw();
 static void sprintd(char *buf, long delta);
 
+SSD1306Wire display(0x3c, SDA_OLED, SCL_OLED);
+
 char buf[40];
 const char *error = 0;
 
 void screen_init() {
-  Heltec.display->init();
-  Heltec.display->setFont(ArialMT_Plain_24);
-  Heltec.display->drawString(6, 17, "ParaDrone");
-  Heltec.display->setFont(ArialMT_Plain_10);
-  Heltec.display->drawString(7, 10, "BASEline");
-  Heltec.display->drawString(77, 38, "AutoPilot");
-  Heltec.display->display();
+  // Reset needed for heltec screen
+  pinMode(RST_OLED, OUTPUT);
+  digitalWrite(RST_OLED, LOW);
+  delay(20);
+  digitalWrite(RST_OLED, HIGH);
+
+  display.init();
+  display.flipScreenVertically();
+  display.setFont(ArialMT_Plain_24);
+  display.drawString(6, 17, "ParaDrone");
+  display.setFont(ArialMT_Plain_10);
+  display.drawString(7, 10, "BASEline");
+  display.drawString(77, 38, "AutoPilot");
+  display.display();
 }
 
 void screen_loop() {
@@ -39,17 +48,17 @@ void screen_update() {
 }
 
 static void screen_draw() {
-  Heltec.display->clear();
+  display.clear();
 
   if (last_location != NULL) {
     // Lat/lng
     sprintf(buf, "%f, %f", last_location->lat, last_location->lng);
-    Heltec.display->setTextAlignment(TEXT_ALIGN_LEFT);
-    Heltec.display->drawString(0, 2, buf);
+    display.setTextAlignment(TEXT_ALIGN_LEFT);
+    display.drawString(0, 2, buf);
   } else {
-    Heltec.display->setTextAlignment(TEXT_ALIGN_CENTER);
-    Heltec.display->drawString(DISPLAY_WIDTH / 2, 2, "ParaDrone");
-    Heltec.display->setTextAlignment(TEXT_ALIGN_LEFT);
+    display.setTextAlignment(TEXT_ALIGN_CENTER);
+    display.drawString(DISPLAY_WIDTH / 2, 2, "ParaDrone");
+    display.setTextAlignment(TEXT_ALIGN_LEFT);
   }
 
   // Alt
@@ -60,7 +69,7 @@ static void screen_draw() {
     } else {
       sprintf(buf, "%.0f mMSL", last_location->alt);
     }
-    Heltec.display->drawString(0, 12, buf);
+    display.drawString(0, 12, buf);
   }
 
   // Ground speed
@@ -68,16 +77,16 @@ static void screen_draw() {
     const double vel = sqrt(last_location->vN * last_location->vN + last_location->vE * last_location->vE);
     if (!isnan(vel)) {
       sprintf(buf, "%.0f mph", vel * 2.23694);
-      Heltec.display->drawString(70, 12, buf);
+      display.drawString(70, 12, buf);
    }
   }
 
   // GPS lastfix
-  Heltec.display->setTextAlignment(TEXT_ALIGN_RIGHT);
+  display.setTextAlignment(TEXT_ALIGN_RIGHT);
   if (last_fix_millis >= 0) {
     long delta = millis() - last_fix_millis;
     sprintd(buf, delta);
-    Heltec.display->drawString(DISPLAY_WIDTH, 12, buf);
+    display.drawString(DISPLAY_WIDTH, 12, buf);
   }
 
   // LZ
@@ -97,53 +106,53 @@ static void screen_draw() {
   } else {
     sprintf(buf, "No LZ");
   }
-  Heltec.display->drawString(DISPLAY_WIDTH, 22, buf);
+  display.drawString(DISPLAY_WIDTH, 22, buf);
 
   // Flight mode
-  Heltec.display->setTextAlignment(TEXT_ALIGN_LEFT);
+  display.setTextAlignment(TEXT_ALIGN_LEFT);
   if (rc_override()) {
-    Heltec.display->drawString(0, 22, "RC");
+    display.drawString(0, 22, "RC");
   } else if (config_flight_mode == MODE_IDLE) {
-    Heltec.display->drawString(0, 22, "Idle");
+    display.drawString(0, 22, "Idle");
   } else if (config_flight_mode == MODE_AUTO) {
     if (current_plan_name) {
-      Heltec.display->drawString(0, 22, current_plan_name);
+      display.drawString(0, 22, current_plan_name);
     } else {
-      Heltec.display->drawString(0, 22, "Auto");
+      display.drawString(0, 22, "Auto");
     }
   }
 
   // Current motor position
   sprintf(buf, "%d ", (short) motor_left->position);
-  int prewidth = Heltec.display->getStringWidth(buf);
+  int prewidth = display.getStringWidth(buf);
   sprintf(buf, "%d | %d", (short) motor_left->position, (short) motor_right->position);
-  Heltec.display->drawString(DISPLAY_WIDTH / 2 - prewidth, 54, buf);
+  display.drawString(DISPLAY_WIDTH / 2 - prewidth, 54, buf);
   // Target position
   if (motor_left->position != motor_left->target || motor_right->position != motor_right->target) {
     sprintf(buf, "%d ", motor_left->target);
-    prewidth = Heltec.display->getStringWidth(buf);
+    prewidth = display.getStringWidth(buf);
     sprintf(buf, "%d | %d", motor_left->target, motor_right->target);
-    Heltec.display->drawString(DISPLAY_WIDTH / 2 - prewidth, 44, buf);
+    display.drawString(DISPLAY_WIDTH / 2 - prewidth, 44, buf);
   }
 
   // LoRa enabled?
   if (lora_enabled) {
-    Heltec.display->drawString(0, 54, "LoRa");
+    display.drawString(0, 54, "LoRa");
   }
 
   // Phone connected?
   if (bt_connected) {
-    Heltec.display->setTextAlignment(TEXT_ALIGN_RIGHT);
-    Heltec.display->drawString(DISPLAY_WIDTH, 54, "BT");
+    display.setTextAlignment(TEXT_ALIGN_RIGHT);
+    display.drawString(DISPLAY_WIDTH, 54, "BT");
   }
 
   // Error?
   if (error) {
-    Heltec.display->setTextAlignment(TEXT_ALIGN_CENTER);
-    Heltec.display->drawString(DISPLAY_WIDTH / 2, 34, error);
+    display.setTextAlignment(TEXT_ALIGN_CENTER);
+    display.drawString(DISPLAY_WIDTH / 2, 34, error);
   }
 
-  Heltec.display->display();
+  display.display();
 }
 
 /**

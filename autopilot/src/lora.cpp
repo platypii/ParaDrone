@@ -1,4 +1,4 @@
-#include <lora/LoRa.h>
+#include <LoRa.h>
 #include "messages.h"
 #include "paradrone.h"
 
@@ -11,7 +11,9 @@ bool lora_enabled = false;
 static long last_received_millis = -1;
 
 void lora_init() {
-  if (!LoRa.begin(motor_config.frequency, true)) { // TODO: while?
+  // SPI.begin(SCK, MISO, MOSI, SS);
+  LoRa.setPins(SS, RST_LoRa, DIO0);
+  if (!LoRa.begin(motor_config.frequency)) { // TODO: while?
     Serial.printf("%.1fs lora init failed\n", millis() * 1e-3);
   }
   // LoRa.setPreambleLength();
