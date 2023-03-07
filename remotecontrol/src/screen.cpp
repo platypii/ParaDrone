@@ -6,15 +6,16 @@ static unsigned long last_redraw_millis = 2000; // splash screen ms
 static void screen_draw();
 static void sprintd(char *buf, long delta);
 
+char buf[40];
+
 void screen_init() {
   Heltec.display->init();
   Heltec.display->setTextAlignment(TEXT_ALIGN_LEFT);
-  Heltec.display->setFont(ArialMT_Plain_10);
-  Heltec.display->drawString(7, 12, "BASEline");
   Heltec.display->setFont(ArialMT_Plain_24);
   Heltec.display->drawString(6, 19, "ParaDrone");
-  Heltec.display->setFont(ArialMT_Plain_16);
-  Heltec.display->drawString(66, 40, "<=> RC");
+  Heltec.display->setFont(ArialMT_Plain_10);
+  Heltec.display->drawString(7, 12, "BASEline");
+  Heltec.display->drawString(86, 40, "<=> RC");
   Heltec.display->display();
 }
 
@@ -35,9 +36,7 @@ void screen_update() {
 }
 
 static void screen_draw() {
-  char buf[80];
   Heltec.display->clear();
-  Heltec.display->setFont(ArialMT_Plain_10);
   Heltec.display->setTextAlignment(TEXT_ALIGN_LEFT);
 
   if (last_lat != 0 && last_lng != 0) {

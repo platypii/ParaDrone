@@ -6,17 +6,16 @@ static long last_redraw_millis = -1;
 static void screen_draw();
 static void sprintd(char *buf, long delta);
 
+char buf[40];
 const char *error = 0;
 
 void screen_init() {
   Heltec.display->init();
-  Heltec.display->setTextAlignment(TEXT_ALIGN_LEFT);
-  Heltec.display->setFont(ArialMT_Plain_10);
-  Heltec.display->drawString(3, 12, "BASEline");
   Heltec.display->setFont(ArialMT_Plain_24);
-  Heltec.display->drawString(2, 19, "ParaDrone");
-  Heltec.display->setFont(ArialMT_Plain_16);
-  Heltec.display->drawString(62, 41, "AutoPilot");
+  Heltec.display->drawString(6, 17, "ParaDrone");
+  Heltec.display->setFont(ArialMT_Plain_10);
+  Heltec.display->drawString(7, 10, "BASEline");
+  Heltec.display->drawString(77, 38, "AutoPilot");
   Heltec.display->display();
 }
 
@@ -40,9 +39,7 @@ void screen_update() {
 }
 
 static void screen_draw() {
-  char buf[80];
   Heltec.display->clear();
-  Heltec.display->setFont(ArialMT_Plain_10);
 
   if (last_location != NULL) {
     // Lat/lng
