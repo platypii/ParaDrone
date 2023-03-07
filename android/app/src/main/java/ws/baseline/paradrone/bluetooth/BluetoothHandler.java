@@ -20,6 +20,7 @@ import java.util.UUID;
 import timber.log.Timber;
 import ws.baseline.paradrone.Permissions;
 
+import static com.welie.blessed.BluetoothBytesParser.asHexString;
 import static ws.baseline.paradrone.bluetooth.BluetoothPreferences.DeviceMode.AP;
 import static ws.baseline.paradrone.bluetooth.BluetoothPreferences.DeviceMode.RC;
 import static ws.baseline.paradrone.bluetooth.BluetoothState.BT_CONNECTED;
@@ -28,7 +29,6 @@ import static ws.baseline.paradrone.bluetooth.BluetoothState.BT_SEARCHING;
 import static ws.baseline.paradrone.bluetooth.BluetoothState.BT_STARTED;
 import static ws.baseline.paradrone.bluetooth.BluetoothState.BT_STOPPED;
 import static ws.baseline.paradrone.bluetooth.BluetoothState.BT_STOPPING;
-import static ws.baseline.paradrone.bluetooth.Util.byteArrayToHex;
 
 /**
  * Thread that reads from bluetooth connection.
@@ -74,6 +74,9 @@ class BluetoothHandler {
         }
     }
 
+    /**
+     * Check if bluetooth permissions are granted, and then scan().
+     */
     private void scanIfPermitted() {
         if (Permissions.hasBluetoothPermissions(activity)) {
             Timber.d("Bluetooth permitted, starting scan");
@@ -89,6 +92,9 @@ class BluetoothHandler {
         }
     }
 
+    /**
+     * Scan for bluetooth peripherals
+     */
     private void scan() {
         service.setState(BT_SEARCHING);
         // Scan for peripherals with a certain service UUIDs
@@ -146,7 +152,7 @@ class BluetoothHandler {
             if (status == GattStatus.SUCCESS) {
 //                Timber.d("SUCCESS: Writing <%s> to <%s>", byteArrayToHex(value), characteristic.getUuid().toString());
             } else {
-                Timber.w("ERROR: Failed writing <%s> to <%s>", byteArrayToHex(value), characteristic.getUuid().toString());
+                Timber.w("ERROR: Failed writing <%s> to <%s>", asHexString(value, "-"), characteristic.getUuid().toString());
             }
         }
 
@@ -252,6 +258,10 @@ class BluetoothHandler {
         }
     };
 
+    /**
+     * Parse bluetooth messages from the device.
+     * @param value the message to parse
+     */
     private void processBytes(@NonNull byte[] value) {
         if (value[0] == 'C' && value.length == 8) {
             // Config message
@@ -272,10 +282,14 @@ class BluetoothHandler {
             // Landing zone message
             ApLandingZone.parse(value);
         } else {
-            Timber.e("ap -> phone: unknown %c %s", (char) value[0], byteArrayToHex(value));
+            Timber.e("ap -> phone: unknown %c %s", (char) value[0], asHexString(value, "-"));
         }
     }
 
+    /**
+     * Send a command to the device.
+     * @param value the command to send
+     */
     void sendCommand(@NonNull byte[] value) {
         Timber.d("phone -> ap: cmd %c", (char) value[0]);
         final BluetoothGattCharacteristic ch = getCharacteristic();
@@ -317,6 +331,9 @@ class BluetoothHandler {
         }
     }
 
+    /**
+     * Stop all bluetooth scanning and connections.
+     */
     void stop() {
         currentCharacteristic = null;
         service.setState(BT_STOPPING);

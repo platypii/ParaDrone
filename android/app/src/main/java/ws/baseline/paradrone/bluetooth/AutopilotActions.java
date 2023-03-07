@@ -17,6 +17,9 @@ public class AutopilotActions {
         this.bt = bt;
     }
 
+    /**
+     * Send new landing zone to the device.
+     */
     public void setLandingZone(@Nullable LandingZone lz) {
         Timber.i("phone -> ap: set lz %s", lz);
         // Pack LZ into bytes
@@ -30,6 +33,9 @@ public class AutopilotActions {
         fetchLandingZone();
     }
 
+    /**
+     * Send desired toggle position to the device.
+     */
     public void setTogglePosition(int left, int right) {
         if (left < 0 || left > 255 || right < 0 || right > 255) {
             Timber.e("Invalid motor controls %d %d", left, right);
@@ -38,6 +44,9 @@ public class AutopilotActions {
         sendCommand(new byte[] {'T', (byte) left, (byte) right});
     }
 
+    /**
+     * Send desired motor speed to the device.
+     */
     public void setMotorSpeed(int left, int right) {
         if (left < -127 || left > 127 || right < -127 || right > 127) {
             Timber.e("Invalid motor speed %d %d", left, right);
@@ -46,34 +55,52 @@ public class AutopilotActions {
         sendCommand(new byte[] {'S', (byte) left, (byte) right});
     }
 
+    /**
+     * Send a request to the device for its target landing zone.
+     */
     public void fetchLandingZone() {
         Timber.i("phone -> ap: fetch lz");
         sendCommand(new byte[] {'Q', 'Z'});
     }
 
+    /**
+     * Send a request to the device for its configuration.
+     */
     public void fetchConfig() {
         Timber.i("phone -> ap: fetch config");
         sendCommand(new byte[] {'Q', 'C'});
     }
 
+    /**
+     * Send configuration settings to the device.
+     */
     public void setConfig(@NonNull ApConfigMsg msg) {
         Timber.i("phone -> ap: set config %s", msg);
         sendCommand(msg.toBytes());
     }
 
+    /**
+     * Send requested flight mode () to the device.
+     */
     public void setMode(int mode) {
         Timber.i("phone -> ap: set mode %d", mode);
         sendCommand(new byte[] {'M', (byte) mode});
     }
 
-    public void startWebServer(@NonNull String ssid, @NonNull String password) {
-        Timber.i("phone -> ap: web init %s:%s", ssid, password);
-        sendCommand(("W" + ssid + ":" + password).getBytes());
-    }
-
+    /**
+     * Send a request to the device to run a motor calibration routine.
+     */
     public void calibrate() {
         Timber.i("phone -> ap: calibrate");
         sendCommand(new byte[] {'Q', 'I'});
+    }
+
+    /**
+     * Send a request to the device for it to start a webserver for log access.
+     */
+    public void startWebServer(@NonNull String ssid, @NonNull String password) {
+        Timber.i("phone -> ap: web init %s:%s", ssid, password);
+        sendCommand(("W" + ssid + ":" + password).getBytes());
     }
 
     private void sendCommand(@NonNull byte[] value) {
