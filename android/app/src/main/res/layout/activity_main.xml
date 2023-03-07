@@ -9,7 +9,7 @@
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="370dp">
+        android:layout_height="360dp">
 
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/map"

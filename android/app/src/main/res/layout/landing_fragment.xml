@@ -5,25 +5,30 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:paddingHorizontal="8dp"
+    android:paddingTop="8dp"
     tools:ignore="HardcodedText">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="@android:style/TextAppearance.Material"
+        android:textSize="8pt"
         android:text="@string/landing_location" />
 
     <TextView
         android:id="@+id/landing_location"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textSize="10pt"
         android:text="" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="16dp"
         android:textAppearance="@android:style/TextAppearance.Material"
+        android:textSize="8pt"
         android:text="@string/altitude" />
 
     <LinearLayout

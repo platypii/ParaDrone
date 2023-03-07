@@ -29,6 +29,11 @@ static void parse_lz();
 void web_init(const char *ssid, const char *password) {
   if (web_started) {
     Serial.printf("%.1fs web already started\n", millis() * 1e-3);
+
+    // Notify app
+    String localIp = WiFi.localIP().toString();
+    bt_send_url(localIp.c_str());
+
     return;
   }
 

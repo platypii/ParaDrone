@@ -1,7 +1,10 @@
 package ws.baseline.paradrone;
 
 import java.util.Locale;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 import ws.baseline.paradrone.bluetooth.ApLandingZone;
+import ws.baseline.paradrone.bluetooth.BluetoothState;
 import ws.baseline.paradrone.databinding.LandingFragmentBinding;
 import ws.baseline.paradrone.geo.LandingZone;
 import ws.baseline.paradrone.map.DroneMap;
@@ -55,6 +58,25 @@ public class LandingFragment extends Fragment {
         }
 
         return binding.getRoot();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        ViewState.setMode(ViewState.ViewMode.LZ);
+        EventBus.getDefault().register(this);
+        onBluetoothState(null);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Subscribe
+    public void onBluetoothState(@Nullable BluetoothState bt) {
+        binding.setLandingZone.setEnabled(Services.bluetooth.isConnected());
     }
 
     private void update(@Nullable LatLng ll, double direction) {
@@ -137,11 +159,5 @@ public class LandingFragment extends Fragment {
             Timber.e("Failed to find map fragment");
             return null;
         }
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        ViewState.setMode(ViewState.ViewMode.LZ);
     }
 }

@@ -3,16 +3,18 @@
 #include "messages.h"
 #include "paradrone.h"
 
-#define ADDR_LZ 0
-#define ADDR_MC 13
-#define ADDR_AP 22
-#define ADDR_CAL 23
+#define ADDR_LZ 0 // landing zone
+#define ADDR_MC 13 // frequency
+#define ADDR_AP 22 // flight mode
+#define ADDR_CAL 23 // calibration
 
 #define SIGNUM(x) (x < 0) ? -1 : (x > 0)
 
 // Persisted config
+// Flight mode
 uint8_t config_flight_mode = MODE_IDLE;
 
+// Landing zone
 LandingZone *config_landing_zone;
 
 // Default motor config
@@ -123,10 +125,11 @@ void set_motor_config(MotorConfigMessage *msg) {
   load_motor_config();
 }
 
+/**
+ * Save calibration settings to EEPROM
+ */
 void set_calibration(int ticks_per_second) {
-  // Persist to EEPROM
   EEPROM.put(ADDR_CAL, ticks_per_second);
   EEPROM.commit();
-
   config_ticks_per_second = ticks_per_second;
 }

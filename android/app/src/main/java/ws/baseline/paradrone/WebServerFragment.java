@@ -35,7 +35,7 @@ public class WebServerFragment extends Fragment {
             final String url = binding.webServerUrl.getText().toString();
             if (!url.isEmpty()) {
                 final Intent intent = new Intent(Intent.ACTION_VIEW);
-                intent.setData(Uri.parse("http://" + url));
+                intent.setData(Uri.parse(url));
                 startActivity(intent);
             }
         });
@@ -45,6 +45,7 @@ public class WebServerFragment extends Fragment {
         // Use cached url if available
         if (UrlMsg.lastUrl != null) {
             binding.webServerUrl.setText(UrlMsg.lastUrl.url);
+            binding.webSummary.setText(R.string.wifi_connect);
         }
 
         return binding.getRoot();
@@ -72,7 +73,8 @@ public class WebServerFragment extends Fragment {
     @Subscribe
     public void onWebServerMsg(@NonNull UrlMsg msg) {
         // Update views
-        binding.webServerUrl.setText(msg.url);
+        binding.webServerUrl.setText("http://" + msg.url);
+        binding.webSummary.setText(R.string.wifi_connect);
     }
 
     private void send() {

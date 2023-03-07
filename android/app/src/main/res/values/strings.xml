@@ -29,6 +29,8 @@
     <string name="fetching_elevation">Fetching elevation</string>
 
     <!-- Web server -->
+    <string name="wifi_summary">Enter your wifi network name and password. The device will join and start a web server where you can access log files.</string>
+    <string name="wifi_connect">Connect to the device:</string>
     <string name="wifi_network">wifi network</string>
     <string name="wifi_password">wifi password</string>
     <string name="start_web_server">Start Web Server</string>
