@@ -4,6 +4,10 @@ ParaDrone supports remote control operation via LoRa radio. I use the Heltec ESP
 
 PlatformIO is used to manage the software.
 
+A 3D printed case is available in the [hardware](../hardware) directory.
+
+![ParaDrone remote control](remote.jpg)
+
 ## Development
 
 [Download](https://code.visualstudio.com/) and install Visual Studio Code.

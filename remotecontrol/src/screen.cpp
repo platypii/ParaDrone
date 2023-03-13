@@ -31,6 +31,9 @@ void screen_loop() {
   }
 }
 
+/**
+ * Notify that screen should redraw on next loop. Non-blocking
+ */
 void screen_update() {
   should_redraw = true;
 }

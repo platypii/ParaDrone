@@ -56,10 +56,20 @@ void lora_send(uint8_t *data, size_t len) {
   LoRa.write(data, len);
   LoRa.endPacket();
   LoRa.receive(); // Put it back in receive mode
-  if (data[0] == 'P' && len == 1) {
+
+  // Logging
+  if (data[0] == 'M' && len == 2) {
+    Serial.printf("%.1fs lora sent mode %d\n", millis() * 1e-3, data[1]);
+  } else if (data[0] == 'P' && len == 1) {
     Serial.printf("%.1fs lora sent ping\n", millis() * 1e-3);
   } else if (data[0] == 'Q' && len == 2) {
     Serial.printf("%.1fs lora sent query %c\n", millis() * 1e-3, data[1]);
+  } else if (data[0] == 'S' && len == 3) {
+    Serial.printf("%.1fs lora sent speed %d %d\n", millis() * 1e-3, data[1], data[2]);
+  } else if (data[0] == 'T' && len == 3) {
+    Serial.printf("%.1fs lora sent toggle %d %d\n", millis() * 1e-3, data[1], data[2]);
+  } else if (data[0] == 'Z' && len == 13) {
+    Serial.printf("%.1fs lora sent lz\n", millis() * 1e-3);
   } else {
     Serial.printf("%.1fs lora sent %c size %d\n", millis() * 1e-3, data[0], len);
   }
