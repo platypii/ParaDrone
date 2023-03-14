@@ -1,4 +1,4 @@
-#include <heltec.h>
+#include <LoRa.h>
 #include "rc.h"
 
 #define MAX_PACKET_SIZE 20 // Same as BT
@@ -20,10 +20,11 @@ static void lora_send_ping();
 static void lora_read();
 static void read_location(uint8_t *buffer);
 static void on_receive(int packet_size);
-static size_t bytes_ready = 0; // Are bytes ready to be read?
+static volatile size_t bytes_ready = 0; // Are bytes ready to be read?
 
 void lora_init() {
-  if (!LoRa.begin(LORA_BAND, true)) {
+  LoRa.setPins(SS, RST_LoRa, DIO0);
+  if (!LoRa.begin(LORA_BAND)) {
     Serial.printf("%.1fs lora init failed\n", millis() * 1e-3);
   }
   // LoRa.setPreambleLength();

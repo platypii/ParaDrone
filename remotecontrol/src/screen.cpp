@@ -1,4 +1,4 @@
-#include <heltec.h>
+#include <SSD1306Wire.h>
 #include "rc.h"
 
 static boolean should_redraw = false;
@@ -6,17 +6,26 @@ static unsigned long last_redraw_millis = 2000; // splash screen ms
 static void screen_draw();
 static void sprintd(char *buf, long delta);
 
+SSD1306Wire display(0x3c, SDA_OLED, SCL_OLED);
+
 char buf[40];
 
 void screen_init() {
-  Heltec.display->init();
-  Heltec.display->setTextAlignment(TEXT_ALIGN_LEFT);
-  Heltec.display->setFont(ArialMT_Plain_24);
-  Heltec.display->drawString(6, 19, "ParaDrone");
-  Heltec.display->setFont(ArialMT_Plain_10);
-  Heltec.display->drawString(7, 12, "BASEline");
-  Heltec.display->drawString(86, 40, "<=> RC");
-  Heltec.display->display();
+  // Reset needed for heltec screen
+  pinMode(RST_OLED, OUTPUT);
+  digitalWrite(RST_OLED, LOW);
+  delay(20);
+  digitalWrite(RST_OLED, HIGH);
+
+  display.init();
+  display.flipScreenVertically();
+  display.setTextAlignment(TEXT_ALIGN_LEFT);
+  display.setFont(ArialMT_Plain_24);
+  display.drawString(6, 19, "ParaDrone");
+  display.setFont(ArialMT_Plain_10);
+  display.drawString(7, 12, "BASEline");
+  display.drawString(86, 40, "<=> RC");
+  display.display();
 }
 
 void screen_loop() {
@@ -39,21 +48,21 @@ void screen_update() {
 }
 
 static void screen_draw() {
-  Heltec.display->clear();
-  Heltec.display->setTextAlignment(TEXT_ALIGN_LEFT);
+  display.clear();
+  display.setTextAlignment(TEXT_ALIGN_LEFT);
 
   if (last_lat != 0 && last_lng != 0) {
     // Show last lat,lng to help find lost drone
     sprintf(buf, "%f, %f", last_lat, last_lng);
-    Heltec.display->drawString(0, 0, buf);
+    display.drawString(0, 0, buf);
   } else {
-    Heltec.display->drawString(20, 0, "ParaDrone <=> RC");
+    display.drawString(20, 0, "ParaDrone <=> RC");
   }
 
   // Alt
   if (!isnan(last_alt)) {
     sprintf(buf, "%.0f m MSL", last_alt);
-    Heltec.display->drawString(0, 10, buf);
+    display.drawString(0, 10, buf);
   }
 
   // LoRa lastfix
@@ -62,33 +71,33 @@ static void screen_draw() {
 
     if (delta <= 15000) {
       sprintf(buf, "Snr %.2f", last_packet_snr);
-      Heltec.display->drawString(0, 30, buf);
+      display.drawString(0, 30, buf);
 
       sprintf(buf, "Rssi %d", last_packet_rssi);
-      Heltec.display->drawString(0, 42, buf);
+      display.drawString(0, 42, buf);
 
-      Heltec.display->drawString(0, 54, "LoRa");
+      display.drawString(0, 54, "LoRa");
     }
   }
 
   // GPS lastfix
-  Heltec.display->setTextAlignment(TEXT_ALIGN_RIGHT);
+  display.setTextAlignment(TEXT_ALIGN_RIGHT);
   if (last_fix_millis >= 0) {
     const long delta = millis() - last_fix_millis;
     sprintd(buf, delta);
-    Heltec.display->drawString(DISPLAY_WIDTH, 10, buf);
+    display.drawString(DISPLAY_WIDTH, 10, buf);
   }
 
   // Phone connected?
   if (bt_connected) {
-    Heltec.display->drawString(DISPLAY_WIDTH, 54, "BT");
+    display.drawString(DISPLAY_WIDTH, 54, "BT");
   }
 
   // Battery level
   sprintf(buf, "%.0f%%", 100 * get_battery_level());
-  Heltec.display->drawString(DISPLAY_WIDTH, 44, buf);
+  display.drawString(DISPLAY_WIDTH, 44, buf);
 
-  Heltec.display->display();
+  display.display();
 }
 
 /**
