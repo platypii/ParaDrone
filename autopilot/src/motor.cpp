@@ -1,5 +1,4 @@
 #include <Arduino.h>
-#include "paradrone.h"
 #include "motor.h"
 
 #define DRIVE_FORWARD 0

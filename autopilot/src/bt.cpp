@@ -38,8 +38,8 @@ class AutopilotCharacteristic : public BLECharacteristicCallbacks {
       if (value[0] == 'C' && value.length() == 8) {
         set_motor_config((MotorConfigMessage*) value.c_str());
       } else if (value[0] == 'D' && value.length() == 17) {
-        // Location from bluetooth
-        GeoPointV *point = unpack_speed((SpeedMessage*) value.c_str());
+        // Location from bluetooth, used for replay
+        GeoPointV *point = unpack_speed(millis(), (SpeedMessage*) value.c_str());
         update_location(point);
       } else if (value[0] == 'M' && value.length() == 2) {
         // Flight mode
@@ -140,10 +140,12 @@ void bt_send_location(GeoPointV *point) {
 
 static void bt_send_lz() {
   if (bt_connected) {
-    LandingZoneMessage msg = pack_lz(config_landing_zone);
-    uint8_t *data = (uint8_t*) &msg;
-    size_t len = sizeof(msg);
-    ap_ch->setValue(data, len);
+    if (config_landing_zone) {
+      LandingZoneMessage msg = pack_lz(config_landing_zone);
+      ap_ch->setValue((uint8_t*) &msg, sizeof(msg));
+    } else {
+      ap_ch->setValue((uint8_t*) "Z", 1);
+    }
     ap_ch->notify();
   }
 }

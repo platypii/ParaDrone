@@ -50,14 +50,6 @@ extern Path *current_plan;
 extern const char *current_plan_name;
 bool rc_override();
 
-// Left and Right motors
-extern Motor *motor_left;
-extern Motor *motor_right;
-
-// Toggle speed and left/right balance
-float get_turn_speed();
-float get_turn_balance();
-
 // Screen
 void screen_init();
 void screen_loop();

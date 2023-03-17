@@ -1,4 +1,3 @@
-#include <Arduino.h>
 #include "landingzone.h"
 #include "messages.h"
 
@@ -13,17 +12,21 @@ LandingZoneMessage pack_lz(LandingZone *lz) {
     };
   } else {
     // No LZ
-    return LandingZoneMessage {'Z'};
+    return LandingZoneMessage {'Z', 0, 0, 0, 0};
   }
 }
 
 LandingZone *unpack_lz(LandingZoneMessage *packed) {
-  return new LandingZone(
-    packed->lat * 1e-6, // microdegrees
-    packed->lng * 1e-6, // microdegrees
-    packed->alt * 0.1, // decimeters
-    packed->landing_direction * 0.001 // milliradians
-  );
+  if (packed->lat || packed->lng) {
+    return new LandingZone(
+      packed->lat * 1e-6, // microdegrees
+      packed->lng * 1e-6, // microdegrees
+      packed->alt * 0.1, // decimeters
+      packed->landing_direction * 0.001 // milliradians
+    );
+  } else {
+    return nullptr;
+  }
 }
 
 SpeedMessage pack_speed(GeoPointV *point) {
@@ -38,9 +41,9 @@ SpeedMessage pack_speed(GeoPointV *point) {
   };
 }
 
-GeoPointV *unpack_speed(SpeedMessage *packed) {
+GeoPointV *unpack_speed(unsigned long millis, SpeedMessage *packed) {
   return new GeoPointV {
-    .millis = millis(),
+    .millis = millis,
     .lat = packed->lat * 1e-6, // microdegrees
     .lng = packed->lng * 1e-6, // microdegrees
     .alt = packed->alt * 0.1, // decimeters

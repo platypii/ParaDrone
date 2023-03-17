@@ -1,9 +1,14 @@
 #include "landingzone.h"
+#include "messages.h"
 #include "path.h"
 #include "plan.h"
 #include <vector>
 #include <unity.h>
 using namespace std;
+
+// Unity setup
+void setUp() {}
+void tearDown() {}
 
 LandingZone lz(47.239, -123.143, 84, 0.5585 /* 32 degrees */);
 double r = 100;
@@ -14,6 +19,15 @@ Point3V start = {
   .vx = 10,
   .vy = 0,
   .climb = -3
+};
+GeoPointV loc = {
+  .millis = 0,
+  .lat = 47.239,
+  .lng = -123.143,
+  .alt = 84,
+  .vN = 0,
+  .vE = 0,
+  .climb = 0
 };
 
 void test_straight() {
@@ -98,6 +112,41 @@ void test_path() {
   free_path(path);
 }
 
+void test_messages() {
+  TEST_ASSERT_EQUAL(11, sizeof(LocationMessage));
+  TEST_ASSERT_EQUAL(17, sizeof(SpeedMessage));
+  TEST_ASSERT_EQUAL(13, sizeof(LandingZoneMessage));
+  TEST_ASSERT_EQUAL(8, sizeof(MotorConfigMessage));
+
+  // Landing zone
+  LandingZoneMessage packed_lz = pack_lz(&lz);
+  LandingZone *lz2 = unpack_lz(&packed_lz);
+  TEST_ASSERT_EQUAL(13, sizeof(packed_lz));
+  TEST_ASSERT_EQUAL(lz.destination.lat, lz2->destination.lat);
+  TEST_ASSERT_EQUAL(lz.destination.lng, lz2->destination.lng);
+  TEST_ASSERT_EQUAL(lz.destination.alt, lz2->destination.alt);
+  TEST_ASSERT_EQUAL(lz.landingDirection, lz2->landingDirection);
+  delete lz2;
+
+  // No landing zone
+  packed_lz = pack_lz(NULL);
+  LandingZone *nolz = unpack_lz(&packed_lz);
+  TEST_ASSERT_NULL(nolz);
+  delete nolz;
+
+  // Speed message
+  SpeedMessage packed_loc = pack_speed(&loc);
+  GeoPointV *loc2 = unpack_speed(0, &packed_loc);
+  TEST_ASSERT_EQUAL(17, sizeof(packed_loc));
+  TEST_ASSERT_EQUAL(loc.lat, loc2->lat);
+  TEST_ASSERT_EQUAL(loc.lng, loc2->lng);
+  TEST_ASSERT_EQUAL(loc.alt, loc2->alt);
+  TEST_ASSERT_EQUAL(loc.vN, loc2->vN);
+  TEST_ASSERT_EQUAL(loc.vE, loc2->vE);
+  TEST_ASSERT_EQUAL(loc.climb, loc2->climb);
+  delete loc2;
+}
+
 int main() {
   test_straight();
   test_naive();
@@ -106,6 +155,7 @@ int main() {
   test_autopilot_far();
   test_autopilot_near();
   test_path();
+  test_messages();
 
   return 0;
 }

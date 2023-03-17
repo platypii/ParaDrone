@@ -14,6 +14,16 @@ const float ticks_per_unit = gear_ratio * encoder_ppr * stroke_len / (255 * spoo
 const float units_per_second = 255 * spool_circumference * motor_rpm / (60 * stroke_len);
 
 /**
+ * Sustained rate of speed for current toggle position (m/s)
+ */
+float get_turn_speed();
+
+/**
+ * Left/right balance of current toggle position
+ */
+float get_turn_balance();
+
+/**
  * Represents a paradrone motor
  */
 class Motor {
@@ -44,5 +54,9 @@ class Motor {
     int last_ticks;
     void set_speed_hw(const int drive, uint8_t speed);
 };
+
+// Left and Right motors
+extern Motor *motor_left;
+extern Motor *motor_right;
 
 #endif

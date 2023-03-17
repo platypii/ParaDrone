@@ -1,7 +1,7 @@
 
 paradrone: bin
 	g++ \
-		-I ~/.platformio/packages/tool-unity ~/.platformio/packages/tool-unity/unity.c \
+		-I .pio/libdeps/native/Unity/src .pio/libdeps/native/Unity/src/unity.c \
 		-I lib/paralib lib/paralib/*.cpp test/test.cpp \
 		-lm -Wall -Wextra -g -DPIO_UNIT_TESTING -o bin/paradrone
 

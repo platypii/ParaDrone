@@ -60,6 +60,6 @@ struct MotorConfigMessage {
 LandingZoneMessage pack_lz(LandingZone *lz);
 LandingZone *unpack_lz(LandingZoneMessage *lz);
 SpeedMessage pack_speed(GeoPointV *point);
-GeoPointV *unpack_speed(SpeedMessage *packed);
+GeoPointV *unpack_speed(unsigned long millis, SpeedMessage *packed);
 
 #endif
