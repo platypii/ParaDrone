@@ -5,7 +5,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Ensure that we are parsing NMEA correctly
+ * Ensure that we know geography
  */
 public class GeoTest {
 

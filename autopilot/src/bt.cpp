@@ -2,7 +2,6 @@
 #include <BLEDevice.h>
 #include <BLEUtils.h>
 #include <BLEServer.h>
-#include "messages.h"
 #include "paradrone.h"
 
 #define AP_SERVICE        "ba5e0001-c55f-496f-a444-9855f5f14901"

@@ -18,7 +18,8 @@ double geo_bearing(double lat1, double lng1, double lat2, double lng2) {
 }
 
 /**
- * Distance between two points in meters
+ * Distance between two points
+ * @return distance in meters
  */
 double geo_distance(double lat1, double lng1, double lat2, double lng2) {
   const double lat1r = to_radians(lat1);
@@ -35,6 +36,14 @@ double geo_distance(double lat1, double lng1, double lat2, double lng2) {
   return R * c;
 }
 
+/**
+ * Moves a location along a bearing by a given distance
+ * @param lat_degrees starting latitude in degrees
+ * @param lng_degrees starting longitude in degrees
+ * @param bear bearing in radians
+ * @param dist distance in meters
+ * @return LatLng ending coordinate
+ */
 LatLng geo_move_bearing(double lat_degrees, double lng_degrees, double bear, double dist) {
   if (dist == 0) {
     // Fast case for dist = 0
@@ -59,5 +68,8 @@ LatLng geo_move_bearing(double lat_degrees, double lng_degrees, double bear, dou
   const double lat3 = to_degrees(lat2);
   const double lng3 = mod360(to_degrees(lng2));
 
-  return {lat: lat3, lng: lng3};
+  return {
+    .lat = lat3,
+    .lng = lng3
+  };
 }

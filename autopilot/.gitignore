@@ -7,3 +7,6 @@
 *.gch
 bin
 infer-out
+
+# doxygen
+/docs

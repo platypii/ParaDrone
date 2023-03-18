@@ -1,7 +1,7 @@
 #include <SSD1306Wire.h>
 #include "rc.h"
 
-static boolean should_redraw = false;
+static bool should_redraw = false;
 static unsigned long last_redraw_millis = 2000; // splash screen ms
 static void screen_draw();
 static void sprintd(char *buf, long delta);
@@ -102,6 +102,7 @@ static void screen_draw() {
 
 /**
  * Print time duration to a buffer (2h, 5m, 6s)
+ * @param buf buffer to write to
  * @param delta time duration in milliseconds
  */
 static void sprintd(char *buf, long delta) {

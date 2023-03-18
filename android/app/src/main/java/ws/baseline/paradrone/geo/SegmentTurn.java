@@ -76,8 +76,8 @@ public class SegmentTurn implements Segment {
         final List<Point> points = new ArrayList<>();
         final double angle1 = angle1();
         final double step = 0.1; // ~6 degrees
-        final double arcs = arcs();
-        for (double delta = 0; delta < arcs; delta += step) {
+        final double arc = arcs();
+        for (double delta = 0; delta < arc; delta += step) {
             final double theta = angle1 + turn * delta;
             points.add(new Point(
                     circle.x + circle.radius * Math.sin(theta),
@@ -92,9 +92,9 @@ public class SegmentTurn implements Segment {
      * The arc angle in radians
      */
     private double arcs() {
-        double arcs = this.turn * (this.angle2() - this.angle1());
-        if (arcs < 0) arcs += 2 * Math.PI;
-        return arcs;
+        double arc = this.turn * (this.angle2() - this.angle1());
+        if (arc < 0) arc += 2 * Math.PI;
+        return arc;
     }
 
     /**

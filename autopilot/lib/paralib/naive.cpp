@@ -39,8 +39,8 @@ Path *naive(PointV loc, PointV dest, double r) {
   // const double commute_length = sqrt(cdest * cdest - r * r);
   // Last touch of first dubin circle (start of commute home)
   Point comm1 = {
-    x: c1.x - turn1 * r * cos(commute_angle),
-    y: c1.y + turn1 * r * sin(commute_angle)
+    .x = c1.x - turn1 * r * cos(commute_angle),
+    .y = c1.y + turn1 * r * sin(commute_angle)
   };
   // Construct path
   Turn *arc1 = new Turn {'T', {loc.x, loc.y}, comm1, c1, turn1};

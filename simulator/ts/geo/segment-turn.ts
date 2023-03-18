@@ -38,14 +38,14 @@ export class SegmentTurn {
 
   public controls(): TogglePosition {
     // Sigmoid-ish activation function.
-    const x = this.arcs()
+    const arc = this.arcs()
     let activation = 1
-    if (x < minimum_turn) {
+    if (arc < minimum_turn) {
       // 0..min_turn
-      activation = 0.01 * x / minimum_turn
-    } else if (x <= maximum_turn) {
+      activation = 0.01 * arc / minimum_turn
+    } else if (arc <= maximum_turn) {
       // min_turn..max_turn
-      activation = 0.01 + 0.99 * (x - minimum_turn) / (maximum_turn - minimum_turn)
+      activation = 0.01 + 0.99 * (arc - minimum_turn) / (maximum_turn - minimum_turn)
     }
     // Normalized and ranged to match AP protocol
     const deflect = Math.round(activation * 255)
@@ -96,8 +96,8 @@ export class SegmentTurn {
     const points: Point[] = [this.start]
     const angle1 = this.angle1()
     const step = 0.05 // ~3 degrees
-    const arcs = this.arcs()
-    for (let delta = step; delta < arcs; delta += step) {
+    const arc = this.arcs()
+    for (let delta = step; delta < arc; delta += step) {
       const theta = angle1 + this.turn * delta
       points.push({
         x: this.circle.x + this.circle.radius * Math.sin(theta),
@@ -113,9 +113,9 @@ export class SegmentTurn {
    * Always positive
    */
   private arcs(): number {
-    let arcs = this.turn * (this.angle2() - this.angle1())
-    if (arcs < 0) arcs += 2 * Math.PI
-    return arcs
+    let arc = this.turn * (this.angle2() - this.angle1())
+    if (arc < 0) arc += 2 * Math.PI
+    return arc
   }
 
   /**

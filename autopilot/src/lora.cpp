@@ -1,5 +1,4 @@
 #include <LoRa.h>
-#include "messages.h"
 #include "paradrone.h"
 
 #define MAX_PACKET_SIZE 20 // Same as BT

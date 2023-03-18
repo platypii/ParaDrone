@@ -1,4 +1,4 @@
-#include "landingzone.h"
+#include "geo.h"
 #include "messages.h"
 #include "path.h"
 #include "plan.h"
@@ -112,6 +112,48 @@ void test_path() {
   free_path(path);
 }
 
+void test_convert() {
+  char str[3];
+  bearing2(str, 0);
+  TEST_ASSERT_EQUAL_STRING("N", str);
+  bearing2(str, 45);
+  TEST_ASSERT_EQUAL_STRING("NE", str);
+  bearing2(str, 90);
+  TEST_ASSERT_EQUAL_STRING("E", str);
+  bearing2(str, 135);
+  TEST_ASSERT_EQUAL_STRING("SE", str);
+  bearing2(str, 180);
+  TEST_ASSERT_EQUAL_STRING("S", str);
+  bearing2(str, 225);
+  TEST_ASSERT_EQUAL_STRING("SW", str);
+  bearing2(str, 270);
+  TEST_ASSERT_EQUAL_STRING("W", str);
+  bearing2(str, 315);
+  TEST_ASSERT_EQUAL_STRING("NW", str);
+  bearing2(str, 0);
+  TEST_ASSERT_EQUAL_STRING("N", str);
+  bearing2(str, NAN);
+  TEST_ASSERT_EQUAL_STRING("", str);
+  bearing2(str, 720);
+  TEST_ASSERT_EQUAL_STRING("N", str);
+  bearing2(str, 800);
+  TEST_ASSERT_EQUAL_STRING("E", str);
+  bearing2(str, -400);
+  TEST_ASSERT_EQUAL_STRING("NW", str);
+}
+
+void test_geo() {
+  LatLng seattle = {47.60, -122.33};
+  LatLng la = {34.0, -118.2};
+  double bear = 2.8913; // radians
+  double dist = 1551093.52;
+  TEST_ASSERT_EQUAL(bear, geo_bearing(seattle.lat, seattle.lng, la.lat, la.lng));
+  TEST_ASSERT_EQUAL(dist, geo_distance(seattle.lat, seattle.lng, la.lat, la.lng));
+  LatLng moved = geo_move_bearing(seattle.lat, seattle.lng, bear, dist);
+  TEST_ASSERT_EQUAL(la.lat, moved.lat);
+  TEST_ASSERT_EQUAL(la.lng, moved.lng);
+}
+
 void test_messages() {
   TEST_ASSERT_EQUAL(11, sizeof(LocationMessage));
   TEST_ASSERT_EQUAL(17, sizeof(SpeedMessage));
@@ -155,6 +197,8 @@ int main() {
   test_autopilot_far();
   test_autopilot_near();
   test_path();
+  test_convert();
+  test_geo();
   test_messages();
 
   return 0;

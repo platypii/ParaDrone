@@ -47,6 +47,8 @@ Point *line_render(Line *line) {
 
 /**
  * Linear interpolation
+ * @param start the start point for interpolation
+ * @param end the end point for interpolation
  * @param alpha interpolation parameter from 0 (start) to 1 (end)
  */
 static double interpolate(double start, double end, double alpha) {

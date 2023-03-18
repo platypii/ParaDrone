@@ -1,6 +1,5 @@
 #include <Arduino.h>
 #include <EEPROM.h>
-#include "messages.h"
 #include "paradrone.h"
 
 #define ADDR_LZ 0 // landing zone

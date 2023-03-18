@@ -26,9 +26,9 @@ PointV turn_end(Turn *turn) {
 }
 
 double turn_length(Turn *turn) {
-  double arcs = turn->turn * (angle2(turn) - angle1(turn));
-  if (arcs < 0) arcs += 2 * M_PI;
-  return turn->circle.radius * arcs;
+  double arc = turn->turn * (angle2(turn) - angle1(turn));
+  if (arc < 0) arc += 2 * M_PI;
+  return turn->circle.radius * arc;
 }
 
 /**
@@ -77,10 +77,10 @@ Path *turn_fly(Turn *turn, const double distance) {
 //   const double step = 0.1; // ~6 degrees
 
 //   // Arc length
-//   double arcs = turn->turn * (a2 - a1);
-//   if (arcs < 0) arcs += 2 * M_PI;
+//   double arc = turn->turn * (a2 - a1);
+//   if (arc < 0) arc += 2 * M_PI;
 
-//   const int n = ceil(arcs / step) + 1;
+//   const int n = ceil(arc / step) + 1;
 //   Point *points = new Point[n];
 //   points[0] = turn->start;
 
@@ -99,12 +99,14 @@ Path *turn_fly(Turn *turn, const double distance) {
  * If the turn is short, don't crank a hard toggle turn.
  */
 TogglePosition turn_controls(Turn *turn) {
-  const float x = arcs(turn);
+  const float arc = arcs(turn);
   float activation = 1;
-  if (x < minimum_turn) {
-    activation = 0.01f * x / minimum_turn;
-  } else if (x < maximum_turn) {
-    activation = 0.01f + 0.99f * (x - minimum_turn) / (maximum_turn - minimum_turn);
+  if (arc < minimum_turn) {
+    // 0..min_turn
+    activation = 0.01f * arc / minimum_turn;
+  } else if (arc < maximum_turn) {
+    // min_turn..max_turn
+    activation = 0.01f + 0.99f * (arc - minimum_turn) / (maximum_turn - minimum_turn);
   }
   const uint8_t deflect = activation * 255;
   TogglePosition toggles = {};
@@ -123,9 +125,9 @@ static double arcs(Turn *turn) {
   if (turn->start.x == turn->end.x && turn->start.y == turn->end.y) {
     return 0;
   }
-  double arcs = turn->turn * (angle2(turn) - angle1(turn));
-  if (arcs < 0) arcs += 2 * M_PI;
-  return arcs;
+  double arc = turn->turn * (angle2(turn) - angle1(turn));
+  if (arc < 0) arc += 2 * M_PI;
+  return arc;
 }
 
 /**

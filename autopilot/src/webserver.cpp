@@ -6,11 +6,11 @@
 // Set web server port number to 80
 WiFiServer server(80);
 
-boolean web_started = false;
+bool web_started = false;
 
 // Incoming HTTP request
 String request;
-boolean firstLine = true;
+bool firstLine = true;
 
 // Current time
 unsigned long currentTime = millis();
@@ -19,13 +19,16 @@ unsigned long previousTime = 0;
 // Define timeout time in milliseconds (example: 2000ms = 2s)
 const long timeoutTime = 2000;
 
-static void send_header(WiFiClient client, int status, const char *content_type = NULL, boolean cors = false);
+static void send_header(WiFiClient client, int status, const char *content_type = NULL, bool cors = false);
 static void send_landing_page(WiFiClient client);
 static void send_file(WiFiClient client, char *filename);
 static void delete_file(WiFiClient client, char *filename);
 static void parse_location();
 static void parse_lz();
 
+/**
+ * Connect to wifi, and start a web server
+ */
 void web_init(const char *ssid, const char *password) {
   if (web_started) {
     Serial.printf("%.1fs web already started\n", millis() * 1e-3);
@@ -130,7 +133,14 @@ void web_loop() {
   }
 }
 
-static void send_header(WiFiClient client, int status, const char *content_type, boolean cors) {
+/**
+ * Send http header to a client
+ * @param client the http client
+ * @param status http status code
+ * @param content_type mime content type (eg- text/html)
+ * @param cors allow cross origin requests (for browser automation)
+ */
+static void send_header(WiFiClient client, int status, const char *content_type, bool cors) {
   client.printf("HTTP/1.1 %d OK\n", status);
   if (content_type) {
     client.printf("Content-type: %s\n", content_type);
@@ -142,6 +152,10 @@ static void send_header(WiFiClient client, int status, const char *content_type,
   client.println();
 }
 
+/**
+ * Send landing page as an http response
+ * @param client the http client
+ */
 static void send_landing_page(WiFiClient client) {
   const size_t used = SPIFFS.usedBytes();
   const size_t total = SPIFFS.totalBytes();

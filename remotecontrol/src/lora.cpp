@@ -86,6 +86,9 @@ static void lora_send_ping() {
   lora_send(&data, 1);
 }
 
+/**
+ * Parse an incoming LoRa message
+ */
 static void lora_read() {
   uint8_t buffer[MAX_PACKET_SIZE];
   int buffer_len = 0;

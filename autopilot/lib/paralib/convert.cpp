@@ -3,6 +3,8 @@
 
 /**
  * Print human readable bearing into str
+ * @param str string to write to
+ * @param degrees bearing in degrees
  */
 void bearing2(char *str, double degrees) {
   if (isnan(degrees)) {

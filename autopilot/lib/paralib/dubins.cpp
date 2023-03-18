@@ -54,13 +54,13 @@ Path *dubins(PointV loc, PointV dest, double r, int turn1, int turn2) {
   }
   // Last touch of first dubin circle (start of commute home)
   Point comm1 = {
-    x: c1.x - turn1 * r * cos(commute_angle),
-    y: c1.y + turn1 * r * sin(commute_angle)
+    .x = c1.x - turn1 * r * cos(commute_angle),
+    .y = c1.y + turn1 * r * sin(commute_angle)
   };
   // First touch of second dubin circle (beginning of turn to final)
   Point comm2 = {
-    x: c2.x - turn2 * r * cos(commute_angle),
-    y: c2.y + turn2 * r * sin(commute_angle)
+    .x = c2.x - turn2 * r * cos(commute_angle),
+    .y = c2.y + turn2 * r * sin(commute_angle)
   };
   // Construct path
   Turn *arc1 = new Turn {'T', {loc.x, loc.y}, comm1, c1, turn1};

@@ -2,7 +2,6 @@
 #define _PARADRONE_H
 
 #include "geo.h"
-#include "landingzone.h"
 #include "messages.h"
 #include "motor.h"
 

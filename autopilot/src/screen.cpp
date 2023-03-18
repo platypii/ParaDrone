@@ -157,6 +157,7 @@ static void screen_draw() {
 
 /**
  * Print time duration to a buffer (2h, 5m, 6s)
+ * @param buf buffer to write to
  * @param delta time duration in milliseconds
  */
 static void sprintd(char *buf, long delta) {

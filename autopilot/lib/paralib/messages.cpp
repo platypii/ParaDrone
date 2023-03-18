@@ -1,4 +1,3 @@
-#include "landingzone.h"
 #include "messages.h"
 
 LandingZoneMessage pack_lz(LandingZone *lz) {

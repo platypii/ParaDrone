@@ -22,6 +22,7 @@ static float expected_ticks_per_sec(int speed);
  * @param pin_hall_b pin number for hall sensor B
  * @param pin_pwm1 pin number for motor driver IN1
  * @param pin_pwm2 pin number for motor driver IN2
+ * @param config_direction the motor direction (-1, 1)
  * @param hall_isr the isr function to attach to interrupt
  */
 Motor::Motor(int pin_hall_a, int pin_hall_b, int pin_pwm1, int pin_pwm2, short *config_direction, void hall_isr())

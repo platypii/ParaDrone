@@ -3,11 +3,12 @@
 
 #include "landingzone.h"
 
+#pragma pack(1)
+
 /**
  * Message with just location.
  * sizeof 11
  */
-#pragma pack(1)
 struct LocationMessage {
   char msg_type; // 'L'
   int lat; // microdegrees
@@ -19,7 +20,6 @@ struct LocationMessage {
  * Message with location and speed.
  * sizeof 17
  */
-#pragma pack(1)
 struct SpeedMessage {
   char msg_type; // 'D'
   int lat; // microdegrees
@@ -34,7 +34,6 @@ struct SpeedMessage {
  * Message with landing zone.
  * sizeof 13
  */
-#pragma pack(1)
 struct LandingZoneMessage {
   char msg_type; // 'Z'
   int lat; // microdegrees
@@ -48,7 +47,6 @@ struct LandingZoneMessage {
  * Length of toggle stroke, motor direction, frequency.
  * sizeof 8
  */
-#pragma pack(1)
 struct MotorConfigMessage {
   char msg_type; // C
   int frequency; // Hz

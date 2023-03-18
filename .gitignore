@@ -7,9 +7,6 @@
 # linter output
 /infer-out
 
-# doxygen
-/docs
-
 # node
 node_modules
 
