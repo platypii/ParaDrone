@@ -1,8 +1,9 @@
 {
   "compilerOptions": {
     "target": "es6",
-    "module": "umd", // UMD needed for tests (node), AMD needed for outFile
+    "module": "ESNext", // UMD needed for tests (node)
     "moduleResolution": "node",
+    "esModuleInterop": true,
     "sourceMap": true,
     "sourceRoot": "/ts",
     "baseUrl": ".",
@@ -14,7 +15,6 @@
     "noUnusedLocals": true,
     // "noUnusedParameters": true, // TODO: stricter
     "outDir": "js",
-    // "outFile": "js/main.js",
     "lib": ["es6", "dom"],
     "typeRoots": [
       "node_modules/@types",

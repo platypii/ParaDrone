@@ -34,7 +34,7 @@ const simEnabled = document.getElementById("sim-enabled") as HTMLInputElement
 const simSection = document.getElementById("sim-section") as HTMLElement
 const simError = document.getElementById("sim-error") as HTMLElement
 
-export function init() {
+function init() {
   welcome.init()
   // Setup map
   map = new DroneMap(lz)
@@ -118,3 +118,6 @@ function update() {
   apScreen.update(para, lz, autopilot.plan)
   toggleView.update(para)
 }
+
+// Auto init
+init()
