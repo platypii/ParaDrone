@@ -1,7 +1,8 @@
-const paradroneModel = require("../hardware/jscad/index.js").main
-const jscadReglRenderer = require("@jscad/regl-renderer")
-const { toPolygons } = require("@jscad/modeling").geometries.geom3
-const { flatten } = require("@jscad/modeling").utils
+import { main as paradroneModel } from "../hardware/jscad/index.js"
+import jscadReglRenderer from "@jscad/regl-renderer"
+import jscad from "@jscad/modeling"
+const { toPolygons } = jscad.geometries.geom3
+const { flatten } = jscad.utils
 
 // ********************
 // Renderer configuration and initiation.

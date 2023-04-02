@@ -7,4 +7,6 @@ DRY=--dryrun
 # Change to repo dir
 ROOT=$(dirname $(dirname -- "$(readlink -f -- "$BASH_SOURCE")"))
 
+# npm run build
+
 aws --profile paradrone s3 sync $DRY "$ROOT/website/html/" s3://paradr.one/
