@@ -1,12 +1,34 @@
+#include <FS.h>
+#include <SD.h>
+#include <SPI.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <time.h>
-#include <SPIFFS.h>
 #include "gtypes.h"
 
 static File log_file;
 static File get_file(struct tm *date);
+
+int SD_CS = 0;
+int SD_MOSI = 23;
+int SD_MISO = 38;
+int SD_SCLK = 5;
+
+SPIClass sd_spi(HSPI);
+
+void log_init() {
+    sd_spi.begin(SD_SCLK, SD_MISO, SD_MOSI, SD_CS);
+    if (!SD.begin(SD_CS, sd_spi)) {
+        Serial.printf("sd mount failed\n");
+        return;
+    }
+    uint8_t cardType = SD.cardType();
+    if (cardType == CARD_NONE) {
+        Serial.printf("sd card not found\n");
+        return;
+    }
+}
 
 void log_point(GeoPointV *loc) {
   // Date string
@@ -25,20 +47,13 @@ void log_point(GeoPointV *loc) {
 }
 
 static File get_file(struct tm *date) {
-  // Start SPIFFS file system
-  if (!SPIFFS.begin(true)) {
-    Serial.printf("%.1fs error mounting spiffs\n", millis() * 1e-3);
-  }
-
   // Construct filename
   char filename[24] = "/";
   strftime(filename + 1, 12, "%Y-%m-%d", date);
   strcat(filename, ".csv");
   Serial.printf("%.1fs logging to %s\n", millis() * 1e-3, filename);
   // Open file for append writing
-  return SPIFFS.open(filename, FILE_APPEND);
-
-  // TODO: Check available space and delete oldest file if needed.
+  return SD.open(filename, FILE_APPEND);
 }
 
 void stop_logging() {

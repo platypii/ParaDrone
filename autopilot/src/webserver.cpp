@@ -1,4 +1,5 @@
-#include <SPIFFS.h>
+#include <FS.h>
+#include <SD.h>
 #include <sys/types.h>
 #include <WiFi.h>
 #include "paradrone.h"
@@ -53,11 +54,6 @@ void web_init(const char *ssid, const char *password) {
   }
   String local_ip = WiFi.localIP().toString();
   Serial.println(local_ip);
-
-  // Start SPIFFS file system
-  if (!SPIFFS.begin(true)) {
-    Serial.printf("%.1fs error mounting spiffs\n", millis() * 1e-3);
-  }
 
   // Start web server
   server.begin();
@@ -159,7 +155,7 @@ static void send_header(WiFiClient client, int status, const char *content_type,
  * @param client the http client
  */
 static void send_landing_page(WiFiClient client) {
-  const uint64_t used = SPIFFS.usedBytes();
+  const uint64_t used = SD.usedBytes();
   send_header(client, 200, "text/html");
   client.println("<!DOCTYPE html><html>");
   client.println("<head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">");
@@ -178,7 +174,7 @@ static void send_landing_page(WiFiClient client) {
   client.println("<h1>ParaDrone Logs</h1>");
 
   // List files
-  File root = SPIFFS.open("/");
+  File root = SD.open("/");
   File file = root.openNextFile();
   client.println("<ul>");
   if (!file) {
@@ -213,7 +209,7 @@ static void send_landing_page(WiFiClient client) {
 
 static void send_file(WiFiClient client, char *filename) {
   Serial.printf("%.1fs serve %s\n", millis() * 1e-3, filename);
-  File file = SPIFFS.open(filename);
+  File file = SD.open(filename);
   if (file) {
     send_header(client, 200, "text/plain");
     uint8_t buf[512];
@@ -230,7 +226,7 @@ static void send_file(WiFiClient client, char *filename) {
 
 static void delete_file(WiFiClient client, char *filename) {
   Serial.printf("%.1fs delete file '%s'\n", millis() * 1e-3, filename);
-  if (SPIFFS.remove(filename)) {
+  if (SD.remove(filename)) {
     send_header(client, 200);
   } else {
     send_header(client, 400);

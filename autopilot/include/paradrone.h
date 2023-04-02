@@ -68,6 +68,7 @@ void parse_nmea(char *line);
 void update_location(GeoPointV *point);
 
 // Logger
+void log_init();
 void log_point(GeoPointV *loc);
 
 // LoRa

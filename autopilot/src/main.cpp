@@ -16,6 +16,7 @@ void setup() {
   screen_init(); // 70ms
   bt_init(); // 680ms
   lora_init(); // 30ms
+  log_init();
   // web_init("ssid", "password");
 }
 
@@ -53,5 +54,5 @@ void update_location(GeoPointV *point) {
   // Notify listeners
   bt_send_location(point);
   lora_send_location(point);
-  // log_point(point); // TODO: Logging causing constant crashing. Move to core 1?
+  log_point(point);
 }
