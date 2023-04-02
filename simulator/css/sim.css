@@ -201,6 +201,8 @@ svg#sim-error-chart {
 
 /* Map */
 .map-container {
+  background: url(../img/loading.jpg) center no-repeat;
+  background-size: cover;
   position: relative;
   flex: 1;
   height: 100%;
