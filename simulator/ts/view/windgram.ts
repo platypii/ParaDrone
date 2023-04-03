@@ -1,4 +1,5 @@
-import * as d3 from "d3"
+import { drag } from "d3-drag"
+import { select, Selection } from "d3-selection"
 
 const MPH = 0.44704 // m/s
 const windMax = 10 * MPH // m/s
@@ -7,7 +8,7 @@ export class Windgram {
   public vE: number = -0
   public vN: number = -0
 
-  private line: d3.Selection<SVGLineElement, unknown, HTMLElement, unknown>
+  private line: Selection<SVGLineElement, unknown, HTMLElement, unknown>
   private readonly speedLabel = document.getElementById("wind-speed")!
   private readonly directionLabel = document.getElementById("wind-direction")!
 
@@ -20,7 +21,7 @@ export class Windgram {
     const height = 100
     this.radius = Math.min(width, height) / 2
 
-    const svg: d3.Selection<Element, unknown, HTMLElement, unknown> = d3.select("svg#windgram")
+    const svg: Selection<Element, unknown, HTMLElement, unknown> = select("svg#windgram")
     svg.attr("width", width)
     svg.attr("height", height)
 
@@ -50,7 +51,7 @@ export class Windgram {
 
     svg.on("click", (e) => this.onClick(e.offsetX, e.offsetY))
 
-    const dragHandler = d3.drag().on("drag", (e) => this.onClick(e.x, e.y))
+    const dragHandler = drag().on("drag", (e) => this.onClick(e.x, e.y))
     svg.call(dragHandler)
 
     this.update()

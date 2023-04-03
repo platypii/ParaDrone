@@ -38,6 +38,12 @@ export class BaseMap {
     this.map = new Cesium.Viewer(options.element, cesiumOptions)
     this.map.terrainProvider = Cesium.createWorldTerrain()
     this.map.scene.globe.depthTestAgainstTerrain = true
+    // Show map when ready
+    // this.map.scene.globe.tileLoadProgressEvent.addEventListener((foo) => {
+    //   if (this.map.scene.globe.tilesLoaded) {
+    //     document.getElementById("map")!.style.opacity = "1"
+    //   }
+    // })
 
     // Set sun position
     this.map.clock.currentTime = Cesium.JulianDate.fromDate(new Date(1597792800000))

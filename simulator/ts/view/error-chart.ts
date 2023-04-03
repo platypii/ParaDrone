@@ -1,12 +1,14 @@
-import * as d3 from "d3"
+import { max } from "d3-array"
+import { Selection } from "d3-selection"
+import { line } from "d3-shape"
 import { SimStep } from "../sim"
 import { BaseChart } from "./base-chart"
 
 export class ErrorChart extends BaseChart {
-  private errorPath: d3.Selection<SVGPathElement, unknown, HTMLElement, unknown>
-  private left: d3.Selection<SVGGElement, unknown, HTMLElement, unknown>
-  private right: d3.Selection<SVGGElement, unknown, HTMLElement, unknown>
-  private focusLine: d3.Selection<SVGLineElement, unknown, HTMLElement, unknown>
+  private errorPath: Selection<SVGPathElement, unknown, HTMLElement, unknown>
+  private left: Selection<SVGGElement, unknown, HTMLElement, unknown>
+  private right: Selection<SVGGElement, unknown, HTMLElement, unknown>
+  private focusLine: Selection<SVGLineElement, unknown, HTMLElement, unknown>
   private timeSteps: number = 107
 
   constructor() {
@@ -51,24 +53,24 @@ export class ErrorChart extends BaseChart {
 
   public update(steps: SimStep[]): void {
     const errors = steps.map((s) => s.score.score)
-    const errorBound = Math.max(d3.max(errors) || 1, 200)
+    const errorBound = Math.max(max(errors) || 1, 200)
     this.timeSteps = Math.max(this.timeSteps, steps.length)
     this.xAxis.scale.domain([0, errorBound])
     this.yAxis.scale.domain([0, this.timeSteps])
     this.updateAxes()
 
     // Update error line
-    const line = d3.line<number>()
+    const errorLine = line<number>()
       .x((d: number) => this.xAxis.scale(d))
       .y((d: number, i: number) => this.yAxis.scale(steps.length - i))
     this.errorPath
-      .attr("d", line(errors) || "")
+      .attr("d", errorLine(errors) || "")
 
     // Update left/right toggle controls
     const segmentSize = Math.ceil(this.height / steps.length)
 
     // Left red
-    const left: d3.Selection<any, SimStep, SVGGElement, unknown> = this.left.selectAll("rect")
+    const left: Selection<any, SimStep, SVGGElement, unknown> = this.left.selectAll("rect")
       .data(steps)
     left.enter()
       .append("rect")
@@ -80,7 +82,7 @@ export class ErrorChart extends BaseChart {
       .style("opacity", (d: SimStep) => d.controls.left / 255)
 
     // Right green
-    const right: d3.Selection<any, SimStep, SVGGElement, unknown> = this.right.selectAll("rect")
+    const right: Selection<any, SimStep, SVGGElement, unknown> = this.right.selectAll("rect")
       .data(steps)
     right.enter()
       .append("rect")

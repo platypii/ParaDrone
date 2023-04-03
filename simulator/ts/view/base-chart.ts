@@ -1,32 +1,34 @@
-import * as d3 from "d3"
+import { axisRight, axisTop, Axis } from "d3-axis"
+import { NumberValue, scaleLinear, ScaleLinear } from "d3-scale"
+import { BaseType, select, Selection } from "d3-selection"
 
-interface Axis {
-  scale: d3.ScaleLinear<number, number>
-  axis?: d3.Axis<d3.NumberValue>
-  layer?: d3.Selection<SVGGElement, unknown, HTMLElement, unknown>
+interface BaseAxis {
+  scale: ScaleLinear<number, number>
+  axis?: Axis<NumberValue>
+  layer?: Selection<SVGGElement, unknown, HTMLElement, unknown>
 }
 
 export class BaseChart {
-  protected readonly svg: d3.Selection<d3.BaseType, unknown, HTMLElement, unknown>
-  protected readonly layers: d3.Selection<SVGGElement, unknown, HTMLElement, unknown>
-  protected readonly xAxis: Axis = {
-    scale: d3.scaleLinear()
+  protected readonly svg: Selection<BaseType, unknown, HTMLElement, unknown>
+  protected readonly layers: Selection<SVGGElement, unknown, HTMLElement, unknown>
+  protected readonly xAxis: BaseAxis = {
+    scale: scaleLinear()
   }
-  protected readonly yAxis: Axis = {
-    scale: d3.scaleLinear()
+  protected readonly yAxis: BaseAxis = {
+    scale: scaleLinear()
   }
   protected width: number = 185
   protected height: number = 160
 
   constructor() {
-    this.svg = d3.select("#sim-error-chart")
+    this.svg = select("#sim-error-chart")
     this.layers = this.svg.append("g")
       .attr("class", "layers")
       .attr("transform", "translate(15,0)")
 
     // X Axis
     this.xAxis.scale.range([0, this.width - 30])
-    this.xAxis.axis = d3.axisTop(this.xAxis.scale)
+    this.xAxis.axis = axisTop(this.xAxis.scale)
       .ticks(4)
       .tickFormat((d) => d ? `${d}` : "")
     this.xAxis.layer = this.layers.append("g")
@@ -35,7 +37,7 @@ export class BaseChart {
 
     // Y Axis
     this.yAxis.scale.range([this.height, 0])
-    this.yAxis.axis = d3.axisRight(this.yAxis.scale)
+    this.yAxis.axis = axisRight(this.yAxis.scale)
       .ticks(6)
       .tickFormat((d) => d ? `${d}s` : "")
     this.yAxis.layer = this.layers.append("g")
