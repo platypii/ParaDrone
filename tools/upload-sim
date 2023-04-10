@@ -8,7 +8,7 @@ DRY=--dryrun
 ROOT=$(dirname $(dirname -- "$(readlink -f -- "$BASH_SOURCE")"))
 cd $ROOT/simulator
 
-# npm run build
+npm run build
 
 aws --profile paradrone s3 cp $DRY index.html s3://paradr.one/simulator/
 aws --profile paradrone s3 sync --delete $DRY css s3://paradr.one/simulator/css
