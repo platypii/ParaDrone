@@ -9,4 +9,4 @@ ROOT=$(dirname $(dirname -- "$(readlink -f -- "$BASH_SOURCE")"))
 
 npm run build
 
-aws --profile paradrone s3 sync $DRY "$ROOT/website/html/" s3://paradr.one/
+aws --profile paradrone s3 sync --acl public-read $DRY "$ROOT/website/html/" s3://paradr.one/

@@ -10,8 +10,11 @@ cd $ROOT/simulator
 
 npm run build
 
-aws --profile paradrone s3 cp $DRY index.html s3://paradr.one/simulator/
-aws --profile paradrone s3 sync --delete $DRY css s3://paradr.one/simulator/css
-aws --profile paradrone s3 sync --delete $DRY img s3://paradr.one/simulator/img
-aws --profile paradrone s3 sync --delete $DRY js s3://paradr.one/simulator/js
-aws --profile paradrone s3 sync --delete $DRY ts s3://paradr.one/simulator/ts
+aws --profile paradrone s3 cp --acl public-read $DRY index.html s3://paradr.one/simulator/
+aws --profile paradrone s3 sync --acl public-read --delete $DRY css s3://paradr.one/simulator/css
+aws --profile paradrone s3 sync --acl public-read --delete $DRY img s3://paradr.one/simulator/img
+aws --profile paradrone s3 sync --acl public-read --delete $DRY js s3://paradr.one/simulator/js
+aws --profile paradrone s3 sync --acl public-read --delete $DRY ts s3://paradr.one/simulator/ts
+
+# Set character encoding content type
+# aws --profile paradrone s3 cp --acl public-read --content-type "text/javascript; charset=utf-8" js/bundle.js s3://paradr.one/simulator/js/bundle.js

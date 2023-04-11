@@ -7,12 +7,12 @@
     "@jscad/modeling": "^2.9.4"
   },
   "scripts": {
-    "model": "npx jscad jscad/index.js -o model.obj",
-    "print": "npx jscad jscad/index.js -o print.stl --print=1",
-    "actuator": "npx jscad jscad/actuator.js -o actuator.stl --print=1",
-    "autopilot": "npx jscad jscad/autopilot.js -o autopilot.stl --print=1",
-    "battery": "npx jscad jscad/battery.js -o battery.stl --print=1",
-    "remotecontrol": "npx jscad jscad/remotecontrol.js -o remotecontrol.stl --print=1",
-    "spool": "npx jscad jscad/spool.js -o spool.stl --print=1"
+    "model": "jscad jscad/index.js -o model.obj",
+    "print": "jscad jscad/index.js -o print.stl --print=1",
+    "actuator": "jscad jscad/actuator.js -o actuator.stl --print=1",
+    "autopilot": "jscad jscad/autopilot.js -o autopilot.stl --print=1",
+    "battery": "jscad jscad/battery.js -o battery.stl --print=1",
+    "remotecontrol": "jscad jscad/remotecontrol.js -o remotecontrol.stl --print=1",
+    "spool": "jscad jscad/spool.js -o spool.stl --print=1"
   }
 }

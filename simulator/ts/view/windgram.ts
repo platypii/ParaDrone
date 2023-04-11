@@ -88,6 +88,6 @@ export class Windgram {
     const speed = Math.sqrt(this.vE * this.vE + this.vN * this.vN) / MPH // mph
     const direction = (Math.atan2(-this.vE, -this.vN) * 180 / Math.PI + 360) % 360 // degrees
     this.speedLabel.innerText = speed.toFixed(1) + " mph"
-    this.directionLabel.innerText = `${direction.toFixed(0)}\u00B0`
+    this.directionLabel.innerText = `${direction.toFixed(0)}°`
   }
 }
