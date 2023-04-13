@@ -1,4 +1,5 @@
 #include <SSD1306Wire.h>
+#include <WiFi.h>
 #include "paradrone.h"
 
 static bool should_redraw = false;
@@ -49,6 +50,14 @@ void screen_update() {
 
 static void screen_draw() {
   display.clear();
+
+  if (web_started) {
+    display.setTextAlignment(TEXT_ALIGN_CENTER);
+    display.drawString(DISPLAY_WIDTH / 2, 20, "Log Mode");
+    display.drawString(DISPLAY_WIDTH / 2, 30, WiFi.localIP().toString());
+    display.display();
+    return;
+  }
 
   if (last_location != NULL) {
     // Lat/lng

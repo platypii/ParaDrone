@@ -10,14 +10,14 @@ bool web_started = false;
 
 // Incoming HTTP request
 String request;
-bool firstLine = true;
+bool first_line = true;
 
 // Current time
-unsigned long currentTime = millis();
+unsigned long current = millis();
 // Previous time
-unsigned long previousTime = 0;
-// Define timeout time in milliseconds (example: 2000ms = 2s)
-const long timeoutTime = 2000;
+unsigned long previous = 0;
+// Define timeout in milliseconds (example: 2000ms = 2s)
+const long timeout = 2000;
 
 static void send_header(WiFiClient client, int status, const char *content_type = NULL, bool cors = false);
 static void send_landing_page(WiFiClient client);
@@ -34,8 +34,8 @@ void web_init(const char *ssid, const char *password) {
     Serial.printf("%.1fs web already started\n", millis() * 1e-3);
 
     // Notify app
-    String localIp = WiFi.localIP().toString();
-    bt_send_url(localIp.c_str());
+    String local_ip = WiFi.localIP().toString();
+    bt_send_url(local_ip.c_str());
 
     return;
   }
@@ -51,8 +51,8 @@ void web_init(const char *ssid, const char *password) {
     delay(500);
     Serial.print('.');
   }
-  String localIp = WiFi.localIP().toString();
-  Serial.println(localIp);
+  String local_ip = WiFi.localIP().toString();
+  Serial.println(local_ip);
 
   // Start SPIFFS file system
   if (!SPIFFS.begin(true)) {
@@ -63,7 +63,7 @@ void web_init(const char *ssid, const char *password) {
   server.begin();
 
   // Notify app
-  bt_send_url(localIp.c_str());
+  bt_send_url(local_ip.c_str());
 
   web_started = true;
 }
@@ -76,32 +76,34 @@ void web_loop() {
 
   if (client) {
     // New client connected
-    currentTime = millis();
-    previousTime = currentTime;
-    String currentLine = "";
+    current = millis();
+    previous = current;
+    String line = "";
     // loop while client is connected
-    while (client.connected() && currentTime - previousTime <= timeoutTime) {
-      currentTime = millis();
+    while (client.connected() && current - previous <= timeout) {
+      current = millis();
       if (client.available()) {
         char c = client.read();
         // Serial.write(c); // print full request
         request += c;
         if (c == '\n') {
-          if (firstLine) {
+          if (first_line) {
             Serial.print(request);
-            firstLine = false;
+            first_line = false;
           }
           // if the current line is blank, you got two newline characters in a row.
           // that's the end of the client HTTP request, so send a response:
-          if (currentLine.length() == 0) {
+          if (line.length() == 0) {
             // Response content
             if (request.startsWith("GET / ")) {
               send_landing_page(client);
             } else if (request.startsWith("GET /log/")) {
-              char *filename = strdup(request.substring(8, 23).c_str());
+              const int space = request.indexOf(' ', 8);
+              char *filename = strdup(request.substring(8, space).c_str());
               send_file(client, filename);
             } else if (request.startsWith("DELETE /log/")) {
-              char *filename = strdup(request.substring(11, 26).c_str());
+              const int space = request.indexOf(' ', 11);
+              char *filename = strdup(request.substring(11, space).c_str());
               delete_file(client, filename);
             } else if (request.startsWith("GET /msg")) {
               // Parse location from parameters
@@ -118,16 +120,16 @@ void web_loop() {
             client.println();
             break;
           } else {
-            currentLine = ""; // EOL
+            line = ""; // EOL
           }
         } else if (c != '\r') {
-          currentLine += c;
+          line += c;
         }
       }
     }
     // Clear header variable
     request = "";
-    firstLine = true;
+    first_line = true;
     // Close the connection
     client.stop();
   }
@@ -157,20 +159,23 @@ static void send_header(WiFiClient client, int status, const char *content_type,
  * @param client the http client
  */
 static void send_landing_page(WiFiClient client) {
-  const size_t used = SPIFFS.usedBytes();
-  const size_t total = SPIFFS.totalBytes();
+  const uint64_t used = SPIFFS.usedBytes();
   send_header(client, 200, "text/html");
   client.println("<!DOCTYPE html><html>");
   client.println("<head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">");
   client.println("<style>");
-  client.println("html { font-family: Helvetica; display: inline-block; margin: 0px auto; text-align: center; }");
-  client.println("ul { list-style-type:none; }");
+  client.println("html { font-family: Helvetica; }");
+  client.println("h1 { text-align: center; }");
+  client.println("a { text-decoration: none; }");
+  client.println("a:first-child { margin-right: 8px; }");
+  client.println("ul { list-style-type: none; padding: 0; }");
+  client.println("li { display: flex; margin-bottom: 4px; }");
+  client.println(".dots { flex: 1; border-bottom: 1px dotted #999; }");
   client.println("</style>");
   client.println("<link rel=\"icon\" type=\"image/png\" href=\"https://paradr.one/favicon.png\">");
   client.println("<title>ParaDrone Device</title>");
   client.println("</head><body>");
   client.println("<h1>ParaDrone Logs</h1>");
-  client.printf("<div>%d / %d bytes (%d%%)</div>\n", used, total, (int) (100.0f * used / total));
 
   // List files
   File root = SPIFFS.open("/");
@@ -181,13 +186,20 @@ static void send_landing_page(WiFiClient client) {
   }
   while (file) {
     client.println("<li>");
-    client.printf("<a href=\"/log%s\">%s</a> (%d kb)\n", file.name(), file.name() + 1, file.size() >> 10);
-    client.printf("<a href onclick=\"return rm('/log%s')\">[x]</a>\n", file.name());
+    client.printf("<a href=\"/log%s\">%s</a>", file.path(), file.path() + 1);
+    if (file.size() < 1024) {
+      client.printf(" %d b\n", file.size());
+    } else {
+      client.printf(" %d kb\n", file.size() >> 10);
+    }
+    client.println("<span class=dots></span>");
+    client.printf("<a href onclick=\"return rm('/log%s')\">[X]</a>\n", file.path());
     client.println("</li>");
     file = root.openNextFile();
   }
   client.println("</ul>");
   root.close();
+  client.printf("<div>Total %ld bytes</div>\n", used);
 
   client.println("<script>");
   client.println("function rm(url){");
@@ -201,7 +213,6 @@ static void send_landing_page(WiFiClient client) {
 
 static void send_file(WiFiClient client, char *filename) {
   Serial.printf("%.1fs serve %s\n", millis() * 1e-3, filename);
-  // Serve file
   File file = SPIFFS.open(filename);
   if (file) {
     send_header(client, 200, "text/plain");
@@ -218,7 +229,7 @@ static void send_file(WiFiClient client, char *filename) {
 }
 
 static void delete_file(WiFiClient client, char *filename) {
-  Serial.printf("%.1fs delete %s\n", millis() * 1e-3, filename);
+  Serial.printf("%.1fs delete file '%s'\n", millis() * 1e-3, filename);
   if (SPIFFS.remove(filename)) {
     send_header(client, 200);
   } else {

@@ -102,6 +102,7 @@ void rc_set_speed(const short new_left, const short new_right);
 void rc_set_position(uint8_t new_left, uint8_t new_right);
 
 // Web server
+extern bool web_started;
 void web_init(const char *ssid, const char *password);
 void web_loop();
 

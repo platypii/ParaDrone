@@ -36,7 +36,7 @@ static File get_file(struct tm *date) {
   strcat(filename, ".csv");
   Serial.printf("%.1fs logging to %s\n", millis() * 1e-3, filename);
   // Open file for append writing
-  return SPIFFS.open(filename, "a");
+  return SPIFFS.open(filename, FILE_APPEND);
 
   // TODO: Check available space and delete oldest file if needed.
 }
