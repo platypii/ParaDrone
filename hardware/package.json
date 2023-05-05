@@ -3,8 +3,8 @@
   "description": "ParaDrone hardware CAD designs",
   "license": "MIT",
   "dependencies": {
-    "@jscad/cli": "^2.2.20",
-    "@jscad/modeling": "^2.9.4"
+    "@jscad/cli": "^2.2.26",
+    "@jscad/modeling": "^2.11.1"
   },
   "scripts": {
     "model": "jscad jscad/index.js -o model.obj",

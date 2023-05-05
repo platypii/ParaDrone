@@ -63,6 +63,7 @@ video {
 #jscad {
   width: 320px;
   height: 180px;
+  cursor: move;
 }
 .video-container {
   position: relative;
