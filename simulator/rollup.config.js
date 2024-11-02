@@ -4,7 +4,7 @@ import typescript from "@rollup/plugin-typescript"
 import serve from "rollup-plugin-serve"
 import livereload from "rollup-plugin-livereload"
 
-const production = !process.env.ROLLUP_WATCH;
+const production = !process.env.ROLLUP_WATCH
 
 export default {
   input: "ts/main.ts",
@@ -15,7 +15,7 @@ export default {
     sourcemap: true,
     globals: {
       cesium: "Cesium",
-    }
+    },
   },
   plugins: [
     resolve(),
