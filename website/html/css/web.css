@@ -12,9 +12,12 @@ a {
   color: #337ab7;
   text-decoration: none;
 }
+iframe {
+  margin-top: 20px;
+}
 .content {
   background: white;
-  width: 420px;
+  width: 500px;
   margin: 20px auto;
   padding: 20px 40px;
   border-radius: 10px;
@@ -40,13 +43,6 @@ h3 {
 p {
   margin-bottom: 20px;
 }
-video {
-  background-color: black;
-  margin-top: 20px;
-  margin-bottom: 20px;
-  width: 320px;
-  height: 180px;
-}
 .file-link {
   display: flex;
   align-items: center;
@@ -61,7 +57,7 @@ video {
   border-radius: 4px;
 }
 #jscad {
-  width: 320px;
+  width: 420px;
   height: 180px;
   cursor: move;
 }
