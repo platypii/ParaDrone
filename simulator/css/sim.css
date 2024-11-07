@@ -223,7 +223,7 @@ svg#sim-error-chart {
 
 /* Playback */
 .playback-controls {
-  top: 80px;
+  top: 82px;
 }
 .map-overlay-button {
   background-color: transparent;
@@ -264,19 +264,9 @@ svg#sim-error-chart {
   min-width: 180px;
   min-height: 56px;
 }
-#ap-alt {
-  display: inline-block;
-  width: 96px;
-}
-#ap-speed {
-  display: inline-block;
-}
-#ap-flightmode {
-  display: inline-block;
-}
-#ap-landingzone {
-  display: inline-block;
-  float: right;
+.ap-status > div {
+  display: flex;
+  justify-content: space-between;
 }
 
 #welcome {

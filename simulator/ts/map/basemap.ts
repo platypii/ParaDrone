@@ -26,6 +26,7 @@ const cesiumOptions = {
   navigationInstructionsInitiallyVisible: false,
   sceneModePicker: false, // 2d vs 3d
   selectionIndicator: false,
+  terrain: Cesium.Terrain.fromWorldTerrain(),
   infoBox: false,
   timeline: false // bottom timeline
 }
@@ -36,7 +37,6 @@ export class BaseMap {
 
   constructor(options: MapOptions) {
     this.map = new Cesium.Viewer(options.element, cesiumOptions)
-    this.map.terrainProvider = Cesium.createWorldTerrain()
     this.map.scene.globe.depthTestAgainstTerrain = true
     // Show map when ready
     // this.map.scene.globe.tileLoadProgressEvent.addEventListener((foo) => {
